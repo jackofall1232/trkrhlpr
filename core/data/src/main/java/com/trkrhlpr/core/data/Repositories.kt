@@ -45,11 +45,11 @@ class OfflineProgressRepository(private val dao: TrkrHlprDao) : ProgressReposito
             InspectionProgress(completed.map(::ContentId).toSet(), items.size)
         }
     override fun observeProgressSnapshot(): Flow<ProgressSnapshot> =
-        combine(observeInspectionProgress(), dao.observeTestAttemptCount(),
-            dao.observeCorrectTestAttemptCount(), dao.observeDailyCompletionCount()
-        ) { inspection, attempts, correct, daily ->
-            ProgressSnapshot(inspection.completedCount, inspection.totalItems, attempts,
-                if (attempts == 0) 0 else correct * 100 / attempts, daily > 0, if (daily > 0) 1 else 0)
+        combine(observeInspectionProgress(), dao.observeTestAttemptStats(), dao.observeDailyCompletionCount()
+        ) { inspection, stats, daily ->
+            ProgressSnapshot(inspection.completedCount, inspection.totalItems, stats.total,
+                if (stats.total == 0) 0 else stats.correct * 100 / stats.total,
+                daily > 0, if (daily > 0) 1 else 0)
         }
     override suspend fun setInspectionItemComplete(itemId: ContentId, complete: Boolean) {
         if (complete) dao.setInspectionCompletion(InspectionCompletionEntity(itemId.value, System.currentTimeMillis()))
@@ -73,13 +73,16 @@ class DataStorePreferencesRepository(private val context: Context) : Preferences
         val largeText = booleanPreferencesKey("large_text")
     }
     override val preferences = context.preferencesDataStore.data.map { p ->
-        UserPreferences(p[Keys.theme]?.let(ThemePreference::valueOf) ?: ThemePreference.DARK,
+        UserPreferences(parseThemePreference(p[Keys.theme]),
             p[Keys.reduceMotion] ?: false, p[Keys.largeText] ?: false)
     }
     override suspend fun setTheme(theme: ThemePreference) { context.preferencesDataStore.edit { it[Keys.theme] = theme.name } }
     override suspend fun setReduceMotion(enabled: Boolean) { context.preferencesDataStore.edit { it[Keys.reduceMotion] = enabled } }
     override suspend fun setLargeText(enabled: Boolean) { context.preferencesDataStore.edit { it[Keys.largeText] = enabled } }
 }
+
+internal fun parseThemePreference(value: String?): ThemePreference =
+    ThemePreference.entries.firstOrNull { it.name == value } ?: ThemePreference.DARK
 
 private fun InspectionItemEntity.toModel() = InspectionItem(
     ContentId(id), ContentId(categoryId), title, inspectFor, sampleDefects, sequence, isSample)

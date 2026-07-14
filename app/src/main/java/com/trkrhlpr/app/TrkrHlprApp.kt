@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.*
 import com.trkrhlpr.core.designsystem.*
@@ -32,10 +33,13 @@ private val topDestinations = listOf(
     Destination(Routes.Progress, "Progress", Icons.Rounded.QueryStats),
     Destination(Routes.Settings, "Settings", Icons.Rounded.Tune),
 )
+private val topRoutes = topDestinations.mapTo(mutableSetOf()) { it.route }
 
 @Composable
 fun TrkrHlprApp(container: AppContainer) {
-    val preferences by container.preferencesRepository.preferences.collectAsState(initial = UserPreferences())
+    val preferences by container.preferencesRepository.preferences.collectAsStateWithLifecycle(
+        initialValue = UserPreferences(),
+    )
     val dark = when (preferences.theme) {
         ThemePreference.DARK -> true
         ThemePreference.LIGHT -> false
@@ -56,7 +60,7 @@ fun TrkrHlprApp(container: AppContainer) {
             Scaffold(
                 snackbarHost = { SnackbarHost(snackbar) },
                 bottomBar = {
-                    if (!useRail && current?.route in topDestinations.map { it.route }) {
+                    if (!useRail && current?.route in topRoutes) {
                         NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
                             topDestinations.forEach { destination ->
                                 NavigationBarItem(
@@ -71,7 +75,7 @@ fun TrkrHlprApp(container: AppContainer) {
                 },
             ) { padding ->
                 Row(Modifier.fillMaxSize().padding(padding)) {
-                    if (useRail && current?.route in topDestinations.map { it.route }) {
+                    if (useRail && current?.route in topRoutes) {
                         NavigationRail(containerColor = MaterialTheme.colorScheme.surface) {
                             Spacer(Modifier.height(24.dp))
                             Icon(Icons.Rounded.LocalShipping, "trkrhlpr", tint = MaterialTheme.colorScheme.primary)

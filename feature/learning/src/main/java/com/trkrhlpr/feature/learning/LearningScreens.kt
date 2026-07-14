@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.trkrhlpr.core.designsystem.*
 import com.trkrhlpr.core.model.*
 import kotlinx.coroutines.launch
@@ -22,9 +23,15 @@ import kotlinx.coroutines.launch
     progressRepository: ProgressRepository,
     modifier: Modifier = Modifier,
 ) {
-    val categories by contentRepository.observeInspectionCategories().collectAsState(initial = emptyList())
-    val items by contentRepository.observeInspectionItems().collectAsState(initial = emptyList())
-    val progress by progressRepository.observeInspectionProgress().collectAsState(initial = InspectionProgress())
+    val categories by contentRepository.observeInspectionCategories().collectAsStateWithLifecycle(
+        initialValue = emptyList(),
+    )
+    val items by contentRepository.observeInspectionItems().collectAsStateWithLifecycle(
+        initialValue = emptyList(),
+    )
+    val progress by progressRepository.observeInspectionProgress().collectAsStateWithLifecycle(
+        initialValue = InspectionProgress(),
+    )
     var mode by rememberSaveable { mutableStateOf<InspectionMode?>(null) }
     var expandedId by rememberSaveable { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
@@ -97,7 +104,9 @@ private enum class InspectionMode { STUDY, INSPECTION }
     progressRepository: ProgressRepository,
     modifier: Modifier = Modifier,
 ) {
-    val categories by contentRepository.observeTestCategories().collectAsState(initial = emptyList())
+    val categories by contentRepository.observeTestCategories().collectAsStateWithLifecycle(
+        initialValue = emptyList(),
+    )
     var selectedCategoryId by rememberSaveable { mutableStateOf<String?>(null) }
     val selectedCategory = categories.firstOrNull { it.id.value == selectedCategoryId }
     var question by remember { mutableStateOf<PracticeQuestion?>(null) }
@@ -197,7 +206,9 @@ private enum class InspectionMode { STUDY, INSPECTION }
     var question by remember { mutableStateOf<DailyQuestion?>(null) }
     var selected by rememberSaveable { mutableStateOf<String?>(null) }
     var complete by rememberSaveable { mutableStateOf(false) }
-    val progress by progressRepository.observeProgressSnapshot().collectAsState(initial = ProgressSnapshot())
+    val progress by progressRepository.observeProgressSnapshot().collectAsStateWithLifecycle(
+        initialValue = ProgressSnapshot(),
+    )
     val scope = rememberCoroutineScope()
     LaunchedEffect(Unit) { question = contentRepository.getDailyQuestion() }
     LaunchedEffect(progress.dailyCompleted) {

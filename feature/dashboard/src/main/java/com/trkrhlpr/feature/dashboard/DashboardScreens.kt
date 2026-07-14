@@ -14,6 +14,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.trkrhlpr.core.designsystem.*
 import com.trkrhlpr.core.model.*
 import kotlinx.coroutines.launch
@@ -71,7 +72,9 @@ import kotlinx.coroutines.launch
     onResetComplete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val progress by repository.observeProgressSnapshot().collectAsState(initial = ProgressSnapshot())
+    val progress by repository.observeProgressSnapshot().collectAsStateWithLifecycle(
+        initialValue = ProgressSnapshot(),
+    )
     var showReset by rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(TrkrSpacing.lg),
@@ -126,7 +129,9 @@ import kotlinx.coroutines.launch
     appVersion: String,
     modifier: Modifier = Modifier,
 ) {
-    val prefs by preferencesRepository.preferences.collectAsState(initial = UserPreferences())
+    val prefs by preferencesRepository.preferences.collectAsStateWithLifecycle(
+        initialValue = UserPreferences(),
+    )
     val scope = rememberCoroutineScope()
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(TrkrSpacing.lg),
         verticalArrangement = Arrangement.spacedBy(TrkrSpacing.lg)) {

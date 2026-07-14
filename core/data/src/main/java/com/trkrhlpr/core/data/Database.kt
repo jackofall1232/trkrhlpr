@@ -23,7 +23,7 @@ data class InspectionItemEntity(
     val inspectFor: String, val sampleDefects: String, val sequence: Int, val isSample: Boolean,
 )
 
-@Entity(tableName = "inspection_completions", indices = [Index("itemId")])
+@Entity(tableName = "inspection_completions")
 data class InspectionCompletionEntity(@PrimaryKey val itemId: String, val completedAtEpochMillis: Long)
 
 @Entity(tableName = "test_categories")
@@ -49,6 +49,8 @@ data class DailyCompletionEntity(
     @PrimaryKey val questionId: String, val correct: Boolean, val completedAtEpochMillis: Long,
 )
 
+data class TestAttemptStats(val total: Int, val correct: Int)
+
 @Dao
 interface TrkrHlprDao {
     @Query("SELECT * FROM inspection_categories ORDER BY sequence")
@@ -63,10 +65,14 @@ interface TrkrHlprDao {
     suspend fun getPracticeQuestion(categoryId: String): QuestionEntity?
     @Query("SELECT * FROM questions WHERE type = 'daily' LIMIT 1")
     suspend fun getDailyQuestion(): QuestionEntity?
-    @Query("SELECT COUNT(*) FROM test_attempts")
-    fun observeTestAttemptCount(): Flow<Int>
-    @Query("SELECT COUNT(*) FROM test_attempts WHERE correct = 1")
-    fun observeCorrectTestAttemptCount(): Flow<Int>
+    @Query(
+        """
+        SELECT COUNT(*) AS total,
+               COALESCE(SUM(CASE WHEN correct = 1 THEN 1 ELSE 0 END), 0) AS correct
+        FROM test_attempts
+        """,
+    )
+    fun observeTestAttemptStats(): Flow<TestAttemptStats>
     @Query("SELECT COUNT(*) FROM daily_completions")
     fun observeDailyCompletionCount(): Flow<Int>
     @Query("SELECT COUNT(*) FROM content_versions WHERE version = :version")

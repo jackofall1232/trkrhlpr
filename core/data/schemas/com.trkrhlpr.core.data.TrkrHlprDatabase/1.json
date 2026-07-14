@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d9e6b7606ba43065512448d07ba56aea",
+    "identityHash": "a15049d86995875f80ba14515e8f3a68",
     "entities": [
       {
         "tableName": "content_versions",
@@ -158,18 +158,7 @@
           "columnNames": [
             "itemId"
           ]
-        },
-        "indices": [
-          {
-            "name": "index_inspection_completions_itemId",
-            "unique": false,
-            "columnNames": [
-              "itemId"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_inspection_completions_itemId` ON `${TABLE_NAME}` (`itemId`)"
-          }
-        ]
+        }
       },
       {
         "tableName": "test_categories",
@@ -364,7 +353,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd9e6b7606ba43065512448d07ba56aea')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a15049d86995875f80ba14515e8f3a68')"
     ]
   }
 }

@@ -142,3 +142,27 @@ Append one entry per agent run. Do not overwrite prior runs.
   timestamp: 2026-07-14T02:07:03Z.
 - **Next action:** Commit the verified foundation for human review.
 - **Lock:** 53680f65-a741-48fe-a5d7-7adcd878ace6 acquired and released for final persistence.
+
+### Run 2026-07-14T02:20:05Z — Codex — PR #2 review corrections
+- **Goal:** Resolve all five valid Android-foundation review comments without widening scope.
+- **Triggering event:** event-20260714-022005-github-pr2-foundation-review-a5f2.
+- **Completed work:** Removed a redundant Room primary-key index; made persisted theme parsing
+  tolerant of unknown values; replaced independently observed attempt counters with one atomic
+  statistics query; made Compose state collection lifecycle-aware; and hoisted the static
+  top-level route set. Added regression coverage for preference parsing and regenerated the
+  unshipped version-1 Room schema.
+- **Tests run / Verification:**
+  - command: ./gradlew :core:data:testDebugUnitTest :app:compileDebugKotlin; exit_code: 0;
+    summary: targeted data tests and application Kotlin compilation passed;
+    timestamp: 2026-07-14T02:20:05Z.
+  - command: ./gradlew :app:assembleDebug testDebugUnitTest :app:assembleDebugAndroidTest lintDebug;
+    exit_code: 0; summary: full 346-task APK, JVM test, instrumentation APK, and lint suite passed;
+    timestamp: 2026-07-14T02:20:05Z.
+  - command: git diff --check; exit_code: 0; summary: no whitespace errors;
+    timestamp: 2026-07-14T02:20:05Z.
+- **Failures:** None.
+- **Decisions:** All five comments were valid. Updating the version-1 Room schema is safe because
+  no production database has shipped; a migration is not required.
+- **Confidence:** High.
+- **Next action:** Commit and push the corrections to PR #2, then await reviewer confirmation.
+- **Lock:** 8f3d85b2-b767-4f22-910f-441c5ca29fab acquired for the review loop.
