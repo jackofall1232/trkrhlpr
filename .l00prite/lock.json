@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "lock_id": null,
+  "lock_id": "53680f65-a741-48fe-a5d7-7adcd878ace6",
   "owner_agent": null,
   "owner_session": null,
-  "acquired_at": null,
-  "expires_at": null,
+  "acquired_at": "2026-07-14T02:07:03Z",
+  "expires_at": "2026-07-14T02:17:03Z",
   "ttl_seconds": 1800,
   "purpose": null,
   "protected_paths": [
@@ -18,5 +18,5 @@
     "reviews/",
     "sessions/"
   ],
-  "status": "unlocked"
+  "status": "released"
 }

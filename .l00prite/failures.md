@@ -20,7 +20,15 @@ Record failed approaches and why they should not be retried unless conditions ch
 | Stale Arming (crashed run left `enabled: true`) | S2 | Pre-flight stale-run recovery; persisted flags never authorize a run. |
 
 ## Failed Approaches
-- None yet.
+### Android foundation — 2026-07-14
+
+- **Compose API mismatch:** Positional TextStyle and MaterialTheme calls did not compile
+  with the current Compose BOM. Named parameters are required.
+- **SDK mismatch:** AndroidX Core 1.19.0 and Lifecycle 2.11.0 require compileSdk 37.
+  This project is SDK 36, so use Core 1.17.0 and Lifecycle 2.10.0 until an SDK upgrade is approved.
+- **Build transport:** Long Gradle tasks were interrupted by the command-yield boundary.
+  Persistent PTY execution completed normally and should be used for long builds.
 
 ## Blockers
-- None yet.
+- None blocking the committed foundation. Physical phone/tablet review and connected tests
+  remain a human review gate because this host has neither a device nor KVM.

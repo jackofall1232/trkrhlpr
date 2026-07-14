@@ -14,7 +14,14 @@ Durable project facts and decisions that future agents should preserve.
   synchronization are future roadmap items excluded from the first milestone.
 - Product content must be researched from FMCSA materials, official CDL manuals, and other
   lawful authoritative sources. Proprietary commercial study materials must not be copied.
-- This initialization is protocol-only; it does not authorize Android scaffolding or implementation.
+- The 2026-07-13 protocol-initialization run did not authorize application implementation;
+  the Android foundation was separately approved on 2026-07-13.
+- Android foundation architecture uses seven modules: app, core model/data/design/testing,
+  and dashboard/learning features.
+- Minimum Android version is API 26; compile/target SDK is 36; Java target is 17.
+- Manual constructor injection is sufficient for the current dependency graph.
+- Room stores versioned content/progress; DataStore stores theme/accessibility preferences.
+- SDK-36-compatible pins include Core 1.17.0 and Lifecycle 2.10.0.
 
 ## Facts
 
@@ -26,6 +33,8 @@ Durable project facts and decisions that future agents should preserve.
   passenger-car navigation.
 - Exact inspection content, CDL questions, official sources, and unresolved product choices
   require research and explicit decisions before implementation.
+- The foundation builds an installable debug APK at app/build/outputs/apk/debug/app-debug.apk.
+- The app manifest requests no Internet, location, account, analytics, or mapping permission.
 
 ## Avoid
 - Do not store random temporary notes, speculative ideas, or stale debugging output here.
@@ -46,3 +55,16 @@ Durable project facts and decisions that future agents should preserve.
   update strategy. The prioritized list is in `todos.md`.
 - **Recommended next step:** Human review of the initialized blueprint, followed by
   authoritative-source research before Android scaffolding is separately authorized.
+
+## Android Foundation Handoff — 2026-07-14
+
+- **Added:** Reproducible Android build; seven-module architecture; Room/DataStore offline
+  persistence; industrial Compose design system; adaptive navigation; representative
+  inspection, practice, daily, progress, and settings flows; unit/UI test sources.
+- **Why:** Provide a scalable application shell before importing regulated content.
+- **Validation:** Debug APK, JVM tests, instrumentation-test APK, and lint all build
+  successfully. APK SHA-256 and exact commands are recorded in ledger.md.
+- **Remaining:** Physical phone/tablet visual and connected-test review; authoritative
+  content research; production signing/update process; detailed product acceptance criteria.
+- **Recommended next step:** Install the APK on representative hardware and review the
+  foundation before starting authoritative feature content.
