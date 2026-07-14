@@ -14,7 +14,17 @@ education, not merely a way to pass the CDL exam.
 - Native Kotlin, Jetpack Compose, and Android SDK 36 (Android 16).
 - Offline-first operation and local progress tracking.
 - No application architecture, modules, storage engine, source tree, or build configuration
-  has been selected or generated during protocol initialization.
+  was selected during protocol initialization.
+
+## Implemented Foundation Architecture
+
+- Seven modules separate application composition, models/contracts, offline data,
+  design-system components, testing support, dashboard/settings, and learning flows.
+- Compose UI consumes repository Flows; Room persists versioned content and progress;
+  DataStore persists user preferences.
+- Manual constructor injection is centralized in the application container.
+- Phone navigation uses a bottom bar; larger widths use a navigation rail.
+- Representative content is fictional, local, visibly labeled, and versioned.
 
 ## First Production Milestone
 

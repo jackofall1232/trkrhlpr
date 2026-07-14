@@ -1,14 +1,13 @@
 # Prioritized TODOs
 
 ## Next
-- [ ] Review and approve the initialized blueprint, requirements, constraints, and open questions.
 - [ ] Research authoritative FMCSA and official CDL-manual sources for the 131-point checklist.
 - [ ] Define the exact checklist scope, sequence, vehicle configurations, and defect criteria.
 - [ ] Define objective acceptance criteria for Study Mode and Real Inspection Mode.
 - [ ] Research lawful authoritative sources and provenance rules for each CDL category.
 - [ ] Define daily safety-question sourcing, review, and update rules.
-- [ ] Resolve the minimum supported Android version and SDK compatibility strategy.
-- [ ] Select and approve application architecture, local storage, and project structure before scaffolding.
+- [ ] Run visual, accessibility, and connected Compose tests on representative phone and tablet hardware.
+- [ ] Review and approve the production foundation before importing authoritative content.
 
 ## Later
 - [ ] Define accessibility, privacy, local-data retention, backup, export, reset, and migration requirements.
@@ -24,3 +23,7 @@
 - Move completed items here with dates when helpful.
 - [x] 2026-07-13: Confirmed product direction, first milestone, roadmap exclusions, technology, and mission.
 - [x] 2026-07-13: Initialized the canonical l00prite protocol without application scaffolding.
+- [x] 2026-07-14: Selected API 26 minimum, SDK 36, Kotlin/Compose module architecture.
+- [x] 2026-07-14: Added Room/DataStore persistence and versioned representative content.
+- [x] 2026-07-14: Added design system, adaptive navigation, and representative screens.
+- [x] 2026-07-14: Built the APK, passed unit tests/lint, and compiled Compose UI tests.
