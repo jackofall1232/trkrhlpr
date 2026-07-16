@@ -61,22 +61,39 @@ fun RoutingMapScreen(
     }
 
     DisposableEffect(mapView, lifecycleOwner) {
-        mapView.onStart()
-        mapView.onResume()
+        var started = false
+        var resumed = false
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
-                Lifecycle.Event.ON_START -> mapView.onStart()
-                Lifecycle.Event.ON_RESUME -> mapView.onResume()
-                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
-                Lifecycle.Event.ON_STOP -> mapView.onStop()
+                Lifecycle.Event.ON_START -> {
+                    mapView.onStart()
+                    started = true
+                }
+                Lifecycle.Event.ON_RESUME -> {
+                    mapView.onResume()
+                    resumed = true
+                    val hasPermission = context.hasCoarseLocationPermission()
+                    locationGranted = hasPermission
+                    if (hasPermission) locationDenied = false
+                }
+                Lifecycle.Event.ON_PAUSE -> {
+                    mapView.onPause()
+                    resumed = false
+                }
+                Lifecycle.Event.ON_STOP -> {
+                    mapView.onStop()
+                    started = false
+                }
                 else -> Unit
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
-            mapView.onPause()
-            mapView.onStop()
+            // Composition can end while the host Activity remains resumed (for example,
+            // when navigating back), so finish any active MapView states before destroy.
+            if (resumed) mapView.onPause()
+            if (started) mapView.onStop()
             mapView.onDestroy()
         }
     }

@@ -27,8 +27,7 @@ class NavigationSmokeTest {
 
     @Test fun routeMapOpensWithoutRequestingLocation() {
         compose.onNodeWithText("Route map").performScrollTo().performClick()
-        compose.onNodeWithText("MAP PREVIEW").assertIsDisplayed()
-        compose.onNodeWithText("Evaluation map only — not commercial-truck routing data")
-            .assertIsDisplayed()
+        compose.onNodeWithText("Vehicle profile").assertIsDisplayed()
+        compose.onNodeWithText("Confirm and save profile").assertIsDisplayed()
     }
 }
