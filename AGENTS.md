@@ -2,7 +2,7 @@
 
 ## Project
 
-**trkrhlpr** — Help commercial drivers perform safer inspections, become better educated, and reduce preventable violations through practical, offline-first tools.
+**Last Wagon** (repository `trkrhlpr`) — Help commercial drivers perform safer inspections, become better educated, and reduce preventable violations through practical, offline-first tools.
 
 The full blueprint (mission, architecture, requirements, definition of done) lives in
 `CLAUDE.md` and `.l00prite/blueprint.md`. This file is the operating guide for any AI agent

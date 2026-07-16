@@ -19,7 +19,7 @@ This project uses the l00prite protocol: durable agent memory lives in `.l00prit
 
 ## 1. Mission
 
-trkrhlpr exists to help commercial drivers perform safer inspections, become better
+Last Wagon (repository `trkrhlpr`) exists to help commercial drivers perform safer inspections, become better
 educated, and reduce preventable violations through practical, offline-first tools. It is
 intended to become a daily companion for new and working commercial truck drivers in the
 United States, not merely an exam-preparation application.

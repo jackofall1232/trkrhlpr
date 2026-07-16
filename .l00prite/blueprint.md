@@ -1,7 +1,7 @@
 # Project Blueprint
 
 ## Mission
-trkrhlpr exists to help commercial drivers perform safer inspections, become better
+Last Wagon (final product name; repository `trkrhlpr`) exists to help commercial drivers perform safer inspections, become better
 educated, and reduce preventable violations through practical, offline-first tools. The
 initial audience is new and working commercial truck drivers in the United States. The
 product is intended to become a daily companion for safer inspections and continuing

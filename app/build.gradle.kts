@@ -11,11 +11,11 @@ val orsApiKey = providers.gradleProperty("ORS_API_KEY")
     .replace("\"", "\\\"")
 
 android {
-    namespace = "com.trkrhlpr.app"
+    namespace = "com.lastwagon.app"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.trkrhlpr.app"
+        applicationId = "com.lastwagon.app"
         minSdk = 26
         targetSdk = 36
         versionCode = 1

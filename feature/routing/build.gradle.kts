@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.trkrhlpr.feature.routing"
+    namespace = "com.lastwagon.feature.routing"
     compileSdk = 36
     defaultConfig { minSdk = 26 }
     compileOptions {

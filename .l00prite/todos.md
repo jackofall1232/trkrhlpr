@@ -7,8 +7,14 @@
   quota/authorization error, corrupt response, map fit/overlay, and route deletion.
 - [ ] Complete Phase 4 device/accessibility review: long overview scrolling, warning
   visibility, acknowledgment persistence, bypass attempts, stale state, and profile changes.
-- [ ] Routing Phase 5: implement licensed corridor pre-fetching, local route persistence,
-  explicit offline/stale state, and safe off-corridor behavior (routing MVP boundary).
+- [ ] Verify the Last Wagon rename and Phase 5 with the full Gradle suite (unit tests,
+  debug APK, instrumentation-test APK, lint) in an environment with Google Maven access;
+  the 2026-07-16 remote session could not reach dl.google.com.
+- [ ] Complete Phase 5 device/exit review: corridor download progress and size, airplane
+  mode viewing, expiry and stale marking, cancellation/deletion, storage behavior, and
+  off-corridor warning with approximate location.
+- [ ] Obtain written confirmation of OpenFreeMap public-instance offline-prefetch terms
+  (or move to self-hosting/a keyed commercial provider) before any production release.
 - [ ] Research authoritative FMCSA and official CDL-manual sources for the 131-point checklist.
 - [ ] Define the exact checklist scope, sequence, vehicle configurations, and defect criteria.
 - [ ] Define objective acceptance criteria for Study Mode and Real Inspection Mode.
@@ -35,6 +41,14 @@
 
 ## Done
 - Move completed items here with dates when helpful.
+- [x] 2026-07-16: Renamed the product to its final name "Last Wagon" everywhere (label,
+  applicationId com.lastwagon.app, namespaces, classes, docs); repository stays trkrhlpr.
+- [x] 2026-07-16: Implemented Routing Phase 5 offline route corridor: bounded MapLibre
+  geometry-region download along the reviewed route with detail levels, tile estimation,
+  6,000-tile cap, progress, cancellation, deletion, and 7-day expiry; per-provider
+  prefetch permission with OpenFreeMap Liberty for development (production confirmation
+  gated); explicit OFFLINE/STALE states; no offline rerouting; coarse-location
+  off-corridor stop-and-reassess warning. Full Gradle build verification pending.
 - [x] 2026-07-16: Completed Routing Phase 0 safety contract and terminology approval.
 - [x] 2026-07-16: Implemented Routing Phase 1 read-only MapLibre evaluation map, replaceable
   style provider, explicit attribution/limitations, zoom controls, and opt-in approximate

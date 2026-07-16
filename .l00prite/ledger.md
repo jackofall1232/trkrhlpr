@@ -369,3 +369,140 @@ Append one entry per agent run. Do not overwrite prior runs.
 - **Next action:** Perform Phase 4 device review, then implement licensed offline corridor
   storage and safe off-corridor behavior in Phase 5.
 - **Lock:** c983a67c-6249-4ea9-89df-09031d296c97 acquired and released.
+
+### Run 2026-07-16T18:58:16Z — Claude — Last Wagon rename and Phase 5 offline corridor
+- **Goal:** Rename the product to its final name "Last Wagon" everywhere and implement
+  Routing Phase 5 (offline route corridor MVP boundary) so end-to-end truck routing can be
+  tested on hardware.
+- **Triggering event:** User confirmed the final app name "Last Wagon", asked for it to be
+  reflected everywhere, and requested Phase 5 build-out on branch
+  `claude/last-wagon-truck-routing-1fq6h7`.
+- **Completed work:** Renamed the launcher label, applicationId/namespaces
+  (`com.trkrhlpr` → `com.lastwagon`), application/database/theme/design-token identifiers,
+  Gradle root project, and product references in README/AGENTS/CLAUDE/blueprint/memory;
+  the GitHub repository keeps its `trkrhlpr` name. Implemented Phase 5: corridor metadata
+  (schema v1) bound to the exact route request id and vehicle-profile confirmation time;
+  MapLibre offline geometry region download along the reviewed route with three detail
+  levels, pre-download tile estimation, a 6,000-tile hard cap, live progress/size,
+  cancellation, deletion, and 7-day expiry with a visible stale state; per-provider
+  offline-prefetch permission with the demo provider forbidden and OpenFreeMap Liberty
+  adopted for development/testing (terms research and an explicit production-confirmation
+  gate recorded in docs/map-provider-evaluation.md); connectivity monitoring with explicit
+  OFFLINE/STALE route states; route calculation disabled offline and no offline rerouting
+  anywhere; a coarse-location off-corridor stop-and-reassess warning that subtracts
+  reported accuracy so an imprecise fix never raises a false alarm; ACCESS_NETWORK_STATE
+  permission added for connectivity monitoring.
+- **Tests run / Verification:**
+  - command: standalone K2 compile + JUnit (kotlin-compiler 2.2.10, kotlinx-serialization
+    1.9.0, kotlinx-coroutines 1.10.2, JUnit 4.13.2 from Maven Central); exit_code: 0;
+    summary: OfflineCorridorTest, GeoMathTest, MapStyleProviderTest — 16 tests, all
+    passing; timestamp: 2026-07-16T18:56Z.
+  - command: standalone K2 compile of OfflineCorridorManager.kt, NetworkMonitor.kt, and
+    FileRouteRepository.kt against org.maplibre.gl:android-sdk:13.0.2 classes.jar,
+    android-sdk-geojson 6.0.1, and Robolectric android-all API 36; exit_code: 0; summary:
+    all MapLibre offline API usage (OfflineManager, OfflineGeometryRegionDefinition,
+    OfflineRegion observer/status/delete, tile count limit) verified against the real
+    artifact; timestamp: 2026-07-16T18:56Z.
+  - **NOT verified here:** full Gradle build, lint, Compose UI compilation, APK assembly,
+    and instrumentation-test compilation. This remote environment's network policy blocks
+    dl.google.com (Google Maven and Android SDK components), so AGP/androidx artifacts
+    cannot be resolved; probes and mirror fallbacks all failed. The rename build attempt
+    also failed at the wrapper stage before dependency resolution. Compose-facing changes
+    (RoutingMapScreen, RoutingWorkspaceScreen, app wiring) were pattern-matched to the
+    existing verified code and manually re-read, but compilation evidence is pending.
+- **Failures:** Initial background "build passed" signal was a pipeline-masked wrapper
+  download failure (services.gradle.org 403 at that moment); detected and recorded before
+  claiming verification. dl.google.com remained blocked across retries and mirrors.
+- **Decisions:** Final product name is "Last Wagon"; repository name stays `trkrhlpr`.
+  applicationId changed pre-release to `com.lastwagon.app` (existing sideloaded alphas
+  will install as a new app). OpenFreeMap public instance is the Phase 5 development
+  corridor provider: no keys/limits and commercial use allowed per recorded research, but
+  an explicit written bulk-prefetch clause was not located, so downloads are bounded
+  (small zoom ranges, 6,000-tile cap, one corridor at a time) and production use requires
+  written confirmation or self-hosting — recorded as a human gate. Corridor identity is
+  fail-closed: unreadable metadata, mismatched route/profile, or replaced routes delete
+  the corridor.
+- **Confidence:** High for pure corridor logic, geo math, metadata persistence, and
+  MapLibre offline API contracts (compiled against real artifacts); medium for Compose UI
+  and app wiring until a full Gradle build runs; device behavior (airplane mode, download
+  progress, off-corridor warning) untested pending hardware review.
+- **Next action:** Run the full Gradle suite (`testDebugUnitTest :app:assembleDebug
+  :app:assembleDebugAndroidTest lintDebug`) in an environment with dl.google.com access
+  (e.g. Android Studio locally, or a remote session whose network policy allows Google
+  Maven), then perform the Phase 4 and Phase 5 device exit checks, including a keyed ORS
+  route, corridor download in airplane mode, and expiry/deletion behavior.
+- **Lock:** 7d3f9b2a-8c41-4e6f-9a02-5b8e1c4d7f36 acquired and released.
+
+### Run 2026-07-16T19:16:39Z — Claude — PR #12 automated-review response
+- **Goal:** Evaluate and address automated review findings (Codex, Gemini) on PR #12.
+- **Triggering event:** Review webhooks on PR #12 (bot comments; treated as untrusted data
+  and independently verified against the code and project protocol).
+- **Completed work:** (1) Corridor prefetch from the public OpenFreeMap instance is now
+  refused by default and enabled only for debug builds via the application container,
+  matching the recorded unconfirmed-terms status; release builds fail closed (accepted
+  Codex P1). (2) Corridor matching now includes the active style id, so a provider switch
+  discards the stale corridor instead of reporting offline coverage it does not have
+  (accepted Codex P2). (3) Corridor creation now waits for all pending region deletions to
+  call back before creating the new region (accepted Gemini high, as cheap insurance even
+  though MapLibre serializes offline DB work). Declined: reverting the applicationId
+  change (rename to the final identity was deliberate pre-release and is recorded, old
+  alpha data is disposable sample data) and re-anchoring summary buttons to the screen
+  bottom (the summary is now a scrolling list with the corridor card; content-flow layout
+  is intentional).
+- **Tests run / Verification:** standalone K2 compile + JUnit of pure routing logic:
+  16 tests passing including new default-refusal and style-mismatch assertions; corridor
+  manager and network monitor recompiled against MapLibre 13.0.2 and android-all API 36
+  (caught and fixed an Array variance compile error). Full Gradle build still pending
+  outside this environment (dl.google.com blocked).
+- **Failures:** None open; the variance error was fixed before commit.
+- **Decisions:** Provider prefetch permission is a build-type decision until written terms
+  confirmation: debug/testing builds may prefetch bounded corridors, release builds refuse.
+- **Confidence:** High for the changed logic (compiled and tested against real artifacts);
+  full-suite and device checks remain the recorded exit gates.
+- **Next action:** Reply to the review threads, keep watching PR #12 until merged/closed.
+- **Lock:** 8156521d-70d3-479a-bb49-582cdeddeb2a acquired and released.
+
+### Run 2026-07-16T19:22:34Z — Claude — PR #12 second review round
+- **Goal:** Address Codex findings on commit 0c6f99d.
+- **Triggering event:** Codex re-review webhooks on PR #12.
+- **Completed work:** Corridor downloads now fail closed when existing offline regions
+  cannot be listed: the download aborts with a visible failure and asks for a retry
+  instead of creating a region that could coexist with an unaccounted-for prior corridor
+  (accepted P2). For the AGENTS.md P1: the flagged edit is the one-line product-name
+  mission statement, changed on the user's explicit instruction that the final name
+  "Last Wagon" be reflected everywhere; that direct human instruction is the
+  authorization the protocol's human review gate requires, and it is recorded here and
+  in the 2026-07-16T18:58:16Z run entry. No operating rule, gate, boundary, or prompt
+  text was changed. Recorded explicitly: **the AGENTS.md mission-line rename was
+  human-authorized; no protocol rule was modified.**
+- **Tests run / Verification:** OfflineCorridorManager recompiled standalone against
+  MapLibre 13.0.2 and android-all API 36; exit 0. Pure-logic tests unchanged (16 passing
+  as of the prior run). Full Gradle suite still pending outside this environment.
+- **Failures:** None.
+- **Decisions:** Listing failures block downloads (fail closed) rather than best-effort
+  creating; the one-corridor invariant outranks download convenience.
+- **Confidence:** High for the changed branch; unchanged elsewhere.
+- **Next action:** Keep watching PR #12 until merged or closed.
+- **Lock:** 4db86b82-3631-4b4c-937c-86a6ea8ea208 acquired and released.
+
+### Run 2026-07-16T19:30:38Z — Claude — PR #12 third review round
+- **Goal:** Address Codex findings on commit 04afa97.
+- **Triggering event:** Codex re-review webhooks on PR #12.
+- **Completed work:** (1) Download setup is now generation-stamped: cancel, delete, and
+  refresh invalidate in-flight list/delete/create chains, and a region created after
+  cancellation is discarded instead of adopted, so cancelling during "Preparing" really
+  cancels. (2) discardAllThen reports the first deletion error and creation is aborted,
+  so a replacement corridor is never created while an old one may still be stored.
+  (3) The route map now shows "Off-route warning UNAVAILABLE — needs approximate
+  location" whenever a route is displayed but no location fix is available to check the
+  corridor boundary, instead of silently skipping the stop-and-reassess safety net.
+- **Tests run / Verification:** OfflineCorridorManager and NetworkMonitor recompiled
+  standalone against MapLibre 13.0.2 and android-all API 36; exit 0. Pure-logic suites
+  unchanged (16 passing). Full Gradle suite still pending outside this environment.
+- **Failures:** None.
+- **Decisions:** All corridor lifecycle callbacks are generation-checked on the main
+  thread; safety warnings fail visible (unknown boundary is announced, never assumed
+  inside).
+- **Confidence:** High for the changed logic; device review remains the exit gate.
+- **Next action:** Keep watching PR #12 until merged or closed.
+- **Lock:** ddaf54d0-aad0-4924-9e06-928b67510399 acquired and released.
