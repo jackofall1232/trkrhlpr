@@ -131,7 +131,11 @@ fun TrkrHlprApp(container: AppContainer) {
                         }
                         composable(Routes.Routing) {
                             ScreenWithBack("Route map", { navController.popBackStack() }) {
-                                RoutingWorkspaceScreen(container.vehicleProfileRepository)
+                                RoutingWorkspaceScreen(
+                                    container.vehicleProfileRepository,
+                                    container.routingProvider,
+                                    container.routeRepository,
+                                )
                             }
                         }
                     }

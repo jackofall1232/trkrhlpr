@@ -3,8 +3,8 @@
 ## Next
 - [ ] Complete Phase 1 physical phone/tablet review: rendering, lifecycle, controls,
   approximate-location grant/denial, network loss, and accessibility.
-- [ ] Routing Phase 3: implement replaceable online HGV routing with ORS as the initial
-  provider and full request/response provenance.
+- [ ] Complete Phase 3 keyed ORS integration/device review: valid route, no-route, timeout,
+  quota/authorization error, corrupt response, map fit/overlay, and route deletion.
 - [ ] Routing Phase 4: require route overview and driver review before navigation.
 - [ ] Routing Phase 5: implement licensed corridor pre-fetching, local route persistence,
   explicit offline/stale state, and safe off-corridor behavior (routing MVP boundary).
@@ -41,6 +41,9 @@
 - [x] 2026-07-16: Implemented Routing Phase 2 schema-versioned vehicle profile with
   US-customary input, canonical metric persistence, plausibility validation, explicit
   confirmation/reconfirmation, hazmat state, axle data, and supported avoidances.
+- [x] 2026-07-16: Implemented Routing Phase 3 replaceable ORS HGV provider, explicit failure
+  states, exact redacted request/response provenance, atomic saved-route storage, unreviewed
+  coordinate-based route preview, warning handling, and MapLibre geometry overlay.
 - [x] 2026-07-16: Approved and documented the phased commercial-truck routing plan,
   qualified safety language, mandatory driver review, and Phase 5 MVP boundary.
 - [x] 2026-07-13: Confirmed product direction, first milestone, roadmap exclusions, technology, and mission.

@@ -22,9 +22,11 @@ The production foundation is native Kotlin and Jetpack Compose, targeting Androi
 - offline core tools with no account or analytics
 - an online, read-only MapLibre evaluation map with optional approximate location
 - a locally stored, validated, driver-confirmed commercial-vehicle profile
+- an unreviewed ORS HGV route preview using coordinate entry and local route provenance
 
 Truck-stop discovery and commercial-truck routing/GPS remain future research items and
-have no implementation in this foundation. The map preview does not calculate routes.
+remain outside the production milestone. Phase 3 can calculate and display an explicitly
+unreviewed route preview; it is not navigation or a truck-safe-route guarantee.
 
 ## Project structure
 
@@ -101,6 +103,20 @@ selects the location control; map viewing continues if permission is denied. The
 accounts, cloud sync, ads, purchases, or analytics. The confirmed vehicle profile is stored
 locally in DataStore. Resetting progress removes local completion records while leaving the
 vehicle profile and bundled sample content installed.
+
+## Route provider configuration
+
+Phase 3 is disabled when no OpenRouteService key is configured. Supply a development key
+through an uncommitted Gradle property or environment variable:
+
+```bash
+ORS_API_KEY=your-development-key ./gradlew :app:assembleDebug
+```
+
+The key is compiled into the APK and can be extracted; do not distribute a build containing
+a privileged or unrestricted key. Production credential handling requires a separate
+security review. Route coordinates, geometry, request parameters, warnings, and provider
+provenance are stored in the app's private files and can be deleted from the profile screen.
 
 ## Content policy
 

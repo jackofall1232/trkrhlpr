@@ -294,3 +294,42 @@ Append one entry per agent run. Do not overwrite prior runs.
 - **Next action:** Review both phases on representative hardware, then begin Phase 3 only
   after approving the routing API contract and credential handling.
 - **Lock:** 334326fe-19b9-46d9-806e-fcf649892fad acquired and released.
+
+### Run 2026-07-16T17:38:22Z — Codex — Phase 3 ORS route preview
+- **Goal:** Implement a replaceable online HGV routing provider with exact request/response
+  provenance, explicit failure behavior, saved geometry, and an unreviewed map preview.
+- **Triggering event:** User requested Phase 3 implementation on `0.0.3-alpha`.
+- **Completed work:** Added routing domain contracts, ORS `driving-hgv` GeoJSON client,
+  injectable HTTP transport, supported vehicle restrictions and avoidances, restriction
+  metadata parsing, timeout/network/quota/provider/no-route/malformed/missing-key failures,
+  and response hashing. Added coordinate entry, unreviewed summary and warnings, MapLibre
+  route overlay/fit, atomic schema-versioned private-file persistence, route deletion, and
+  invalidation whenever the vehicle profile changes. Added local-only ORS key configuration
+  and documented that client APK credentials are extractable.
+- **Tests run / Verification:**
+  - command: `env ANDROID_HOME=/opt/android-sdk ./gradlew testDebugUnitTest
+    :app:assembleDebug :app:assembleDebugAndroidTest lintDebug`; exit_code: 0; summary:
+    all JVM tests, debug APK, instrumentation-test APK, and full lint suite passed;
+    timestamp: 2026-07-16T17:38:22Z.
+  - tests: exact HGV restriction payload; supported/unsupported avoidances; geometry,
+    summary, restriction extras, warnings, and provider metadata parsing; missing key and
+    rate limit; route persistence round-trip; unknown schema and corrupt geometry rejection.
+  - command: `aapt dump permissions app/build/outputs/apk/debug/app-debug.apk`; exit_code: 0;
+    summary: Internet and coarse location present; fine location absent;
+    timestamp: 2026-07-16T17:38:22Z.
+  - command: `git diff --check`; exit_code: 0; summary: no whitespace errors;
+    timestamp: 2026-07-16T17:38:22Z.
+  - artifact: `app/build/outputs/apk/debug/app-debug.apk`; SHA-256:
+    `eb109f94d2af603b8bcb882e5d46a863f3fc1c39a7164c9692bb854a13453b9e`.
+- **Failures:** An expression-body return, missing coroutine-test dependency, and subsequent
+  compile issues were corrected before the successful suites. No live ORS call ran because
+  this environment intentionally had no API key.
+- **Decisions:** ORS supports toll/ferry but not unpaved-road avoidance; never silently send
+  an invented flag. Store the exact key-free payload and response SHA-256 rather than raw
+  provider response. Coordinate entry is the Phase 3 boundary; geocoding is not fabricated.
+  Every route remains unverified, and Phase 4 owns mandatory driver review.
+- **Confidence:** High for the request/parser/storage contracts and build integrity; medium
+  for live-provider behavior until controlled keyed integration and device tests pass.
+- **Next action:** Exercise a restricted development key and representative failure cases,
+  then implement Phase 4 only after reviewing the resulting route-overview UX.
+- **Lock:** 4a5ca238-e44e-4ad7-979a-a8ec31c2c181 acquired and released.

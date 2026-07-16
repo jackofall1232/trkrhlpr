@@ -121,3 +121,76 @@ interface VehicleProfileRepository {
     suspend fun save(profile: VehicleProfile)
     suspend fun clear()
 }
+
+data class GeoPoint(val latitude: Double, val longitude: Double) {
+    val isValid get() = latitude in -90.0..90.0 && longitude in -180.0..180.0 &&
+        latitude.isFinite() && longitude.isFinite()
+}
+
+data class RouteRequest(
+    val origin: GeoPoint,
+    val destination: GeoPoint,
+    val vehicleProfile: VehicleProfile,
+)
+
+data class RouteStep(
+    val instruction: String,
+    val distanceMeters: Double,
+    val durationSeconds: Double,
+)
+
+data class RouteProvenance(
+    val requestId: String,
+    val providerId: String,
+    val endpoint: String,
+    val routingProfile: String,
+    val requestedAtEpochMillis: Long,
+    val receivedAtEpochMillis: Long,
+    val requestPayload: String,
+    val responseSha256: String,
+    val responseAttribution: String?,
+    val responseService: String?,
+    val responseTimestampEpochMillis: Long?,
+    val engineVersion: String?,
+    val engineBuildDate: String?,
+    val graphDate: String?,
+)
+
+data class CalculatedRoute(
+    val request: RouteRequest,
+    val geometry: List<GeoPoint>,
+    val distanceMeters: Double,
+    val durationSeconds: Double,
+    val steps: List<RouteStep>,
+    val warnings: List<String>,
+    val roadAccessRestrictionSegments: Int,
+    val provenance: RouteProvenance,
+)
+
+enum class RouteFailureKind {
+    MISSING_CREDENTIAL, INVALID_REQUEST, NETWORK, TIMEOUT, RATE_LIMITED,
+    PROVIDER_REJECTED, NO_ROUTE, MALFORMED_RESPONSE, STORAGE,
+}
+
+data class RouteFailure(
+    val kind: RouteFailureKind,
+    val message: String,
+    val httpStatus: Int? = null,
+    val retryable: Boolean = false,
+)
+
+sealed interface RouteCalculationResult {
+    data class Success(val route: CalculatedRoute) : RouteCalculationResult
+    data class Failure(val error: RouteFailure) : RouteCalculationResult
+}
+
+interface RoutingProvider {
+    val id: String
+    suspend fun calculate(request: RouteRequest): RouteCalculationResult
+}
+
+interface RouteRepository {
+    val lastRoute: Flow<CalculatedRoute?>
+    suspend fun save(route: CalculatedRoute)
+    suspend fun clear()
+}

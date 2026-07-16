@@ -63,6 +63,18 @@ Durable project facts and decisions that future agents should preserve.
   dimensions, gross and axle weight, axle count, hazmat state, and supported avoidances.
   Broad plausibility validation is not a legal-limit or route-safety determination, and
   editing always requires the driver to reconfirm the current equipment and load.
+- Phase 3 defines a replaceable `RoutingProvider` and uses ORS `driving-hgv` as the initial
+  implementation. It sends the confirmed metric vehicle restrictions, supported toll/ferry
+  avoidances, and road-access-restriction extra-info request. ORS does not support the
+  profile's unpaved-road avoidance flag, so that preference is not sent and produces a
+  visible warning. Results remain unverified and cannot start guidance.
+- The last calculated route is schema-versioned and atomically stored in private app files
+  with request/profile snapshot, geometry, summary, steps, warnings, restriction count,
+  provider metadata, response hash, and timestamps. Changing the vehicle profile deletes
+  the mismatched route; users can also delete it directly.
+- Development ORS keys come from an uncommitted `ORS_API_KEY` Gradle property/environment
+  value. They are embedded in the APK and must be treated as extractable. Production key
+  handling requires a separate security decision before distribution.
 
 ## Avoid
 - Do not store random temporary notes, speculative ideas, or stale debugging output here.
