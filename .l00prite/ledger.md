@@ -333,3 +333,39 @@ Append one entry per agent run. Do not overwrite prior runs.
 - **Next action:** Exercise a restricted development key and representative failure cases,
   then implement Phase 4 only after reviewing the resulting route-overview UX.
 - **Lock:** 4a5ca238-e44e-4ad7-979a-a8ec31c2c181 acquired and released.
+
+### Run 2026-07-16T17:54:44Z — Codex — Phase 4 mandatory driver review
+- **Goal:** Require a comprehensive, persisted driver review of the exact route and vehicle
+  profile before route-map access, without implying certification or beginning navigation.
+- **Triggering event:** User requested Phase 4 on `0.0.4-alpha` and asked whether Phase 5
+  would form the first end-to-end testable MVP boundary.
+- **Completed work:** Added a versioned `RouteReview`, exact request/profile matching, and
+  repository-level review recording. Migrated saved-route schema from 1 to 2 while loading
+  Phase 3 routes as unverified. Added full overview of endpoints, summary, vehicle/load,
+  warnings, restriction gaps, steps, and provenance; three mandatory acknowledgments; and
+  visible unverified/reviewed/data-warning/offline-stale states. Gated all route-map access
+  on a valid current review and documented that review is not certification.
+- **Tests run / Verification:**
+  - command: `env ANDROID_HOME=/opt/android-sdk ./gradlew testDebugUnitTest
+    :app:assembleDebug :app:assembleDebugAndroidTest lintDebug`; exit_code: 0; summary:
+    JVM tests, debug APK, instrumentation-test APK, and full lint suite passed;
+    timestamp: 2026-07-16T17:54:44Z.
+  - tests: reviewed-route round trip; mismatched request/profile rejection; Phase 3 schema
+    migration to unreviewed; fail-closed map gate for absent/mismatched reviews.
+  - command: `aapt dump permissions app/build/outputs/apk/debug/app-debug.apk`; exit_code: 0;
+    summary: Internet and coarse location present; fine location absent;
+    timestamp: 2026-07-16T17:54:44Z.
+  - command: `git diff --check`; exit_code: 0; summary: no whitespace errors;
+    timestamp: 2026-07-16T17:54:44Z.
+  - artifact: `app/build/outputs/apk/debug/app-debug.apk`; SHA-256:
+    `9ac4441b9b3b2c6181de174fe1814a24077a7be88dddecf4e6a107ee251cf2ca`.
+- **Failures:** None remained after implementation; targeted and full suites passed.
+- **Decisions:** Map preview is gated along with future guidance to make bypass impossible
+  at this stage. Acknowledgments are separate, locally persisted, and invalidated by any
+  request/profile mismatch. Phase 5 is the first integrated MVP boundary, but Phase 4 must
+  still be tested independently before offline complexity is added.
+- **Confidence:** High for persistence, migration, and programmatic gating; medium-high for
+  review UX until long content, accessibility, and bypass attempts are checked on hardware.
+- **Next action:** Perform Phase 4 device review, then implement licensed offline corridor
+  storage and safe off-corridor behavior in Phase 5.
+- **Lock:** c983a67c-6249-4ea9-89df-09031d296c97 acquired and released.

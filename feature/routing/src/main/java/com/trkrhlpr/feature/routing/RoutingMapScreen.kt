@@ -39,6 +39,7 @@ import org.maplibre.android.style.sources.GeoJsonSource
 import org.maplibre.geojson.LineString
 import org.maplibre.geojson.Point
 import com.trkrhlpr.core.model.CalculatedRoute
+import com.trkrhlpr.core.model.hasCurrentDriverReview
 
 private enum class MapLoadState { LOADING, READY }
 
@@ -156,6 +157,22 @@ fun RoutingMapScreen(
                 Text("MAP PREVIEW", style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary)
                 Text(descriptor.usageNotice, style = MaterialTheme.typography.bodyMedium)
+                route?.let { calculated ->
+                    Text(
+                        if (calculated.hasCurrentDriverReview) "Route: DRIVER REVIEWED"
+                        else "Route: UNVERIFIED",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = if (calculated.hasCurrentDriverReview) MaterialTheme.colorScheme.tertiary
+                            else MaterialTheme.colorScheme.error,
+                    )
+                    if (calculated.warnings.isNotEmpty()) Text("Route: DATA WARNING",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.error)
+                    if (System.currentTimeMillis() - calculated.provenance.receivedAtEpochMillis >
+                        24 * 60 * 60 * 1000L
+                    ) Text("Route: OFFLINE / STALE", style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.error)
+                }
                 Text(
                     if (loadState == MapLoadState.READY) "Map loaded" else "Loading evaluation map…",
                     style = MaterialTheme.typography.labelMedium,

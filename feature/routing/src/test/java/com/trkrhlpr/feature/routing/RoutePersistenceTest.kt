@@ -28,8 +28,33 @@ class RoutePersistenceTest {
     }
 
     @Test fun unknownSchemaAndCorruptGeometryAreRejected() {
-        assertNull(decodeRoute("""{"schema_version":2}"""))
+        assertNull(decodeRoute("""{"schema_version":99}"""))
         val corrupt = encodeRoute(route).replace("\"latitude\":40.0", "\"latitude\":400.0")
         assertNull(decodeRoute(corrupt))
+    }
+
+    @Test fun reviewedRouteRoundTripsAndMismatchedReviewIsRejected() {
+        val reviewed = route.copy(review = RouteReview("request-1", 1L, 30L))
+        assertEquals(reviewed, decodeRoute(encodeRoute(reviewed)))
+
+        val mismatched = route.copy(review = RouteReview("different", 1L, 30L))
+        assertNull(decodeRoute(encodeRoute(mismatched)))
+    }
+
+    @Test fun phaseThreeSchemaLoadsAsUnreviewed() {
+        val phaseThree = encodeRoute(route).replace("\"schema_version\":2", "\"schema_version\":1")
+        val decoded = decodeRoute(phaseThree)
+
+        assertNotNull(decoded)
+        assertNull(decoded?.review)
+        assertFalse(decoded?.hasCurrentDriverReview == true)
+        assertFalse(canOpenRouteMap(decoded))
+    }
+
+    @Test fun mapGateRequiresReviewForExactRouteAndProfile() {
+        assertFalse(canOpenRouteMap(route))
+        assertTrue(canOpenRouteMap(route.copy(review = RouteReview("request-1", 1L, 30L))))
+        assertFalse(canOpenRouteMap(route.copy(review = RouteReview("wrong", 1L, 30L))))
+        assertFalse(canOpenRouteMap(route.copy(review = RouteReview("request-1", 2L, 30L))))
     }
 }
