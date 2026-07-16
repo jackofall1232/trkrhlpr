@@ -50,14 +50,25 @@ internal object SampleContent {
         Triple("If you feel too tired to drive safely, the safe action is to:",
             listOf("Push through to the next stop", "Stop and rest before continuing", "Open a window and continue"), 1),
     )
-    val questions = testCategories.map { category ->
-        val id = "sample-question-" + category.id
-        QuestionEntity(id, category.id,
-            "Sample interface question: Which option demonstrates a deliberate safety check?",
-            "Skip the check|Pause and verify the condition|Assume the prior driver checked it",
-            "$id-answer-1",
-            "Sample explanation only. Production questions require an approved official source.",
-            "practice", true)
+    // Several labeled-sample practice questions per category so mock exams can randomize.
+    private val practiceTemplates = listOf(
+        Triple("Which option demonstrates a deliberate safety check?",
+            listOf("Skip the check", "Pause and verify the condition", "Assume the prior driver checked it"), 1),
+        Triple("Before moving the vehicle, what should you confirm?",
+            listOf("Mirrors and gauges are set", "Nothing — just go", "Only that the radio works"), 0),
+        Triple("If a warning light stays on, the safe action is to:",
+            listOf("Ignore it", "Investigate before driving", "Cover it up"), 1),
+        Triple("The safest habit for a repeated task is to:",
+            listOf("Rush to save time", "Follow the same deliberate steps every time", "Skip steps you already know"), 1),
+    )
+    val questions = testCategories.flatMap { category ->
+        practiceTemplates.mapIndexed { i, (prompt, answers, correct) ->
+            val id = "sample-question-${category.id}-$i"
+            QuestionEntity(id, category.id, "Sample interface question: $prompt",
+                answers.joinToString("|"), "$id-answer-$correct",
+                "Sample explanation only. Production questions require an approved official source.",
+                "practice", true)
+        }
     } + dailyPrompts.mapIndexed { index, (prompt, answers, correct) ->
         val id = "sample-daily-" + (index + 1)
         QuestionEntity(id, "daily", "Sample daily question: $prompt",

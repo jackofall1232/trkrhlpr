@@ -64,6 +64,13 @@ data class DailyDayCompletionEntity(
     val completedAtEpochMillis: Long,
 )
 
+/** Local mock-exam history (schema v4). Stores only a factual score — no readiness/pass-fail. */
+@Entity(tableName = "exam_results")
+data class ExamResultEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0, val categoryTitle: String,
+    val correct: Int, val total: Int, val completedAtEpochMillis: Long,
+)
+
 data class TestAttemptStats(val total: Int, val correct: Int)
 
 @Dao
@@ -78,6 +85,8 @@ interface LastWagonDao {
     fun observeTestCategories(): Flow<List<TestCategoryEntity>>
     @Query("SELECT * FROM questions WHERE categoryId = :categoryId AND type = 'practice' LIMIT 1")
     suspend fun getPracticeQuestion(categoryId: String): QuestionEntity?
+    @Query("SELECT * FROM questions WHERE categoryId = :categoryId AND type = 'practice' ORDER BY id")
+    suspend fun getPracticeQuestions(categoryId: String): List<QuestionEntity>
     @Query("SELECT * FROM questions WHERE type = 'daily' LIMIT 1")
     suspend fun getDailyQuestion(): QuestionEntity?
     @Query("SELECT * FROM questions WHERE type = 'daily' ORDER BY id")
@@ -94,6 +103,8 @@ interface LastWagonDao {
     fun observeDailyCompletionCount(): Flow<Int>
     @Query("SELECT epochDay FROM daily_day_completions")
     fun observeCompletedDailyDays(): Flow<List<Long>>
+    @Query("SELECT * FROM exam_results ORDER BY completedAtEpochMillis DESC, id DESC")
+    fun observeExamResults(): Flow<List<ExamResultEntity>>
     @Query("SELECT COUNT(*) FROM content_versions WHERE version = :version")
     suspend fun contentVersionCount(version: Int): Int
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -115,12 +126,15 @@ interface LastWagonDao {
     suspend fun insertDailyCompletion(value: DailyCompletionEntity)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDailyDayCompletion(value: DailyDayCompletionEntity)
+    @Insert suspend fun insertExamResult(value: ExamResultEntity)
     @Query("DELETE FROM inspection_completions") suspend fun clearInspectionProgress()
     @Query("DELETE FROM test_attempts") suspend fun clearTestProgress()
     @Query("DELETE FROM daily_completions") suspend fun clearDailyProgress()
     @Query("DELETE FROM daily_day_completions") suspend fun clearDailyDayProgress()
+    @Query("DELETE FROM exam_results") suspend fun clearExamResults()
     @Transaction suspend fun resetProgress() {
-        clearInspectionProgress(); clearTestProgress(); clearDailyProgress(); clearDailyDayProgress()
+        clearInspectionProgress(); clearTestProgress(); clearDailyProgress()
+        clearDailyDayProgress(); clearExamResults()
     }
 }
 
@@ -153,12 +167,25 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
     }
 }
 
+/** Schema v3 -> v4: adds the exam_results table for local mock-exam history. Additive. The
+ *  column SQL must match Room's generated createSql for the autoGenerate PK (rowid alias). */
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `exam_results` (" +
+                "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `categoryTitle` TEXT NOT NULL, " +
+                "`correct` INTEGER NOT NULL, `total` INTEGER NOT NULL, " +
+                "`completedAtEpochMillis` INTEGER NOT NULL)",
+        )
+    }
+}
+
 @Database(
     entities = [ContentVersionEntity::class, InspectionCategoryEntity::class,
         InspectionItemEntity::class, InspectionCompletionEntity::class,
         TestCategoryEntity::class, QuestionEntity::class, TestAttemptEntity::class,
-        DailyCompletionEntity::class, DailyDayCompletionEntity::class],
-    version = 3,
+        DailyCompletionEntity::class, DailyDayCompletionEntity::class, ExamResultEntity::class],
+    version = 4,
     exportSchema = true,
 )
 abstract class LastWagonDatabase : RoomDatabase() {
@@ -166,7 +193,7 @@ abstract class LastWagonDatabase : RoomDatabase() {
     companion object {
         fun create(context: Context) =
             Room.databaseBuilder(context, LastWagonDatabase::class.java, "lastwagon.db")
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                 .build()
     }
 }

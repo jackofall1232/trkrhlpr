@@ -8,6 +8,13 @@ android {
     defaultConfig { minSdk = 26; testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     ksp { arg("room.schemaLocation", "$projectDir/schemas") }
+    // Exported Room schemas are needed as test assets so MigrationTestHelper can load them.
+    sourceSets {
+        getByName("test") {
+            assets.srcDir("$projectDir/schemas")
+        }
+    }
+    testOptions { unitTests.isIncludeAndroidResources = true }
 }
 dependencies {
     api(project(":core:model"))
@@ -18,4 +25,9 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+    // Robolectric-backed Room migration + DAO tests (owner-approved planned test dependency).
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.androidx.test.ext.junit)
+    testImplementation(libs.androidx.room.testing)
 }

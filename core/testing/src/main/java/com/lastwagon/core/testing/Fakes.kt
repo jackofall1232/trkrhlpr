@@ -20,6 +20,8 @@ class FakeContentRepository(
     override fun observeInspectionItems() = inspectionItems
     override fun observeTestCategories() = testCategories
     override suspend fun getPracticeQuestion(categoryId: ContentId) = practiceQuestion
+    override suspend fun getPracticeQuestions(categoryId: ContentId) =
+        practiceQuestion?.let { listOf(it) } ?: emptyList()
     override suspend fun getDailyQuestion() = dailyQuestion
     override suspend fun getDailyQuestions() = dailyQuestions
 }
@@ -31,9 +33,11 @@ class FakeProgressRepository(
     val inspectionProgress = MutableStateFlow(inspection)
     val progressSnapshot = MutableStateFlow(snapshot)
     val completedDailyDays = MutableStateFlow<Set<Long>>(emptySet())
+    val examHistory = MutableStateFlow<List<ExamResult>>(emptyList())
     override fun observeInspectionProgress() = inspectionProgress
     override fun observeProgressSnapshot() = progressSnapshot
     override fun observeCompletedDailyDays() = completedDailyDays
+    override fun observeExamHistory() = examHistory
     override suspend fun setInspectionItemComplete(itemId: ContentId, complete: Boolean) {
         inspectionProgress.update {
             it.copy(completedItemIds = if (complete) it.completedItemIds + itemId else it.completedItemIds - itemId)
@@ -52,9 +56,13 @@ class FakeProgressRepository(
     override suspend fun completeDailyQuestion(questionId: ContentId, correct: Boolean) {
         progressSnapshot.update { it.copy(dailyCompleted = true, dailyStreak = 1) }
     }
+    override suspend fun recordExamResult(categoryTitle: String, score: ExamScore) {
+        examHistory.update { it + ExamResult("fake-" + it.size, categoryTitle, score, 0L) }
+    }
     override suspend fun resetAllProgress() {
         inspectionProgress.value = InspectionProgress(totalItems = inspectionProgress.value.totalItems)
         progressSnapshot.value = ProgressSnapshot()
+        examHistory.value = emptyList()
     }
 }
 

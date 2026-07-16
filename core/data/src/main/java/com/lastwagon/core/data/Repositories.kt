@@ -36,6 +36,8 @@ class OfflineContentRepository(private val database: LastWagonDatabase) : Conten
         }
     override suspend fun getPracticeQuestion(categoryId: ContentId) =
         dao.getPracticeQuestion(categoryId.value)?.toPracticeQuestion()
+    override suspend fun getPracticeQuestions(categoryId: ContentId) =
+        dao.getPracticeQuestions(categoryId.value).map { it.toPracticeQuestion() }
     override suspend fun getDailyQuestion() = dao.getDailyQuestion()?.toDailyQuestion()
     override suspend fun getDailyQuestions() = dao.getDailyQuestions().map { it.toDailyQuestion() }
 }
@@ -51,6 +53,13 @@ class OfflineProgressRepository(private val dao: LastWagonDao) : ProgressReposit
         }
     override fun observeCompletedDailyDays(): Flow<Set<Long>> =
         dao.observeCompletedDailyDays().map { it.toSet() }
+    override suspend fun recordExamResult(categoryTitle: String, score: ExamScore) {
+        dao.insertExamResult(ExamResultEntity(
+            categoryTitle = categoryTitle, correct = score.correct, total = score.total,
+            completedAtEpochMillis = System.currentTimeMillis()))
+    }
+    override fun observeExamHistory(): Flow<List<ExamResult>> =
+        dao.observeExamResults().map { results -> results.map { it.toModel() } }
     override fun observeProgressSnapshot(): Flow<ProgressSnapshot> =
         combine(observeInspectionProgress(), dao.observeTestAttemptStats(), observeCompletedDailyDays()
         ) { inspection, stats, days ->
@@ -210,3 +219,5 @@ private fun QuestionEntity.toPracticeQuestion() = PracticeQuestion(
     explanation, isSample)
 private fun QuestionEntity.toDailyQuestion() = DailyQuestion(
     ContentId(id), prompt, answers(), ContentId(correctAnswerId), explanation, isSample)
+private fun ExamResultEntity.toModel() = ExamResult(
+    id.toString(), categoryTitle, ExamScore(correct, total), completedAtEpochMillis)

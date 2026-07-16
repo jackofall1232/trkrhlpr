@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lastwagon.core.designsystem.*
 import com.lastwagon.core.model.*
+import kotlin.random.Random
 import kotlinx.coroutines.launch
 
 @Composable fun InspectionScreen(
@@ -282,6 +283,11 @@ private fun verificationDisplay(status: VerificationStatus): Pair<String, Color>
     progressRepository: ProgressRepository,
     modifier: Modifier = Modifier,
 ) {
+    var examMode by rememberSaveable { mutableStateOf(false) }
+    if (examMode) {
+        MockExamScreen(contentRepository, progressRepository, onBack = { examMode = false }, modifier)
+        return
+    }
     val categories by contentRepository.observeTestCategories().collectAsStateWithLifecycle(
         initialValue = emptyList(),
     )
@@ -303,6 +309,16 @@ private fun verificationDisplay(status: VerificationStatus): Pair<String, Color>
             category == null -> LazyColumn(modifier.fillMaxSize(), contentPadding = PaddingValues(WagonSpacing.lg),
                 verticalArrangement = Arrangement.spacedBy(WagonSpacing.md)) {
                 item { SectionHeader("Knowledge", "CDL practice", "Sample interaction only. No question is authoritative.") }
+                item {
+                    FeatureTile("Mock exam",
+                        "Randomized sample test with a factual score and missed-question review.",
+                        Icons.AutoMirrored.Rounded.FactCheck, WagonColors.DashboardBlue,
+                        onClick = { examMode = true })
+                }
+                item {
+                    Text("SINGLE QUESTIONS BY CATEGORY", style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary)
+                }
                 items(categories) { value ->
                     WagonCard(Modifier.fillMaxWidth(), onClick = { selectedCategoryId = value.id.value }) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -435,6 +451,157 @@ private fun verificationDisplay(status: VerificationStatus): Pair<String, Color>
                         complete = true
                     }
                 }, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) { Text("Submit answer") }
+            }
+        }
+    }
+}
+
+private enum class ExamPhase { SETUP, IN_PROGRESS, RESULT }
+private const val EXAM_SIZE = 5
+
+/**
+ * Mock-exam flow (Track A unit 4b): pick a category, take a randomized sample exam, then see a
+ * FACTUAL score and a missed-question review, plus local history. Per the owner's decision and
+ * the no-false-claims constraint, nothing here presents a readiness or pass/fail prediction.
+ */
+@Composable fun MockExamScreen(
+    contentRepository: ContentRepository,
+    progressRepository: ProgressRepository,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val categories by contentRepository.observeTestCategories().collectAsStateWithLifecycle(
+        initialValue = emptyList())
+    val history by progressRepository.observeExamHistory().collectAsStateWithLifecycle(
+        initialValue = emptyList())
+    var phase by remember { mutableStateOf(ExamPhase.SETUP) }
+    var exam by remember { mutableStateOf<List<PracticeQuestion>>(emptyList()) }
+    var categoryTitle by remember { mutableStateOf("") }
+    val answers = remember { mutableStateMapOf<String, String>() }
+    var score by remember { mutableStateOf<ExamScore?>(null) }
+    var missed by remember { mutableStateOf<List<PracticeQuestion>>(emptyList()) }
+    val scope = rememberCoroutineScope()
+
+    when (phase) {
+        ExamPhase.SETUP -> LazyColumn(modifier.fillMaxSize(), contentPadding = PaddingValues(WagonSpacing.lg),
+            verticalArrangement = Arrangement.spacedBy(WagonSpacing.md)) {
+            item {
+                TextButton(onClick = onBack) {
+                    Icon(Icons.AutoMirrored.Rounded.ArrowBack, null); Text("Practice")
+                }
+                SectionHeader("Mock exam", "Randomized sample test",
+                    "No score here is a readiness or pass/fail prediction — it is only how many sample questions you answered correctly.")
+            }
+            item {
+                Text("CHOOSE A CATEGORY", style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary)
+            }
+            items(categories, key = { it.id.value }) { category ->
+                WagonCard(Modifier.fillMaxWidth(), onClick = {
+                    scope.launch {
+                        val built = MockExamEngine.buildExam(
+                            contentRepository.getPracticeQuestions(category.id), EXAM_SIZE, Random.Default)
+                        if (built.isNotEmpty()) {
+                            exam = built; categoryTitle = category.title; answers.clear()
+                            score = null; missed = emptyList(); phase = ExamPhase.IN_PROGRESS
+                        }
+                    }
+                }) {
+                    Text(category.title, style = MaterialTheme.typography.titleLarge)
+                    Text("Start a sample exam of up to " + EXAM_SIZE + " questions",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            if (history.isNotEmpty()) {
+                item {
+                    Text("RECENT RESULTS", style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary)
+                }
+                items(history.take(5), key = { it.id }) { result ->
+                    WagonCard(Modifier.fillMaxWidth()) {
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(WagonSpacing.sm)) {
+                            Text(result.categoryTitle, Modifier.weight(1f),
+                                style = MaterialTheme.typography.titleMedium)
+                            WagonTag(result.score.correct.toString() + "/" + result.score.total,
+                                WagonColors.DashboardBlue)
+                        }
+                    }
+                }
+            }
+        }
+        ExamPhase.IN_PROGRESS -> LazyColumn(modifier.fillMaxSize(), contentPadding = PaddingValues(WagonSpacing.lg),
+            verticalArrangement = Arrangement.spacedBy(WagonSpacing.md)) {
+            item {
+                TextButton(onClick = { phase = ExamPhase.SETUP }) {
+                    Icon(Icons.AutoMirrored.Rounded.ArrowBack, null); Text("Cancel")
+                }
+                SectionHeader(categoryTitle, "Answer every question",
+                    "Sample questions only — not official CDL content.")
+            }
+            exam.forEachIndexed { index, question ->
+                item {
+                    WagonCard(Modifier.fillMaxWidth()) {
+                        Text("QUESTION " + (index + 1) + " OF " + exam.size,
+                            style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                        Text(question.prompt, style = MaterialTheme.typography.titleMedium)
+                    }
+                }
+                items(question.answers, key = { question.id.value + "-" + it.id.value }) { answer ->
+                    AnswerOption(answer.text, answers[question.id.value] == answer.id.value,
+                        enabled = true, onClick = { answers[question.id.value] = answer.id.value })
+                }
+            }
+            item {
+                Button(enabled = answers.size == exam.size, onClick = {
+                    val typed = answers.entries.associate { ContentId(it.key) to ContentId(it.value) }
+                    val result = MockExamEngine.score(exam, typed)
+                    score = result; missed = MockExamEngine.missed(exam, typed)
+                    scope.launch { progressRepository.recordExamResult(categoryTitle, result) }
+                    phase = ExamPhase.RESULT
+                }, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
+                    Text(if (answers.size == exam.size) "Submit exam" else "Answer all to submit")
+                }
+            }
+        }
+        ExamPhase.RESULT -> {
+            val result = score
+            LazyColumn(modifier.fillMaxSize(), contentPadding = PaddingValues(WagonSpacing.lg),
+                verticalArrangement = Arrangement.spacedBy(WagonSpacing.md)) {
+                item {
+                    SectionHeader("Result",
+                        (result?.correct ?: 0).toString() + " of " + (result?.total ?: 0) + " correct",
+                        "A factual sample score (" + (result?.percent ?: 0) + "%) — not a readiness or pass/fail prediction.")
+                }
+                if (missed.isNotEmpty()) {
+                    item {
+                        Text("REVIEW MISSED QUESTIONS", style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary)
+                    }
+                    items(missed, key = { it.id.value }) { question ->
+                        WagonCard(Modifier.fillMaxWidth()) {
+                            Text(question.prompt, style = MaterialTheme.typography.titleMedium)
+                            question.answers.firstOrNull { it.id == question.correctAnswerId }?.let {
+                                Text("Correct answer: " + it.text, color = WagonColors.SignalGreen,
+                                    style = MaterialTheme.typography.bodyMedium)
+                            }
+                            Text(question.explanation, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodyMedium)
+                        }
+                    }
+                } else {
+                    item {
+                        StatePanel("All sample answers correct",
+                            "You matched every sample answer in this exam.",
+                            Icons.Rounded.TaskAlt, WagonColors.SignalGreen)
+                    }
+                }
+                item {
+                    Button(onClick = {
+                        answers.clear(); score = null; missed = emptyList(); phase = ExamPhase.SETUP
+                    }, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) { Text("New exam") }
+                }
+                item { TextButton(onClick = onBack) { Text("Back to practice") } }
             }
         }
     }

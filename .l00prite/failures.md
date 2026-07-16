@@ -63,3 +63,19 @@ Record failed approaches and why they should not be retried unless conditions ch
 - **Note vs prior session:** the failures.md "Google Maven blocked / standalone
   kotlin-compiler workaround" note is env-specific to the older remote host and does NOT apply
   here — prefer real `./gradlew` verification on this host.
+- **AGP 9.2.1 test-asset source set DSL:** the top-level form
+  `sourceSets.getByName("test").assets.srcDir(...)` throws at configure time
+  ("DefaultAndroidLibrarySourceSet_Decorated cannot be cast to AndroidLibrarySourceSet"). Use
+  the block form `sourceSets { getByName("test") { assets.srcDir("$projectDir/schemas") } }`
+  instead (needed to expose exported Room schemas to Robolectric MigrationTestHelper). `srcDir`
+  warns as deprecated but works.
+- **Robolectric + compileSdk 36:** pin the emulated SDK via
+  `src/test/resources/robolectric.properties` (`sdk=33`) so Robolectric need not support
+  API 36; Room migration SQL is SDK-independent. Robolectric 4.14.1 + androidx.room:room-testing
+  + androidx.test:core 1.6.1 work for JVM migration/DAO tests here.
+- **New-schema-version first-build race:** the build that FIRST generates schema `N.json`
+  (KSP export) can fail its MigrationTestHelper test with `FileNotFound … /N.json` because the
+  unit-test asset merge ran before the export. The exported schema is on disk afterward, so a
+  simple re-run passes (and the schema should be committed to VCS). Not a schema-content
+  mismatch — distinguish by the message (`Cannot find the schema file` vs an expected/found
+  column diff).

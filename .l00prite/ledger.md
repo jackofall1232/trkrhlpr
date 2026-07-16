@@ -975,3 +975,126 @@ Append one entry per agent run. Do not overwrite prior runs.
   `b8f3f48..2fffe44  0.1.0-beta -> 0.1.0-beta`. Branch is up to date with origin.
 - **Next:** To build Units 4 (no-readiness) and 6 (Robolectric), re-run the execute-loop
   pre-flight (naming the Robolectric dep) + EXECUTE.
+
+### Run 2026-07-16T23:10:44Z — Claude — Execution Mode RESUMED (Units 4 & 6)
+- **Pre-flight:** Updated pre-flight displayed (Units 4 no-readiness + 6 Robolectric, counter
+  reset 4→0/25, Robolectric named as the one new dep). Owner replied `EXECUTE`. No stale
+  arming (both flags false), lock released, schema intact, no pending events.
+- **Armed:** lock 5a8f94ae-78d0-4070-b6df-0254cf4a457c; execution.enabled=true,
+  current_iteration reset 0, should_continue=true, state.execution_active=true.
+
+#### Iteration 1 (resumed) — Unit 6: local progress (real migration/DAO tests + criteria)
+- **Unit:** Give local-progress persistence real tests and draft acceptance criteria (todos
+  Track A #6), using the owner-approved Robolectric test dependency.
+- **Changed files:** `gradle/libs.versions.toml` (+robolectric 4.14.1, +androidx.test:core
+  1.6.1, +androidx.room:room-testing, +androidx.test.ext:junit ref); `core/data/build.gradle.kts`
+  (Robolectric/room-testing testImplementations; `unitTests.isIncludeAndroidResources=true`;
+  test source set assets ← `$projectDir/schemas` so MigrationTestHelper finds exported JSON);
+  `core/data/src/test/resources/robolectric.properties` (sdk=33); new
+  `core/data/schemas/com.lastwagon.core.data.LastWagonDatabase/1.json` (v1 baseline seeded from
+  the pre-rename trkrhlpr v1 schema — identical entity structure, so identityHash matches);
+  new `MigrationTest.kt` (executes v1→v3, validates vs exported schema) and `LastWagonDaoTest.kt`
+  (real Room v3 round-trip); new `docs/local-progress-acceptance.md` (proposed criteria).
+- **Design decisions:** (1) Robolectric pinned to emulate SDK 33 via robolectric.properties —
+  the migration SQL is SDK-independent SQLite, so this sidesteps needing Robolectric support for
+  compileSdk 36. (2) Seeded the missing v1 baseline schema from the trkrhlpr v1 JSON (DB class
+  name is not part of the identity hash; v1 tables were unchanged by the rename) so
+  MigrationTestHelper can start at v1. (3) Acceptance criteria drafted as *proposed pending
+  approval* — implementing tests against them; formal sign-off stays a human gate.
+- **Verification:** `ANDROID_HOME=/opt/android-sdk ./gradlew :core:data:testDebugUnitTest
+  --no-daemon` → real exit 0, **BUILD SUCCESSFUL in 1m 3s** (2026-07-16). NEW: MigrationTest
+  1/0/0/0 (real v1→v3 ALTER/CREATE executed + schema-validated), LastWagonDaoTest 3/0/0/0
+  (provenance columns round-trip, day-completions one-per-day + streak, resetProgress clears
+  them). Existing InspectionContentSchemaTest 8, AnswerEncodingTest 1, PreferencesParsingTest 2,
+  VehicleProfilePersistenceTest 2 all green. Evidence: scratchpad/gradle-unit6b.log.
+- **Significance:** the v1→v2 and v2→v3 migrations shipped in commits 2fffe44 are now
+  EXECUTED-and-validated in JVM, not merely device-gated. Only the Compose UI rendering remains
+  a device gate.
+- **Failures:** One tooling failure, fixed on the 2nd attempt (recorded in failures.md): AGP
+  9.2.1 rejected the top-level `sourceSets.getByName("test").assets` accessor with a
+  DefaultAndroidLibrarySourceSet cast error; the `sourceSets { getByName("test") { assets.srcDir
+  } }` block form works.
+- **Progress telemetry:** real progress → last_progress_iteration=1, iterations_since_progress=0.
+- **Next action:** Iteration 2 — Unit 4 mock-exam engine, **no readiness claim** (score %, test
+  history, missed-question review; randomized selection). Pure engine logic in core:model with
+  tests; UI in feature:learning.
+- **Lock:** 5a8f94ae-78d0-4070-b6df-0254cf4a457c held (execution run).
+
+#### Iteration 2 (resumed) — Unit 4a: mock-exam engine + history (no readiness claim)
+- **Unit:** The testable core of the mock-exam engine (todos Track A #4), split from its UI
+  (4b, next iteration). Owner decision honored: **NO readiness/pass-fail signal** — only a
+  factual score.
+- **Changed files:** `core/model/.../Models.kt` (`ExamScore`, `ExamResult`, pure `MockExamEngine`
+  buildExam/score/missed; repo interface methods getPracticeQuestions, recordExamResult,
+  observeExamHistory); new `MockExamEngineTest.kt` (6 tests); `core/data/.../Database.kt`
+  (`ExamResultEntity`, DAO getPracticeQuestions/insertExamResult/observeExamResults/clear;
+  `@Database version=4`; additive `MIGRATION_3_4`; registered); `core/data/.../Repositories.kt`
+  (impls + `ExamResultEntity.toModel`); `core/data/.../SampleContent.kt` (4 labeled-sample
+  practice questions per category so exams can randomize); `core/data/.../AnswerEncodingTest.kt`
+  (updated for the per-category pool); `core/testing/.../Fakes.kt` (new interface methods);
+  `MigrationTest.kt` extended to v1→v4; `LastWagonDaoTest.kt` (+exam-history test);
+  Room-exported schema v4.
+- **Design decisions:** (1) No readiness claim — `ExamResult` carries only correct/total/percent
+  and a timestamp; docstring states the constraint. (2) `buildExam` takes a `kotlin.random.Random`
+  so randomization is deterministic-with-seed and unit-testable; caps at pool size. (3) `missed`
+  treats unanswered as incorrect. (4) exam_results uses an autoGenerate PK; the v3→v4 migration
+  SQL matches Room's `INTEGER PRIMARY KEY AUTOINCREMENT` createSql (verified by MigrationTest).
+- **Verification:** `ANDROID_HOME=/opt/android-sdk ./gradlew :core:data:testDebugUnitTest
+  --no-daemon --rerun-tasks` → real exit 0, **BUILD SUCCESSFUL in 39s** (2026-07-16). NEW/updated:
+  MockExamEngineTest 6/0/0/0, LastWagonDaoTest 4/0/0/0 (incl. exam history newest-first + reset),
+  MigrationTest 1/0/0/0 (now executes v1→**v4**, validating MIGRATION_3_4 against schema 4.json),
+  AnswerEncodingTest 1/0/0/0 (per-category pool). Whole-project run also green except the
+  first-build schema-asset race (below). Evidence: scratchpad/gradle-unit4a2.log.
+- **Failures:** One tooling failure, fixed by re-run (recorded in failures.md): the first build
+  to generate schema 4.json failed MigrationTest with `FileNotFound …/4.json` (unit-test asset
+  merge raced the KSP schema export); re-running with 4.json on disk passed. NOT a schema-content
+  mismatch.
+- **Progress telemetry:** real progress → last_progress_iteration=2, iterations_since_progress=0.
+- **Next action:** Iteration 3 — Unit 4b: mock-exam UI in feature:learning (start exam by
+  category + size, answer flow, factual score + missed-question review, local history list),
+  wired to the engine + repo. Compile-verified (UI device gate).
+- **Lock:** 5a8f94ae-78d0-4070-b6df-0254cf4a457c held (execution run).
+
+#### Iteration 3 (resumed) — Unit 4b: mock-exam UI (no readiness claim)
+- **Unit:** The mock-exam UI flow (todos Track A #4b), completing Unit 4 and all of Track A.
+- **Changed files:** `feature/learning/.../LearningScreens.kt` — new `MockExamScreen`
+  (SETUP→IN_PROGRESS→RESULT state machine): pick a category, take a randomized sample exam
+  (via `MockExamEngine.buildExam`), answer flow, then a FACTUAL score + missed-question review
+  (correct answer + explanation) and a local recent-results list; `PracticeScreen` gains a
+  "Mock exam" entry (mode switch, no app-nav changes).
+- **Design decisions:** (1) All result copy states it is a factual sample score and explicitly
+  "not a readiness or pass/fail prediction" (owner decision / no-false-claims). (2) Integrated
+  as a mode inside PracticeScreen to avoid touching app navigation. (3) Exam/answers/score held
+  in `remember` (reset together) to avoid partial restored state; persisting an in-progress exam
+  across process death is a deferred nicety.
+- **Verification:** `ANDROID_HOME=/opt/android-sdk ./gradlew compileDebugKotlin --no-daemon`
+  → real exit 0, **BUILD SUCCESSFUL** (2026-07-16), all modules compile. Then whole-project
+  `testDebugUnitTest compileDebugKotlin` → exit 0, **65 tests, 0 failures/errors**. Evidence:
+  scratchpad/gradle-unit4b.log, gradle-final.log.
+- **Honest limitation:** the mock-exam UI is compile-verified only; the exam-taking flow,
+  scoring display, missed-review, and history rendering remain under the connected-Compose
+  device gate. The engine + persistence beneath it are unit/Robolectric-tested (iter 2).
+- **Failures:** None.
+- **Progress telemetry:** real progress → last_progress_iteration=3, iterations_since_progress=0.
+
+### Run-summary — Resumed Execution Mode complete; paused at human_review_gate (2026-07-16T23:48:12Z)
+- **Iterations completed:** 3 (Unit 6, Unit 4a, Unit 4b). Budget used 3/25.
+- **Result: ALL SIX Track A units are now done** (1 content-schema v2, 2 Study Mode, 3 Real
+  Inspection Mode, 4 mock-exam engine+UI no-readiness, 5 daily question+streak, 6 local-progress
+  migration/DAO tests). Schema evolved v1→v4, all additive/non-destructive, all executed-and-
+  validated by the Robolectric MigrationTest (v1→v4). Whole project: **65 tests, 0 failures**;
+  all debug Kotlin compiles.
+- **Boundary + why:** `human_review_gate`. No ungated Track-A work remains. Everything beyond is
+  gated: Track B (author the real 132-item checklist + CDL/daily content) needs the docs-
+  foundation approval + full-text verification against FMCSA/eCFR (network to those hosts) that
+  the todos already track; Track C (truck-stop data) needs its research gate; and all new UI +
+  the executed migrations still need on-device/connected-Compose review; production readiness
+  needs human sign-off.
+- **Not done / still open:** Track B & C; device-gated UI + migration reviews; formal approval of
+  the proposed local-progress acceptance criteria; timezone-aware daily day; persisting the
+  inspection vehicle-config + in-progress exam across process death.
+- **Next recommended action:** Commit + push this resumed run to 0.1.0-beta (standing owner
+  grant). Then the highest-value next step is a human decision on Track B: approve the production
+  content foundation so real content authoring + full-text verification can begin in a session
+  with network access to FMCSA/eCFR.
+- **Lock:** 5a8f94ae-78d0-4070-b6df-0254cf4a457c released.

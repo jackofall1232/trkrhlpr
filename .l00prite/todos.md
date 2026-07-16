@@ -23,13 +23,24 @@ waits behind its gate:
      required-progress bar; hidden-not-applicable count. Pure `InspectionApplicability.evaluate`
      unit-tested (6 tests). IF_EQUIPPED kept soft (show-with-skip). UI on-device review is the
      connected-Compose device gate. Config-selection persistence deferred to unit 6.
-  4. Mock-exam engine: randomized tests, scoring, missed-question review, test history,
-     readiness scoring (define behavior first, then implement).
+  4. Mock-exam engine: randomized tests, scoring, missed-question review, test history.
+     Owner decision 2026-07-16: **no readiness scoring / no pass-fail claim** (no-false-claims).
+     - [x] 4a 2026-07-16: pure `MockExamEngine` (seeded randomized selection, scoring, missed
+       review) + `ExamResult` history persistence (Room v3→v4, exam_results). Tests:
+       MockExamEngineTest 6, LastWagonDaoTest exam-history, MigrationTest v1→v4. Green.
+     - [x] 4b 2026-07-16: mock-exam UI (`MockExamScreen`) — pick category, randomized sample
+       exam, factual score + missed-question review + local history; entry from PracticeScreen.
+       No readiness/pass-fail language. Compile-verified (UI device gate). **Unit 4 complete.**
   5. [x] 2026-07-16: Daily safety question — deterministic one-per-day selection from a labeled
      sample pool, answer/explanation, and a real streak backed by a new day-keyed table
      (schema v3). Pure selection + streak logic unit-tested (7 tests). UI + executed migration
      remain device gates.
-  6. Local progress: acceptance criteria + persistence/migration tests.
+  6. [x] 2026-07-16: Local progress — real persistence/migration tests via owner-approved
+     Robolectric: `MigrationTest` executes v1→v3 and validates vs exported schema;
+     `LastWagonDaoTest` round-trips the Room v3 stack (provenance columns, one-per-day
+     completions + streak, resetProgress). Proposed acceptance criteria in
+     docs/local-progress-acceptance.md (formal approval still a human gate). The v1→v2/v2→v3
+     migrations are now executed-and-validated, not just device-gated.
 - **Track B — behind human gates (docs approval + full-text verification):**
   7. Author the 132 checklist items as real content (original prose, per-item provenance).
   8. Author CDL class + endorsement practice questions and daily questions (original prose).

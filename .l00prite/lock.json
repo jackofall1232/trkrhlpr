@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "lock_id": "06ee6370-b66f-4a46-85b7-772e049f1b92",
+  "lock_id": "5a8f94ae-78d0-4070-b6df-0254cf4a457c",
   "owner_agent": null,
   "owner_session": null,
-  "acquired_at": "2026-07-16T22:28:50Z",
-  "expires_at": "2026-07-16T23:58:50Z",
+  "acquired_at": "2026-07-16T23:10:44Z",
+  "expires_at": "2026-07-17T00:40:44Z",
   "ttl_seconds": 5400,
   "purpose": null,
   "protected_paths": [

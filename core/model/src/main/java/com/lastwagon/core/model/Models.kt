@@ -68,6 +68,31 @@ data class PracticeQuestion(
     val correctAnswerId: ContentId, val explanation: String, val isSample: Boolean = true,
 )
 data class AnswerResult(val selectedAnswerId: ContentId, val isCorrect: Boolean, val explanation: String)
+
+data class ExamScore(val correct: Int, val total: Int) {
+    val percent get() = if (total == 0) 0 else correct * 100 / total
+}
+
+/** A completed mock-exam record for local test history. Deliberately carries NO readiness or
+ *  pass/fail judgement — only a factual score — per the no-false-claims safety constraint. */
+data class ExamResult(
+    val id: String, val categoryTitle: String, val score: ExamScore, val completedAtEpochMillis: Long,
+)
+
+object MockExamEngine {
+    /** A randomized, deterministic-with-seed subset of the pool, capped at the pool size. */
+    fun buildExam(pool: List<PracticeQuestion>, size: Int, random: kotlin.random.Random): List<PracticeQuestion> {
+        if (size <= 0 || pool.isEmpty()) return emptyList()
+        return pool.shuffled(random).take(size.coerceAtMost(pool.size))
+    }
+
+    /** `answers` maps question id -> chosen answer id (absent = unanswered = incorrect). */
+    fun score(questions: List<PracticeQuestion>, answers: Map<ContentId, ContentId>): ExamScore =
+        ExamScore(questions.count { answers[it.id] == it.correctAnswerId }, questions.size)
+
+    fun missed(questions: List<PracticeQuestion>, answers: Map<ContentId, ContentId>): List<PracticeQuestion> =
+        questions.filter { answers[it.id] != it.correctAnswerId }
+}
 data class DailyQuestion(
     val id: ContentId, val prompt: String, val answers: List<AnswerChoice>,
     val correctAnswerId: ContentId, val explanation: String, val isSample: Boolean = true,
@@ -168,6 +193,8 @@ interface ContentRepository {
     fun observeInspectionItems(): Flow<List<InspectionItem>>
     fun observeTestCategories(): Flow<List<TestCategory>>
     suspend fun getPracticeQuestion(categoryId: ContentId): PracticeQuestion?
+    /** The full pool of practice questions in a category, for building randomized mock exams. */
+    suspend fun getPracticeQuestions(categoryId: ContentId): List<PracticeQuestion>
     suspend fun getDailyQuestion(): DailyQuestion?
     /** The full pool of daily questions, for deterministic one-per-day selection. */
     suspend fun getDailyQuestions(): List<DailyQuestion>
@@ -180,6 +207,10 @@ interface ProgressRepository {
     suspend fun completeDailyQuestion(questionId: ContentId, correct: Boolean)
     /** UTC day indices on which a daily question has been completed (for streak counting). */
     fun observeCompletedDailyDays(): Flow<Set<Long>>
+    /** Records a completed mock exam in local history. */
+    suspend fun recordExamResult(categoryTitle: String, score: ExamScore)
+    /** Local mock-exam history, most recent first. */
+    fun observeExamHistory(): Flow<List<ExamResult>>
     suspend fun resetAllProgress()
 }
 interface PreferencesRepository {
