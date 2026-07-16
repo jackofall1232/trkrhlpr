@@ -4,8 +4,17 @@ Durable project facts and decisions that future agents should preserve.
 
 ## Decisions
 
+- The final product name is **"Last Wagon"** (confirmed by the user 2026-07-16). It is the
+  launcher label and applicationId (`com.lastwagon.app`) and appears throughout code and
+  docs; the GitHub repository keeps its `trkrhlpr` name.
 - trkrhlpr is Android-only and will initially be distributed as a sideloaded APK; Google
   Play support is not required for the first production milestone.
+- Phase 5 corridor downloads use the OpenFreeMap public instance (Liberty style) for
+  development and testing: no keys or request limits and commercial use allowed per the
+  recorded research, but no explicit written bulk-prefetch clause was located, so corridor
+  downloads stay bounded (small zoom ranges, 6,000-tile cap, one corridor at a time) and
+  production use requires written terms confirmation or self-hosting. The demo MapLibre
+  style must never be prefetched. See docs/map-provider-evaluation.md.
 - **Architecture Decision:** Map routing will use the "Route Corridor" strategy.
   - **Visuals:** MapLibre GL Native for Android (offline-capable vector tiles).
   - **Routing:** OpenRouteService (ORS) is the initial online routing provider, using its
