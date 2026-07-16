@@ -4,6 +4,7 @@
 - [ ] Implement MapLibre GL Native Android wrapper for offline-first map viewing.
 - [ ] Implement OpenRouteService (ORS) API client for truck-safe (HGV) route calculation.
 - [ ] Build "Route Corridor" tile pre-fetching and local geometry persistence logic.
+- [ ] Update Android manifest to request Internet and location permissions for mapping/routing.
 - [ ] Research authoritative FMCSA and official CDL-manual sources for the 131-point checklist.
 - [ ] Define the exact checklist scope, sequence, vehicle configurations, and defect criteria.
 - [ ] Define objective acceptance criteria for Study Mode and Real Inspection Mode.
