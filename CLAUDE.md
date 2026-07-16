@@ -34,7 +34,7 @@ This protocol initialization creates guidance and durable memory only.
 
 ## 3. Requirements
 
-- [ ] Deliver a researched and verified 131-point commercial-vehicle pre-trip inspection.
+- [ ] Deliver a researched and verified 132-point commercial-vehicle pre-trip inspection.
 - [ ] Provide Study Mode with ordered inspection guidance, item explanations, and common defects.
 - [ ] Provide Real Inspection Mode with item completion and clearly visible progress that reduces skipped items.
 - [ ] Provide lawful, authoritative CDL study material and practice tests for the confirmed classes, topics, and endorsements.
@@ -47,7 +47,7 @@ This protocol initialization creates guidance and durable memory only.
 ## 4. Definition of Done
 
 - [ ] Objective acceptance criteria for each first-milestone feature are researched, agreed, and recorded.
-- [ ] The 131-point inspection content and sequence are verified against authoritative sources.
+- [ ] The 132-point inspection content and sequence are verified against authoritative sources.
 - [ ] CDL and daily-safety content is lawful, attributed where required, and verified against official sources.
 - [ ] The confirmed first-milestone features work offline on the supported Android versions.
 - [ ] Local progress behavior, accessibility expectations, data handling, and update behavior are defined and verified.

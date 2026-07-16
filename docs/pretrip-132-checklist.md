@@ -1,42 +1,43 @@
-# 131-Point Pre-Trip Inspection — Researched Definition
+# 132-Point Pre-Trip Inspection — Researched Definition
 
-This document defines Last Wagon's 131-point commercial-vehicle pre-trip inspection:
+This document defines Last Wagon's 132-point commercial-vehicle pre-trip inspection:
 scope, sequence, every item, what to check, applicability, and the authoritative source
 basis for each. It implements the blueprint requirement to research and verify the
 checklist against authoritative sources before implementation. Licensing and authoring
 rules are in `docs/content-sourcing.md`. This is a content definition for human review —
 it does not authorize importing content into the app.
 
-## What "131 points" means — required honesty
+## What "132 points" means — required honesty
 
-Research found **no official source that defines a "131-point" pre-trip inspection**. It is
-not a term used by FMCSA, AAMVA, any state CDL manual, or any regulation. Official material
-instead defines inspection *areas* and *items*: the CDL manual's Section 11 walk-around and
-the parts lists of 49 CFR 392.7, 393, and 396. Item counts in official and training
-material vary with enumeration granularity (roughly 60–150 for a tractor-trailer).
+Research found **no official source that defines a fixed-point pre-trip inspection** (131,
+132, or any other count). It is not a term used by FMCSA, AAMVA, any state CDL manual, or
+any regulation. Official material instead defines inspection *areas* and *items*: the CDL
+manual's Section 11 walk-around and the parts lists of 49 CFR 392.7, 393, and 396. Item
+counts in official and training material vary with enumeration granularity (roughly 60–150
+for a tractor-trailer).
 
-Therefore: **131 is Last Wagon's product enumeration** — a specific, fixed way of counting
+Therefore: **132 is Last Wagon's product enumeration** — a specific, fixed way of counting
 the authoritative inspection content for a Class A tractor + semi-trailer with air brakes.
-The app must present it as "Last Wagon's 131-point checklist, built from the CDL manual
+The app must present it as "Last Wagon's 132-point checklist, built from the CDL manual
 inspection test and federal regulations," and must never call it an official standard,
 an official count, or a guarantee of test coverage or legal compliance.
 
-Point-count decision (owner, 2026-07-16): the owner offered to fall back to a 100- or
-101-point checklist if 131 was not available. No fixed count — 131, 101, or 100 — exists in
-any official source, so all are product enumerations; and the 131-item enumeration below is
-fully mapped to authoritative content, so no fallback is needed. 131 stands (it also
-matches the blueprint and existing UI copy). Re-cutting to another count would be a
-branding choice, not an accuracy fix.
+Point-count history (owner decisions, 2026-07-16): the count began as a working "131" (with
+a fallback offer of 100/101 that was never needed). During PR review a genuinely missing
+combination safety check — the trailer air-supply/breakaway test — was identified; the owner
+approved adding it as a distinct item (now item 129), which moved the count to **132**.
+Because no count is official, this was an accuracy decision, not a branding one: the number
+simply reflects however many verified items the enumeration contains.
 
 ## Scope and vehicle applicability
 
-- **131 is the full enumeration, not a per-vehicle count.** The 131 items are the complete
+- **132 is the full enumeration, not a per-vehicle count.** The 132 items are the complete
   set for a fully-equipped Class A tractor + single semi-trailer with air brakes. The number
-  of items that actually *apply* to a given vehicle is always ≤ 131 and depends on its
+  of items that actually *apply* to a given vehicle is always ≤ 132 and depends on its
   equipment — a leaf-spring tractor with no cargo lift, no sliding fifth wheel, and no
   washers has fewer applicable items than one with all of those. Real Inspection Mode shows
   the applicable count for the driver's configuration; the app must not imply every vehicle
-  has 131 live points.
+  has 132 live points.
 - **Primary configuration for authoring:** Class A tractor + single semi-trailer, air
   brakes — the most common configuration for the target audience, and the basis on which the
   enumeration was built.
@@ -75,7 +76,7 @@ corroborated (secondary sources echo the manual; official wording not yet captur
 **U** = unverified figure or wording — must be checked against the full source text before
 this item ships.
 
-## The 131 items
+## The 132 items
 
 ### 1. Engine compartment — engine off (items 1–17)
 
@@ -247,13 +248,16 @@ Checked at each drive axle; dual wheels throughout.
 | 120 | Cargo lift (`IF-EQUIPPED`) | No leaking, damaged, or missing parts; fully retracted and latched | S11 | C |
 | 121 | Splash guards — trailer (`IF-EQUIPPED`) | Not damaged, mounted securely | S11 | C |
 
-### 10. Brake checks — performed last (items 122–131)
+### 10. Brake checks — performed last (items 122–132)
 
-**Safety prerequisite (applies to this whole section):** before releasing the parking
-brakes for any engine-off leakage or pop-out test, chock the wheels or otherwise secure the
-vehicle against rolling. Several of these tests release the service and/or parking brakes
-with the engine off; on any grade an unsecured tractor-trailer can roll. Perform brake tests
-on level ground where possible, wheels chocked.
+**Safety prerequisite (applies to this whole section):** do these on level ground.
+- **Engine-off leakage and pop-out tests (122–129):** the service brakes are released or
+  the system is pumped down with the engine off, so **chock the wheels first** — on any
+  grade an unsecured tractor-trailer can roll.
+- **Holding / pull tests (130–132):** these require the vehicle to be able to move, so
+  **remove the chocks immediately before each controlled pull test**, keep the vehicle on
+  level ground, and be ready to stop — the brake *being tested* is what must hold the
+  vehicle. Re-chock afterward if further engine-off work follows.
 
 | # | Item | Check | Source | Status |
 |---|---|---|---|---|
@@ -264,9 +268,10 @@ on level ground where possible, wheels chocked.
 | 126 | Applied leakage test (`AIR`) | Engine off, service brake fully applied: loss ≤ ~3 psi/min single vehicle, ≤ ~4 psi/min combination | S5 | C |
 | 127 | Low air pressure warning (`AIR`) | Warning activates **before the pressure drops below 60 psi** during pump-down | S11/S5 | C |
 | 128 | Spring / emergency brake pop-out (`AIR`) | Continue the pump-down: the tractor parking-brake (spring) valve — and, on a combination, the trailer air-supply valve / tractor-protection valve — must close automatically in the **20–45 psi** range, applying the parking/emergency brakes | S11/S5 | C |
-| 129 | Tractor parking brake test | With wheels chocked removed only after this test: parking brake set (trailer brakes released), gently pull forward against the tractor parking brake — it must hold | S11 | C |
-| 130 | Trailer brake test (`COMBO`) | **Tractor parking brake released**, trailer brakes set (trailer air-supply/hand valve applied): gently pull forward against the trailer brakes alone — they must hold (releasing the tractor brake first is what makes this test the trailer's, not the tractor's) | S11 | P |
-| 131 | Service brake check | With both parking brakes released, roll at ~5 mph and apply the service brake: firm stop, no pulling to either side, no delay | S11 | P |
+| 129 | Trailer air-supply / breakaway test (`AIR`/`COMBO`) | With the system fully charged, pull the trailer air-supply (red) knob out: the tractor-protection / trailer-air-supply valve must close and the trailer **emergency (breakaway) brakes must apply and lock**. This is a distinct combination check from the trailer service-brake hold test below | S11 | P |
+| 130 | Tractor parking brake test | Chocks removed; parking brake set (trailer brakes released): gently pull forward against the tractor parking brake — it must hold | S11 | C |
+| 131 | Trailer brake test (`COMBO`) | **Tractor parking brake released**, trailer brakes set (trailer hand/trolley valve applied): gently pull forward against the trailer brakes alone — they must hold (releasing the tractor brake first is what makes this the trailer's test, not the tractor's) | S11 | P |
+| 132 | Service brake check | With both parking brakes released, roll at ~5 mph and apply the service brake: firm stop, no pulling to either side, no delay | S11 | P |
 
 Hydraulic-brake variant (replaces the `AIR` items above): pump the pedal three times, apply
 firm pressure, hold five seconds — the pedal must not depress; failure is disqualifying on
@@ -277,10 +282,13 @@ the state test (corroborated: GA, ID, FL Section 11 materials).
 - **Corroborated (C):** 118 items — matched to official state republications of Section 11
   and/or exact CFR text via search excerpts (multiple states cross-checked; identical
   AAMVA-derived wording confirmed in MI, NY, PA, GA, WA copies).
-- **Partial (P):** 10 items (13, 33, 66, 70, 81, 95, 99, 114, 130, 131) — standard Section
-  11 content echoed by secondary sources; official wording not yet captured in excerpts.
+- **Partial (P):** 11 items (13, 33, 66, 70, 81, 95, 99, 114, 129, 131, 132) — standard
+  Section 11 content echoed by secondary sources; official wording not yet captured in
+  excerpts. (Item 129, the trailer air-supply/breakaway test, was added 2026-07-16 and is
+  core combination content, but its exact Section 11 wording is still pending capture.)
 - **Unverified figures (U):** 3 items (122, 124, 125) — figures not yet captured from the
   official full text; must be read from the manual/regulation before shipping.
+- **Total: 132 items** (118 C + 11 P + 3 U).
 - **Before any of this ships:** a line-by-line pass against the FMCSA-hosted model manual
   PDF (July 2014) and eCFR full text in a network-capable session, resolving every P and U;
   then the existing human review gates (foundation approval, content import approval,
@@ -293,7 +301,7 @@ The owner provided a January 1, 2004 CVSA Out-of-Service Criteria scan (see
 never a source of shipped text or figures). Its Part II vehicle categories were
 cross-checked against this checklist at the table-of-contents level:
 
-- **Covered by the 131 items:** brake systems (drums, linings, hoses, low-pressure warning,
+- **Covered by the 132 items:** brake systems (drums, linings, hoses, low-pressure warning,
   air loss, parking brakes, compressor), coupling (fifth wheel, upper/lower coupler),
   exhaust, frame, fuel system, lamps/turn signals, safe loading/tie-downs, steering
   (free play, column, gear box, pitman arm, tie rod/drag links, nuts), suspension (spring
@@ -310,17 +318,14 @@ cross-checked against this checklist at the table-of-contents level:
   during pump-down. The full-text pass must confirm Section 11's exact wording for the
   air-reservoir/air-tank check and fold it into the compressor items if named.
 
-### Known gap flagged in review (open decision for the verification pass)
+### Resolved: trailer air-supply / breakaway test added (item 129)
 
-A combination-vehicle **trailer air-supply / breakaway test is not yet a distinct item** and
-must not be treated as already covered: item 128 tests that the valves *pop out* on
-pump-down, but it does not exercise the full sequence of charging the trailer, then pulling
-the trailer air-supply knob and confirming the **trailer emergency (breakaway) brakes
-actually apply**. That is a genuinely separate combination brake-safety check. Resolving it
-during the full-text verification pass is likely to **add one item (making the count 132)**
-or require merging two granular items to hold at 131. That count change is a content-
-accuracy decision for the human review gate, not something to resolve silently here — the
-honest position for now is that the check is *missing*, not *included*.
+A combination-vehicle **trailer air-supply / breakaway test** — charge the system, pull the
+trailer air-supply (red) knob, and confirm the trailer emergency (breakaway) brakes actually
+apply — was flagged in review as missing (item 128 only tests that the valves *pop out* on
+pump-down). The owner approved adding it as a distinct item (2026-07-16), which is why the
+count is **132, not 131**. Its exact Section 11 wording is still pending the full-text
+verification pass (status P).
 
 ## App-mapping notes
 

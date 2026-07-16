@@ -19,7 +19,7 @@ waits behind its gate:
   5. Daily safety question mechanism: one-per-day selection, answer/explanation, streak.
   6. Local progress: acceptance criteria + persistence/migration tests.
 - **Track B — behind human gates (docs approval + full-text verification):**
-  7. Author the 131 checklist items as real content (original prose, per-item provenance).
+  7. Author the 132 checklist items as real content (original prose, per-item provenance).
   8. Author CDL class + endorsement practice questions and daily questions (original prose).
   9. Import real content, replacing labeled sample content (needs foundation approval).
 - **Track C — behind its own research gate:**
@@ -45,10 +45,11 @@ import, and the truck-stop data-source research gate (Track C start).
   off-corridor warning with approximate location.
 - [ ] Obtain written confirmation of OpenFreeMap public-instance offline-prefetch terms
   (or move to self-hosting/a keyed commercial provider) before any production release.
-- [ ] Human review and approval of `docs/content-sourcing.md` and
-  `docs/pretrip-131-checklist.md` (content basis, licensing boundaries, and the honest
-  "131 is a product enumeration" framing) before any content authoring or import.
-- [ ] Resolve the 10 PARTIAL and 3 UNVERIFIED checklist items and the flagged UNVERIFIED
+- [x] 2026-07-16: Owner approved `docs/content-sourcing.md` and
+  `docs/pretrip-132-checklist.md` (content basis, licensing boundaries, and the product-
+  enumeration framing). Docs human-review gate passed; real content authoring may proceed
+  after foundation approval + full-text verification.
+- [ ] Resolve the 11 PARTIAL and 3 UNVERIFIED checklist items and the flagged UNVERIFIED
   facts in `docs/content-sourcing.md` by line-by-line verification against the FMCSA model
   manual PDF and eCFR full text — needs a session/machine whose network can fetch them
   (this remote environment's policy blocks those hosts).
@@ -81,9 +82,10 @@ import, and the truck-stop data-source research gate (Track C start).
 - Move completed items here with dates when helpful.
 - [x] 2026-07-16: Researched authoritative FMCSA/CDL-manual sources for the 131-point
   checklist and defined its exact scope, sequence, vehicle applicability, and per-item
-  check criteria with citations and verification statuses (`docs/pretrip-131-checklist.md`).
-  Key finding: "131-point" is not an official term — it is Last Wagon's enumeration of
-  Section 11 + 49 CFR content and must be presented as such.
+  check criteria with citations and verification statuses (now
+  `docs/pretrip-132-checklist.md`, renamed from -131- when the count moved to 132).
+  Key finding: a fixed point count is not an official term — it is Last Wagon's enumeration
+  of Section 11 + 49 CFR content and must be presented as such.
 - [x] 2026-07-16: Researched lawful, publicly available sources and provenance rules for
   every first-milestone CDL category and the daily safety question
   (`docs/content-sourcing.md`). Key finding: the AAMVA model CDL manual (even on

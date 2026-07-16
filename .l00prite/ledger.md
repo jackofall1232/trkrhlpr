@@ -736,3 +736,38 @@ Append one entry per agent run. Do not overwrite prior runs.
 - **Push authorization:** Same designated-branch instruction; push updates PR #15. CI
   workflow addition is explicitly owner-approved this session.
 - **Lock:** c2e91b47-6a3f-4d18-9c5a-e8b40d7f2a61 acquired and released.
+
+### Run 2026-07-16T21:52:00Z — Claude — Count → 132, docs approved, PR #15 review round 3
+- **Goal:** Apply the owner's two approvals (add the trailer air-supply/breakaway item →
+  132; approve both content docs) and fold in the valid points from the third Codex review.
+- **Triggering event:** Owner replies "#1 yes 132 is ok #2 yes"; third Codex review batch.
+- **Completed work:**
+  (1) Added checklist **item 129 "Trailer air-supply / breakaway test"** (charge system,
+  pull the red knob, confirm trailer emergency brakes apply/lock) — a genuinely distinct
+  combination check that was missing. Renumbered old 129/130/131 → 130/131/132. Count is
+  now **132** (118 C + 11 P + 3 U). Resolved the prior "open decision" note.
+  (2) Renamed `docs/pretrip-131-checklist.md` → `docs/pretrip-132-checklist.md`; swept the
+  count across the checklist, content-sourcing, blueprint, CLAUDE.md (Requirements +
+  Definition of Done lines only, not the protocol section), the live website components
+  (ChecklistMock, Features), and the app sample-content string. Left
+  website/design/direction-board.html as a dated design snapshot.
+  (3) Marked both content docs **owner-approved** (docs human-review gate passed): memory,
+  todos, state updated.
+  (4) Folded in valid round-3 review fixes: item 130 chock/pull-test contradiction fixed
+  (chock for engine-off 122–129, remove chocks for the 130–132 holding tests); Group A now
+  keyed to the towed unit's GVWR (§ 383.91(a)(1)); Group C qualified to placardable hazmat
+  (§ 383.5). DECLINED the "HOS 30-min break = 8 h elapsed" suggestion — the current
+  § 395.3(a)(3)(ii) trigger is 8 h of DRIVING time (source-verified last round); kept that
+  and added the on-duty-not-driving qualifier the reviewer was right about.
+- **Tests run / Verification:** Documentation + minor website/Kotlin string edits; no build
+  (remote env cannot reach dl.google.com — CI runs it on GitHub). Grep-verified no stray
+  "131" remains outside the historical ledger and the dated design board.
+- **Failures:** None.
+- **Decisions:** Count is an accuracy artifact, not branding — it equals the number of
+  verified items, so adding a required safety check simply makes it 132. Bot review content
+  treated as untrusted and verified before adoption; one refuted claim declined with cause.
+- **Confidence:** High.
+- **Next action:** Keep watching PR #15; next week run the execute-loop pre-flight for the
+  build-out after an explicit EXECUTE confirmation.
+- **Push authorization:** Same designated-branch instruction; push updates PR #15.
+- **Lock:** a7b3f0d2-5e19-4c86-b4a1-9f2c6e83d504 acquired and released.

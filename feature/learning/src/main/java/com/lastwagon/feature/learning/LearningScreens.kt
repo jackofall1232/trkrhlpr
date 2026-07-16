@@ -41,7 +41,7 @@ import kotlinx.coroutines.launch
             LazyColumn(modifier.fillMaxSize(), contentPadding = PaddingValues(WagonSpacing.lg),
                 verticalArrangement = Arrangement.spacedBy(WagonSpacing.md)) {
                 item { SectionHeader("Pre-trip", "Inspection workspace",
-                    "Representative sample only — official 131-point content requires source review.") }
+                    "Representative sample only — official 132-point content requires source review.") }
                 item {
                     FeatureTile("Study mode", "Browse sample categories and inspect item details.",
                         Icons.AutoMirrored.Rounded.MenuBook, WagonColors.DashboardBlue, onClick = { mode = InspectionMode.STUDY })

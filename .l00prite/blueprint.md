@@ -28,9 +28,12 @@ education, not merely a way to pass the CDL exam.
 
 ## First Production Milestone
 
-### 131-point pre-trip inspection
+### 132-point pre-trip inspection
 
-Provide a structured 131-point commercial-vehicle checklist. Exact items, sequence,
+Provide a structured 132-point commercial-vehicle checklist (Last Wagon's own enumeration of
+Section 11 + 49 CFR content; the count is a product number, not an official standard, and
+moved from a working 131 to 132 when the trailer air-supply/breakaway test was added on
+2026-07-16 — see `docs/pretrip-132-checklist.md`). Exact items, sequence,
 vehicle applicability, inspection guidance, and defect criteria require authoritative
 research and verification before implementation.
 
@@ -104,7 +107,7 @@ subsystems and must not be represented as part of the initial milestone.
 
 ## Requirements
 
-- [ ] Research and approve the authoritative 131-point checklist and inspection sequence.
+- [ ] Research and approve the authoritative 132-point checklist and inspection sequence.
 - [ ] Define and approve objective Study Mode acceptance criteria.
 - [ ] Define and approve objective Real Inspection Mode acceptance criteria.
 - [ ] Define and approve lawful CDL content sources and testing acceptance criteria.

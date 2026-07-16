@@ -11,19 +11,19 @@ export default function ChecklistMock() {
         <div>
           <div className="font-display text-[15px] font-bold">Pre-Trip Checklist</div>
           <div className="font-mono text-[11px] uppercase tracking-[0.05em] text-steel">
-            131-POINT · CLASS A
+            132-POINT · CLASS A
           </div>
         </div>
       </div>
       <div className="mb-4">
         <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.1em] text-steel">
           <span>Progress</span>
-          <span className="text-amber">87 of 131</span>
+          <span className="text-amber">87 of 132</span>
         </div>
         <div
           className="mt-2 h-1 rounded-full bg-cream/10"
           role="img"
-          aria-label="Inspection progress: 87 of 131 items complete"
+          aria-label="Inspection progress: 87 of 132 items complete"
         >
           <div className="h-1 w-2/3 rounded-full bg-gradient-to-r from-rust to-amber" />
         </div>

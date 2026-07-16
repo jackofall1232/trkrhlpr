@@ -1,7 +1,7 @@
 # Authoritative Content Sourcing and Provenance
 
 This document records the researched, publicly available sources for Last Wagon's regulated
-and safety-critical content — the 131-point pre-trip inspection, CDL class and endorsement
+and safety-critical content — the 132-point pre-trip inspection, CDL class and endorsement
 study material and practice tests, and the daily safety question — together with the
 licensing boundaries and authoring rules that every piece of imported content must satisfy.
 
@@ -63,9 +63,9 @@ the actual notice on the copy in hand.
    replicate the style, structure, or specific scenarios of actual state exams, and the app
    must say plainly that its questions are practice items, not real exam questions.
 
-## 3. Source registry — pre-trip inspection (131-point checklist)
+## 3. Source registry — pre-trip inspection (132-point checklist)
 
-Detailed item-level mapping lives in `docs/pretrip-131-checklist.md`.
+Detailed item-level mapping lives in `docs/pretrip-132-checklist.md`.
 
 | Source | What it provides | URL |
 |---|---|---|
@@ -80,10 +80,13 @@ Detailed item-level mapping lives in `docs/pretrip-131-checklist.md`.
 
 Federal basis (all public domain, eCFR Part 383):
 
-- § 383.91 vehicle groups: Group A combination ≥ 26,001 lb GCWR towing > 10,000 lb;
-  Group B a single vehicle ≥ 26,001 lb GVWR, **or such a vehicle towing a unit not over
-  10,000 lb GVWR** (so a heavy straight truck with a small trailer is still Group B, not
-  Group A); Group C small vehicle (16+ passengers or hazmat).
+- § 383.91 vehicle groups: Group A combination ≥ 26,001 lb GCWR where the **GVWR of the
+  vehicle(s) being towed** exceeds 10,000 lb (the rating, not the current load); Group B a
+  single vehicle ≥ 26,001 lb GVWR, **or such a vehicle towing a unit whose GVWR is not over
+  10,000 lb** (so a heavy straight truck with a small trailer is still Group B, not Group A);
+  Group C anything not in A or B that either transports 16+ people (including the driver) or
+  carries **placardable hazardous material** (material requiring placards under 49 CFR part
+  172 subpart F, per the § 383.5 definition — not any hazmat).
 - § 383.110–.111 required knowledge: 20 general areas, plus air-brake areas and
   combination-vehicle areas. (**UNVERIFIED:** exact (a)(1)–(a)(20) paragraph numbering and
   the individual air-brake/combination sub-area texts — verify against full § 383.111.)
@@ -126,9 +129,13 @@ All primary sources below are FMCSA-authored US government works (public domain)
 - **Our Roads, Our Safety** tip sheets and visor cards: work zones, safe speed, hazardous
   weather, blind spots. https://www.fmcsa.dot.gov/ourroads
 - **Hours of Service** (Part 395 + FMCSA summary): 11-hour driving / 14-hour window /
-  30-minute break required after 8 cumulative hours of **driving time** (not on-duty time,
-  not elapsed clock time) since the last non-driving break of at least 30 minutes /
-  60-70 hour limits / split sleeper berth: one period
+  30-minute break required after 8 cumulative hours of **driving time** (this is the current
+  post-Sept-2020 § 395.3(a)(3)(ii) trigger — driving time, not on-duty time and not elapsed
+  clock time) without at least one 30-minute interruption of driving status; the qualifying
+  interruption may be off-duty, sleeper-berth, **or on-duty-not-driving** time. (A reviewer
+  asked for the older "8 hours elapsed since last break" framing; that is the pre-2020 rule
+  and was declined — the current codified text is driving-time-based.) / 60-70 hour limits /
+  split sleeper berth: one period
   of at least 7 h in the sleeper plus a second of at least 2 h (off duty or sleeper),
   together totaling at least 10 h — commonly a 7/3 or 8/2 split.
   **UNVERIFIED details:** 14-hour non-pausing wording and the adverse-conditions +2 h
@@ -152,8 +159,8 @@ crossings, cargo security, fatigue, distraction, inspections, emergencies).
 
 1. Full-text verification of every UNVERIFIED mark above against eCFR (blocked in this
    session's network policy; needs a normal-network session or local machine).
-2. Line-by-line verification of the 131-point checklist against CDL manual Section 11 and
-   Appendix A to Part 396 (see `docs/pretrip-131-checklist.md` for per-item status).
+2. Line-by-line verification of the 132-point checklist against CDL manual Section 11 and
+   Appendix A to Part 396 (see `docs/pretrip-132-checklist.md` for per-item status).
 3. Decide the ERG's role after checking its front-matter reproduction terms.
 4. Add provenance and applicability fields to the content schema (Room migration — needs
    review) before authoritative content replaces the labeled sample content.

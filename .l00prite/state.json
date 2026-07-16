@@ -1,12 +1,12 @@
 {
   "schema_version": 2,
   "project_name": "trkrhlpr (product: Last Wagon)",
-  "current_goal": "get docs/content-sourcing.md and docs/pretrip-131-checklist.md human-approved, then close the 13 flagged verification items with full-text sources",
+  "current_goal": "content docs owner-approved (2026-07-16); next, close the flagged verification items with full-text sources and prepare the milestone+truck-stops build-out for next-week Execution Mode",
   "current_phase": "content_source_research_complete",
   "active_agent": null,
   "last_agent": "claude",
-  "last_updated": "2026-07-16T21:41:15Z",
-  "status": "content_docs_review_addressed_ci_added_buildout_backlog_prepared_pending_human_review",
+  "last_updated": "2026-07-16T21:52:00Z",
+  "status": "content_docs_owner_approved_count_132_ci_added_buildout_backlog_ready",
   "blocked": false,
   "blocker_reason": null,
   "active_event_id": null,
@@ -16,5 +16,5 @@
   "ci_status": "unknown",
   "execution_active": false,
   "execution_stop_reason": "human_review_gate",
-  "next_recommended_action": "human review of docs/content-sourcing.md and docs/pretrip-131-checklist.md (now including the open 131-vs-132 trailer-air-supply decision); watch PR #15's first CI run on GitHub; next week run the execute-loop pre-flight for the milestone+truck-stops build-out after an explicit EXECUTE confirmation; resolve the 13 flagged checklist items against full-text sources in a network-capable session"
+  "next_recommended_action": "content docs approved and count set to 132; watch PR #15 CI and any further review; next week run the execute-loop pre-flight for the milestone+truck-stops build-out after an explicit EXECUTE confirmation; resolve the 14 flagged checklist items (11 P + 3 U) against full-text sources in a network-capable session"
 }

@@ -35,7 +35,7 @@ Durable project facts and decisions that future agents should preserve.
     with guided navigation and restriction assurance gated separately.
 - The confirmed technology direction is native Kotlin, Jetpack Compose, Android SDK 36
   (Android 16), and an offline-first architecture.
-- The first production milestone covers the 131-point pre-trip inspection, Study Mode,
+- The first production milestone covers the 132-point pre-trip inspection, Study Mode,
   Real Inspection Mode, CDL practice tests, a daily safety question, and local progress.
 - The national truck-stop directory, truck GPS/routing, online accounts, and cloud
   synchronization are future roadmap items excluded from the first milestone.
@@ -49,11 +49,16 @@ Durable project facts and decisions that future agents should preserve.
 - Manual constructor injection is sufficient for the current dependency graph.
 - Room stores versioned content/progress; DataStore stores theme/accessibility preferences.
 - SDK-36-compatible pins include Core 1.17.0 and Lifecycle 2.10.0.
-- **The pre-trip checklist stays at 131 points** (owner confirmed the count question
-  2026-07-16 by offering 100/101 only "if 131 point is not available" — it is available).
-  "131" is Last Wagon's product enumeration, not an official term; no official source
-  defines any fixed point count. Definition: `docs/pretrip-131-checklist.md`; sourcing and
-  licensing rules: `docs/content-sourcing.md`.
+- **The pre-trip checklist is 132 points** (owner-approved 2026-07-16). It began as a
+  working "131"; during PR #15 review a genuinely missing combination safety check — the
+  trailer air-supply/breakaway test — was found, and the owner approved adding it as a
+  distinct item (item 129), moving the count to 132. The count is Last Wagon's product
+  enumeration, NOT an official term; no official source defines any fixed count, so this was
+  an accuracy decision, not branding. Definition: `docs/pretrip-132-checklist.md` (file
+  renamed from -131-); sourcing/licensing: `docs/content-sourcing.md`. Both content docs
+  were **owner-approved on 2026-07-16** (the docs human-review gate is passed); real content
+  authoring may proceed once the foundation is approved and the flagged items are
+  full-text-verified.
 - The AAMVA model CDL manual (including the FMCSA-hosted PDF) is AAMVA-copyrighted with
   SDLA-only reproduction rights: verification reference only — never copy its prose or
   commit the PDF. CFR text and FMCSA-authored materials are public domain (17 U.S.C.
