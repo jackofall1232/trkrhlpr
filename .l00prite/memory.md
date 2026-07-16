@@ -8,7 +8,7 @@ Durable project facts and decisions that future agents should preserve.
   Play support is not required for the first production milestone.
 - **Architecture Decision:** Map routing will use the "Route Corridor" strategy.
   - **Visuals:** MapLibre GL Native for Android (offline-capable vector tiles).
-  - **Routing:** Online OpenRouteService (ORS) backend using the `driving-hgv` profile to guarantee exact STAA-compliant truck routes and avoid low bridges.
+  - **Routing:** Online OpenRouteService (ORS) backend using the `driving-hgv` profile for truck-oriented route calculation (subject to map/constraint data coverage; do not assume bridge-clearance avoidance without validated height data).
   - **Offline Capability:** The app will fetch the exact route polyline from ORS and save it locally, simultaneously pre-fetching MapLibre tiles along the route corridor. This allows navigation to remain visually intact and reliable during cell dead zones. Re-routing offline is not supported, but visual re-orientation is.
 - The confirmed technology direction is native Kotlin, Jetpack Compose, Android SDK 36
   (Android 16), and an offline-first architecture.
