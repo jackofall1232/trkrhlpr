@@ -26,6 +26,8 @@
 - [ ] Define test-history, missed-question review, randomized-test, and readiness-scoring behavior.
 - [ ] Implement CDL mock exams feature based on the defined behavior.
 - [ ] Implement comprehensive truck stop locations dataset and search features.
+- [ ] Review the marketing website v1 (`website/`), finalize CTA copy and the signed-APK
+  download link, and explicitly approve any Vercel deployment before it happens.
 
 ## Later
 - [ ] Routing Phase 6: implement guided navigation and tested degraded-state handling.
@@ -41,6 +43,10 @@
 
 ## Done
 - Move completed items here with dates when helpful.
+- [x] 2026-07-16: Built the marketing website v1 scaffold under `website/` (Next.js +
+  Tailwind, locked palette/type system, ported hero rig animation, features,
+  how-it-works mockups, download CTA), verified via production build and Chromium
+  screenshots including prefers-reduced-motion.
 - [x] 2026-07-16: Renamed the product to its final name "Last Wagon" everywhere (label,
   applicationId com.lastwagon.app, namespaces, classes, docs); repository stays trkrhlpr.
 - [x] 2026-07-16: Implemented Routing Phase 5 offline route corridor: bounded MapLibre
