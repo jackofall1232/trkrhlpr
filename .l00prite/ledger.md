@@ -210,3 +210,8 @@ Append one entry per agent run. Do not overwrite prior runs.
   `docs/phased-truck-routing-plan`. Push failed because the environment has no GitHub
   credentials (`fatal: could not read Username for 'https://github.com'`). Authenticate
   GitHub, push the branch, and open the PR against `0.0.1-alpha`; no retry was claimed.
+- **SSH follow-up (2026-07-16T16:30:45Z):** Verified the existing SSH key as
+  `jackofall1232`, changed the clone's remote to SSH, and successfully pushed
+  `docs/phased-truck-routing-plan`. `gh pr create` could not create the PR because GitHub
+  CLI has no API authentication; SSH authentication alone does not authenticate the CLI.
+  The branch is available at GitHub's PR creation URL.
