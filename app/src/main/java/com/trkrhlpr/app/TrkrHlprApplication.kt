@@ -4,6 +4,8 @@ import android.app.Application
 import com.trkrhlpr.core.data.*
 import com.trkrhlpr.core.model.*
 import kotlinx.coroutines.*
+import com.trkrhlpr.feature.routing.OrsRoutingProvider
+import com.trkrhlpr.feature.routing.FileRouteRepository
 
 class TrkrHlprApplication : Application() {
     lateinit var container: AppContainer
@@ -24,4 +26,6 @@ class AppContainer(application: Application) {
     val progressRepository: ProgressRepository = OfflineProgressRepository(database.dao())
     val preferencesRepository: PreferencesRepository = DataStorePreferencesRepository(application)
     val vehicleProfileRepository: VehicleProfileRepository = DataStoreVehicleProfileRepository(application)
+    val routingProvider: RoutingProvider = OrsRoutingProvider(BuildConfig.ORS_API_KEY)
+    val routeRepository: RouteRepository = FileRouteRepository(application)
 }

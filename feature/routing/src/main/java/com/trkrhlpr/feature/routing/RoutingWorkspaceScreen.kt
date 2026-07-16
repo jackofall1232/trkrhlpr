@@ -19,22 +19,40 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 
 @Composable
-fun RoutingWorkspaceScreen(repository: VehicleProfileRepository, modifier: Modifier = Modifier) {
+fun RoutingWorkspaceScreen(
+    repository: VehicleProfileRepository,
+    routingProvider: RoutingProvider,
+    routeRepository: RouteRepository,
+    modifier: Modifier = Modifier,
+) {
     val profile by repository.profile.collectAsStateWithLifecycle(initialValue = null)
+    val savedRoute by routeRepository.lastRoute.collectAsStateWithLifecycle(initialValue = null)
     var editing by rememberSaveable { mutableStateOf(false) }
+    var planning by rememberSaveable { mutableStateOf(false) }
     var showMap by rememberSaveable { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     if (showMap) {
         Column(modifier.fillMaxSize()) {
             TextButton(onClick = { showMap = false }, modifier = Modifier.padding(horizontal = 8.dp)) {
                 Text("Back to vehicle profile")
             }
-            RoutingMapScreen(Modifier.weight(1f))
+            RoutingMapScreen(Modifier.weight(1f), route = savedRoute)
         }
+    } else if (planning && profile != null) {
+        RoutePlanner(
+            profile = requireNotNull(profile),
+            routingProvider = routingProvider,
+            routeRepository = routeRepository,
+            onBack = { planning = false },
+            onRouteSaved = { planning = false; showMap = true },
+            modifier = modifier,
+        )
     } else if (profile == null || editing) {
         VehicleProfileEditor(
             existing = profile,
             repository = repository,
+            routeRepository = routeRepository,
             onSaved = { editing = false },
             modifier = modifier,
         )
@@ -42,7 +60,10 @@ fun RoutingWorkspaceScreen(repository: VehicleProfileRepository, modifier: Modif
         VehicleProfileSummary(
             profile = requireNotNull(profile),
             onEdit = { editing = true },
+            savedRoute = savedRoute,
+            onPlanRoute = { planning = true },
             onOpenMap = { showMap = true },
+            onDeleteRoute = { scope.launch { routeRepository.clear() } },
             modifier = modifier,
         )
     }
@@ -52,6 +73,7 @@ fun RoutingWorkspaceScreen(repository: VehicleProfileRepository, modifier: Modif
 private fun VehicleProfileEditor(
     existing: VehicleProfile?,
     repository: VehicleProfileRepository,
+    routeRepository: RouteRepository,
     onSaved: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -133,8 +155,13 @@ private fun VehicleProfileEditor(
                     errors = candidate.second
                     candidate.first?.let { valid ->
                         scope.launch {
-                            repository.save(valid)
-                            onSaved()
+                            try {
+                                routeRepository.clear()
+                                repository.save(valid)
+                                onSaved()
+                            } catch (_: Exception) {
+                                errors = listOf("The profile could not be saved locally.")
+                            }
                         }
                     }
                 },
@@ -148,7 +175,10 @@ private fun VehicleProfileEditor(
 private fun VehicleProfileSummary(
     profile: VehicleProfile,
     onEdit: () -> Unit,
+    savedRoute: CalculatedRoute?,
+    onPlanRoute: () -> Unit,
     onOpenMap: () -> Unit,
+    onDeleteRoute: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -164,7 +194,105 @@ private fun VehicleProfileSummary(
         Text("Reconfirm after any equipment or load change.", color = MaterialTheme.colorScheme.error)
         Spacer(Modifier.weight(1f))
         OutlinedButton(onClick = onEdit, modifier = Modifier.fillMaxWidth()) { Text("Edit and reconfirm") }
-        Button(onClick = onOpenMap, modifier = Modifier.fillMaxWidth()) { Text("Open map preview") }
+        Button(onClick = onPlanRoute, modifier = Modifier.fillMaxWidth()) { Text("Calculate route preview") }
+        if (savedRoute != null) {
+            OutlinedButton(onClick = onOpenMap, modifier = Modifier.fillMaxWidth()) {
+                Text("Open saved unreviewed route")
+            }
+            TextButton(onClick = onDeleteRoute, modifier = Modifier.fillMaxWidth()) {
+                Text("Delete saved route")
+            }
+        }
+    }
+}
+
+@Composable
+private fun RoutePlanner(
+    profile: VehicleProfile,
+    routingProvider: RoutingProvider,
+    routeRepository: RouteRepository,
+    onBack: () -> Unit,
+    onRouteSaved: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var originLatitude by rememberSaveable { mutableStateOf("") }
+    var originLongitude by rememberSaveable { mutableStateOf("") }
+    var destinationLatitude by rememberSaveable { mutableStateOf("") }
+    var destinationLongitude by rememberSaveable { mutableStateOf("") }
+    var calculating by remember { mutableStateOf(false) }
+    var failure by remember { mutableStateOf<RouteFailure?>(null) }
+    var result by remember { mutableStateOf<CalculatedRoute?>(null) }
+    val scope = rememberCoroutineScope()
+
+    LazyColumn(
+        modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        item {
+            Text("Online route preview", style = MaterialTheme.typography.headlineMedium)
+            Text(
+                "Phase 3 accepts coordinates only. Results are unreviewed decision support based on available data—not proof of legality, clearance, or safety.",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        item { DecimalField(originLatitude, { originLatitude = it }, "Origin latitude") }
+        item { DecimalField(originLongitude, { originLongitude = it }, "Origin longitude") }
+        item { DecimalField(destinationLatitude, { destinationLatitude = it }, "Destination latitude") }
+        item { DecimalField(destinationLongitude, { destinationLongitude = it }, "Destination longitude") }
+        failure?.let { error -> item {
+            Text(error.message, color = MaterialTheme.colorScheme.error)
+            error.httpStatus?.let { Text("Provider HTTP status: $it") }
+        } }
+        result?.let { route ->
+            item {
+                Text("Unreviewed route calculated", style = MaterialTheme.typography.titleLarge)
+                Text("${route.distanceMeters.toMilesText()} mi · ${route.durationSeconds.toDurationText()}")
+                Text("Provider: ${route.provenance.providerId} · Request ${route.provenance.requestId}")
+                Text("Response SHA-256: ${route.provenance.responseSha256}",
+                    style = MaterialTheme.typography.labelSmall)
+            }
+            items(route.warnings) { warning -> Text("Warning: $warning", color = MaterialTheme.colorScheme.error) }
+            item {
+                Button(onClick = onRouteSaved, modifier = Modifier.fillMaxWidth()) {
+                    Text("View unreviewed route on map")
+                }
+            }
+        }
+        item {
+            Button(
+                enabled = !calculating,
+                onClick = {
+                    val origin = GeoPoint(originLatitude.toDoubleOrNull() ?: Double.NaN,
+                        originLongitude.toDoubleOrNull() ?: Double.NaN)
+                    val destination = GeoPoint(destinationLatitude.toDoubleOrNull() ?: Double.NaN,
+                        destinationLongitude.toDoubleOrNull() ?: Double.NaN)
+                    calculating = true
+                    failure = null
+                    result = null
+                    scope.launch {
+                        try {
+                            when (val calculated = routingProvider.calculate(RouteRequest(origin, destination, profile))) {
+                                is RouteCalculationResult.Failure -> failure = calculated.error
+                                is RouteCalculationResult.Success -> {
+                                    routeRepository.save(calculated.route)
+                                    result = calculated.route
+                                }
+                            }
+                        } catch (_: Exception) {
+                            failure = RouteFailure(RouteFailureKind.STORAGE,
+                                "The calculated route could not be saved locally.")
+                        } finally {
+                            calculating = false
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                if (calculating) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
+                else Text("Calculate with OpenRouteService")
+            }
+        }
+        item { TextButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) { Text("Back to vehicle profile") } }
     }
 }
 
@@ -233,3 +361,8 @@ private val CommercialVehicleType.displayName get() = when (this) {
 
 private fun Double.toFeetText() = String.format(Locale.US, "%.2f", VehicleUnitConversions.metersToFeet(this))
 private fun Double.toPoundsText() = String.format(Locale.US, "%.0f", VehicleUnitConversions.metricTonnesToPounds(this))
+private fun Double.toMilesText() = String.format(Locale.US, "%.1f", this / 1609.344)
+private fun Double.toDurationText(): String {
+    val totalMinutes = (this / 60.0).toInt()
+    return "${totalMinutes / 60} hr ${totalMinutes % 60} min"
+}

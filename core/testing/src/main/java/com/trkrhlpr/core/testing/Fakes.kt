@@ -68,3 +68,17 @@ class FakeVehicleProfileRepository(initial: VehicleProfile? = null) : VehiclePro
     override suspend fun save(profile: VehicleProfile) { state.value = profile }
     override suspend fun clear() { state.value = null }
 }
+
+class FakeRoutingProvider(
+    var result: RouteCalculationResult,
+    override val id: String = "fake",
+) : RoutingProvider {
+    override suspend fun calculate(request: RouteRequest) = result
+}
+
+class FakeRouteRepository(initial: CalculatedRoute? = null) : RouteRepository {
+    private val state = MutableStateFlow(initial)
+    override val lastRoute = state
+    override suspend fun save(route: CalculatedRoute) { state.value = route }
+    override suspend fun clear() { state.value = null }
+}

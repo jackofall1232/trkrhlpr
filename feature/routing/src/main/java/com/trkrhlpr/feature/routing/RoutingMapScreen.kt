@@ -26,10 +26,19 @@ import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.geometry.LatLngBounds
 import org.maplibre.android.location.LocationComponentActivationOptions
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
+import org.maplibre.android.style.layers.LineLayer
+import org.maplibre.android.style.layers.PropertyFactory.lineColor
+import org.maplibre.android.style.layers.PropertyFactory.lineOpacity
+import org.maplibre.android.style.layers.PropertyFactory.lineWidth
+import org.maplibre.android.style.sources.GeoJsonSource
+import org.maplibre.geojson.LineString
+import org.maplibre.geojson.Point
+import com.trkrhlpr.core.model.CalculatedRoute
 
 private enum class MapLoadState { LOADING, READY }
 
@@ -37,6 +46,7 @@ private enum class MapLoadState { LOADING, READY }
 fun RoutingMapScreen(
     modifier: Modifier = Modifier,
     styleProvider: MapStyleProvider = MapLibreDemoStyleProvider,
+    route: CalculatedRoute? = null,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -98,7 +108,7 @@ fun RoutingMapScreen(
         }
     }
 
-    LaunchedEffect(mapView, descriptor.styleUri) {
+    LaunchedEffect(mapView, descriptor.styleUri, route?.provenance?.requestId) {
         mapView.getMapAsync { readyMap ->
             map = readyMap
             readyMap.cameraPosition = CameraPosition.Builder()
@@ -106,6 +116,19 @@ fun RoutingMapScreen(
                 .zoom(3.25)
                 .build()
             readyMap.setStyle(descriptor.styleUri) { readyStyle ->
+                route?.let { calculated ->
+                    val points = calculated.geometry.map { Point.fromLngLat(it.longitude, it.latitude) }
+                    readyStyle.addSource(GeoJsonSource("calculated-route", LineString.fromLngLats(points)))
+                    readyStyle.addLayer(LineLayer("calculated-route-line", "calculated-route").withProperties(
+                        lineColor("#FFB020"), lineWidth(6f), lineOpacity(0.9f),
+                    ))
+                    mapView.post {
+                        val bounds = LatLngBounds.Builder().includes(
+                            calculated.geometry.map { LatLng(it.latitude, it.longitude) },
+                        ).build()
+                        readyMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 64))
+                    }
+                }
                 style = readyStyle
                 loadState = MapLoadState.READY
             }

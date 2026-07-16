@@ -3,6 +3,13 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+val orsApiKey = providers.gradleProperty("ORS_API_KEY")
+    .orElse(providers.environmentVariable("ORS_API_KEY"))
+    .orElse("")
+    .get()
+    .replace("\\", "\\\\")
+    .replace("\"", "\\\"")
+
 android {
     namespace = "com.trkrhlpr.app"
     compileSdk = 36
@@ -15,6 +22,7 @@ android {
         versionName = "0.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        buildConfigField("String", "ORS_API_KEY", "\"$orsApiKey\"")
     }
 
     buildTypes {
