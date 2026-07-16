@@ -5,8 +5,8 @@
   "current_phase": "content_source_research_complete",
   "active_agent": null,
   "last_agent": "claude",
-  "last_updated": "2026-07-16T21:52:00Z",
-  "status": "content_docs_owner_approved_count_132_ci_added_buildout_backlog_ready",
+  "last_updated": "2026-07-16T22:59:17Z",
+  "status": "execution_paused_human_review_gate_units1235_done",
   "blocked": false,
   "blocker_reason": null,
   "active_event_id": null,
@@ -16,5 +16,5 @@
   "ci_status": "unknown",
   "execution_active": false,
   "execution_stop_reason": "human_review_gate",
-  "next_recommended_action": "content docs approved and count set to 132; watch PR #15 CI and any further review; next week run the execute-loop pre-flight for the milestone+truck-stops build-out after an explicit EXECUTE confirmation; resolve the 14 flagged checklist items (11 P + 3 U) against full-text sources in a network-capable session"
+  "next_recommended_action": "Track A units 1,2,3,5 done and verified (schema v1->v3, whole-project tests green, all debug Kotlin compiles). Paused at human_review_gate: Unit 4 (mock-exam) needs behavior definition + a decision on how/whether to present 'readiness' under the no-false-claims constraint; Unit 6 (local progress) needs acceptance criteria approved + a migration-test path (device vs. adding Robolectric as a planned test dep). Nothing pushed (needs per-action permission). Re-run execute-loop pre-flight after those decisions."
 }

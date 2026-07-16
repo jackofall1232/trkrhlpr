@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
-private const val SAMPLE_VERSION = 1
+private const val SAMPLE_VERSION = 2
 private val Context.preferencesDataStore by preferencesDataStore("preferences")
 
 class OfflineContentRepository(private val database: LastWagonDatabase) : ContentRepository {
@@ -37,19 +37,27 @@ class OfflineContentRepository(private val database: LastWagonDatabase) : Conten
     override suspend fun getPracticeQuestion(categoryId: ContentId) =
         dao.getPracticeQuestion(categoryId.value)?.toPracticeQuestion()
     override suspend fun getDailyQuestion() = dao.getDailyQuestion()?.toDailyQuestion()
+    override suspend fun getDailyQuestions() = dao.getDailyQuestions().map { it.toDailyQuestion() }
 }
+
+/** UTC day index used for daily-question selection and streaks. */
+internal const val EPOCH_DAY_MILLIS = 86_400_000L
+internal fun epochDayOf(epochMillis: Long) = epochMillis / EPOCH_DAY_MILLIS
 
 class OfflineProgressRepository(private val dao: LastWagonDao) : ProgressRepository {
     override fun observeInspectionProgress(): Flow<InspectionProgress> =
         combine(dao.observeCompletedInspectionIds(), dao.observeInspectionItems()) { completed, items ->
             InspectionProgress(completed.map(::ContentId).toSet(), items.size)
         }
+    override fun observeCompletedDailyDays(): Flow<Set<Long>> =
+        dao.observeCompletedDailyDays().map { it.toSet() }
     override fun observeProgressSnapshot(): Flow<ProgressSnapshot> =
-        combine(observeInspectionProgress(), dao.observeTestAttemptStats(), dao.observeDailyCompletionCount()
-        ) { inspection, stats, daily ->
+        combine(observeInspectionProgress(), dao.observeTestAttemptStats(), observeCompletedDailyDays()
+        ) { inspection, stats, days ->
+            val today = epochDayOf(System.currentTimeMillis())
             ProgressSnapshot(inspection.completedCount, inspection.totalItems, stats.total,
                 if (stats.total == 0) 0 else stats.correct * 100 / stats.total,
-                daily > 0, if (daily > 0) 1 else 0)
+                today in days, DailySafety.currentStreak(days, today))
         }
     override suspend fun setInspectionItemComplete(itemId: ContentId, complete: Boolean) {
         if (complete) dao.setInspectionCompletion(InspectionCompletionEntity(itemId.value, System.currentTimeMillis()))
@@ -61,7 +69,8 @@ class OfflineProgressRepository(private val dao: LastWagonDao) : ProgressReposit
             answeredAtEpochMillis = System.currentTimeMillis()))
     }
     override suspend fun completeDailyQuestion(questionId: ContentId, correct: Boolean) {
-        dao.insertDailyCompletion(DailyCompletionEntity(questionId.value, correct, System.currentTimeMillis()))
+        val now = System.currentTimeMillis()
+        dao.insertDailyDayCompletion(DailyDayCompletionEntity(epochDayOf(now), questionId.value, correct, now))
     }
     override suspend fun resetAllProgress() = dao.resetProgress()
 }
@@ -172,7 +181,27 @@ internal fun parseThemePreference(value: String?): ThemePreference =
     ThemePreference.entries.firstOrNull { it.name == value } ?: ThemePreference.DARK
 
 private fun InspectionItemEntity.toModel() = InspectionItem(
-    ContentId(id), ContentId(categoryId), title, inspectFor, sampleDefects, sequence, isSample)
+    ContentId(id), ContentId(categoryId), title, inspectFor, sampleDefects, sequence, isSample,
+    sourceCitation, parseVerificationStatus(verificationStatus),
+    decodeApplicabilityFlags(applicabilityFlags))
+
+private const val APPLICABILITY_FLAG_DELIMITER = ","
+
+/** Canonical column encoding for an item's applicability flags: sorted, delimiter-joined
+ *  flag names (empty string for "always applies"). Kept sorted so the stored value is stable. */
+internal fun encodeApplicabilityFlags(flags: Set<ApplicabilityFlag>): String =
+    flags.map { it.name }.sorted().joinToString(APPLICABILITY_FLAG_DELIMITER)
+
+internal fun decodeApplicabilityFlags(encoded: String): Set<ApplicabilityFlag> =
+    encoded.split(APPLICABILITY_FLAG_DELIMITER)
+        .mapNotNull { token ->
+            token.trim().takeIf { it.isNotEmpty() }
+                ?.let { name -> ApplicabilityFlag.entries.firstOrNull { it.name == name } }
+        }
+        .toSet()
+
+internal fun parseVerificationStatus(value: String?): VerificationStatus =
+    VerificationStatus.entries.firstOrNull { it.name == value } ?: VerificationStatus.UNVERIFIED
 private fun QuestionEntity.answers() = answersEncoded.split("|").mapIndexed { i, text ->
     AnswerChoice(ContentId("$id-answer-$i"), text)
 }

@@ -10,6 +10,7 @@ class FakeContentRepository(
     tests: List<TestCategory> = emptyList(),
     var practiceQuestion: PracticeQuestion? = null,
     var dailyQuestion: DailyQuestion? = null,
+    var dailyQuestions: List<DailyQuestion> = listOfNotNull(dailyQuestion),
 ) : ContentRepository {
     val inspectionCategories = MutableStateFlow(categories)
     val inspectionItems = MutableStateFlow(items)
@@ -20,6 +21,7 @@ class FakeContentRepository(
     override fun observeTestCategories() = testCategories
     override suspend fun getPracticeQuestion(categoryId: ContentId) = practiceQuestion
     override suspend fun getDailyQuestion() = dailyQuestion
+    override suspend fun getDailyQuestions() = dailyQuestions
 }
 
 class FakeProgressRepository(
@@ -28,8 +30,10 @@ class FakeProgressRepository(
 ) : ProgressRepository {
     val inspectionProgress = MutableStateFlow(inspection)
     val progressSnapshot = MutableStateFlow(snapshot)
+    val completedDailyDays = MutableStateFlow<Set<Long>>(emptySet())
     override fun observeInspectionProgress() = inspectionProgress
     override fun observeProgressSnapshot() = progressSnapshot
+    override fun observeCompletedDailyDays() = completedDailyDays
     override suspend fun setInspectionItemComplete(itemId: ContentId, complete: Boolean) {
         inspectionProgress.update {
             it.copy(completedItemIds = if (complete) it.completedItemIds + itemId else it.completedItemIds - itemId)

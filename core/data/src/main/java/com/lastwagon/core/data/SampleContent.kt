@@ -1,22 +1,36 @@
 package com.lastwagon.core.data
 
-/** Fictional UI demonstration data only; never authoritative inspection or CDL content. */
+import com.lastwagon.core.model.ApplicabilityFlag
+
+/** Fictional UI demonstration data only; never authoritative inspection or CDL content. The
+ *  provenance fields below are placeholders that exercise the schema-v2 metadata; they are
+ *  explicitly NOT citations to any regulation. */
 internal object SampleContent {
+    private const val SAMPLE_CITATION = "Sample only — not an authoritative citation."
+
     val inspectionCategories = listOf(
         InspectionCategoryEntity("sample-cab", "Cab & controls", 1),
         InspectionCategoryEntity("sample-front", "Front of vehicle", 2),
         InspectionCategoryEntity("sample-coupling", "Coupling area", 3),
     )
     val inspectionItems = listOf(
+        // No flags: applies to every configuration.
         InspectionItemEntity("sample-seat-belt", "sample-cab", "Seat belt demonstration item",
             "Sample only: review component condition and secure operation.",
-            "Sample only: visible damage, insecure mounting, or impaired operation.", 1, true),
+            "Sample only: visible damage, insecure mounting, or impaired operation.", 1, true,
+            SAMPLE_CITATION, "UNVERIFIED", ""),
+        // IF_EQUIPPED: soft flag — shown to everyone, skippable when not equipped.
         InspectionItemEntity("sample-lights", "sample-front", "Lighting demonstration item",
             "Sample only: review condition, cleanliness, and operation.",
-            "Sample only: damage, obstruction, or failure to operate.", 2, true),
+            "Sample only: damage, obstruction, or failure to operate.", 2, true,
+            SAMPLE_CITATION, "UNVERIFIED",
+            encodeApplicabilityFlags(setOf(ApplicabilityFlag.IF_EQUIPPED))),
+        // COMBO + AIR: hard flags — combination, air-brake-equipped vehicles only.
         InspectionItemEntity("sample-coupling", "sample-coupling", "Coupling demonstration item",
             "Sample only: review visible condition and secure engagement.",
-            "Sample only: damage, looseness, or incomplete engagement.", 3, true),
+            "Sample only: damage, looseness, or incomplete engagement.", 3, true,
+            SAMPLE_CITATION, "UNVERIFIED",
+            encodeApplicabilityFlags(setOf(ApplicabilityFlag.COMBO, ApplicabilityFlag.AIR))),
     )
     val testCategories = listOf(
         "class-a" to "Class A", "class-b" to "Class B", "general" to "General Knowledge",
@@ -24,6 +38,18 @@ internal object SampleContent {
         "hazmat" to "Hazmat", "tanker" to "Tanker", "passenger" to "Passenger",
     ).mapIndexed { index, (id, title) -> TestCategoryEntity(id, title, kindFor(id), index) }
 
+    // A small labeled-sample pool so one-per-day selection and streaks are demonstrable. Not
+    // authoritative content — real daily questions require source and safety review (Track B).
+    private val dailyPrompts = listOf(
+        Triple("What is the safest response when conditions are unclear?",
+            listOf("Continue without checking", "Stop in a safe place and reassess", "Rely on a guess"), 1),
+        Triple("You notice a small air leak before a trip. What is the safe choice?",
+            listOf("Drive and monitor it", "Do not drive until it is resolved", "Ignore it if brakes still work"), 1),
+        Triple("When following another vehicle in good conditions, you should keep a following distance that is:",
+            listOf("As short as traffic allows", "Enough to stop safely for your speed and load", "Fixed at one second"), 1),
+        Triple("If you feel too tired to drive safely, the safe action is to:",
+            listOf("Push through to the next stop", "Stop and rest before continuing", "Open a window and continue"), 1),
+    )
     val questions = testCategories.map { category ->
         val id = "sample-question-" + category.id
         QuestionEntity(id, category.id,
@@ -32,12 +58,13 @@ internal object SampleContent {
             "$id-answer-1",
             "Sample explanation only. Production questions require an approved official source.",
             "practice", true)
-    } + QuestionEntity("sample-daily-1", "daily",
-        "Sample daily question: What is the safest response when conditions are unclear?",
-        "Continue without checking|Stop in a safe place and reassess|Rely on a guess",
-        "sample-daily-1-answer-1",
-        "Sample explanation only. Future daily content requires source and safety review.",
-        "daily", true)
+    } + dailyPrompts.mapIndexed { index, (prompt, answers, correct) ->
+        val id = "sample-daily-" + (index + 1)
+        QuestionEntity(id, "daily", "Sample daily question: $prompt",
+            answers.joinToString("|"), "$id-answer-$correct",
+            "Sample explanation only. Future daily content requires source and safety review.",
+            "daily", true)
+    }
 
     private fun kindFor(id: String) = when (id) {
         "class-a" -> "CLASS_A"; "class-b" -> "CLASS_B"; "general" -> "GENERAL"

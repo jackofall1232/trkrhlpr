@@ -771,3 +771,193 @@ Append one entry per agent run. Do not overwrite prior runs.
   build-out after an explicit EXECUTE confirmation.
 - **Push authorization:** Same designated-branch instruction; push updates PR #15.
 - **Lock:** a7b3f0d2-5e19-4c86-b4a1-9f2c6e83d504 acquired and released.
+
+### Run 2026-07-16T22:28:50Z — Claude — Execution Mode ARMED (Track A build-out)
+- **Goal:** Owner replied `EXECUTE` to the execute-loop pre-flight for the first-milestone
+  build-out against labeled sample content (Track A, units 1–6). Routing Phases 6–8 excluded;
+  Track B/C stay behind their gates.
+- **Pre-flight:** Displayed goal/DoD, the six Track-A units, iteration budget (reset 5→0 / 25),
+  all nine run boundaries, likely-changed paths, per-action-permission actions, the
+  Autonomous-Edit Denylist, no_progress_threshold 3, and the verification commands. No pending
+  events. No stale arming; lock was released; schema v2 present — no recovery/migration needed.
+- **Armed:** lock 06ee6370-b66f-4a46-85b7-772e049f1b92 (purpose "execute-loop run");
+  `execution.enabled=true`, `preflight_confirmed=true` by owner (jackofall1232) at 22:28:50Z;
+  `current_iteration=0`, no-progress telemetry reset; `should_continue=true`;
+  `state.execution_active=true`.
+
+#### Iteration 1 — Unit 1: content-schema migration (v1 → v2)
+- **Unit:** Add per-item content provenance + applicability metadata to inspection content
+  (todos Track A #1 / "reviewed Room migration").
+- **Changed files:** `core/model/.../Models.kt` (new `VerificationStatus`, `ApplicabilityFlag`
+  enums; 3 new `InspectionItem` fields with defaults); `core/data/.../Database.kt`
+  (`InspectionItemEntity` +3 `@ColumnInfo(defaultValue=…)` columns, `@Database version=2`,
+  additive `MIGRATION_1_2`, `.addMigrations(...)`); `core/data/.../Repositories.kt`
+  (`SAMPLE_VERSION` 1→2, flag encode/decode + status parse helpers, mapper wiring);
+  `core/data/.../SampleContent.kt` (sample items now exercise none / IF_EQUIPPED / COMBO+AIR,
+  placeholder citations, UNVERIFIED status); new
+  `core/data/src/test/.../InspectionContentSchemaTest.kt` (8 tests); Room-exported
+  `core/data/schemas/com.lastwagon.core.data.LastWagonDatabase/2.json`; machine-local
+  `local.properties` (gitignored, points Gradle at the pre-installed `/opt/android-sdk`).
+- **Design decisions:** (1) Additive, non-destructive migration (ALTER TABLE ADD COLUMN with
+  NOT NULL DEFAULTs matching the entity `@ColumnInfo(defaultValue)`), so legacy rows and local
+  progress survive — kept within the pre-approved "reviewed Room migration" unit rather than a
+  new architecture change. (2) CSV-encoded flag column (matches the existing pipe-delimited
+  answers precedent); empty string = "always applies"; decode is defensive (unknown/renamed
+  tokens ignored, never crash). (3) Storage token = enum `name` (`IF_EQUIPPED`); the docs'
+  "IF-EQUIPPED" spelling normalizes at the (later, gated) content-import boundary. (4) Advisor
+  (Fable 5) confirmed the design and flagged that IF_EQUIPPED must be a *soft/show-with-skip*
+  flag in Real Inspection Mode, not a hard filter — recorded for Unit 3; the model doc comment
+  captures the hard-vs-soft distinction.
+- **Verification:** `ANDROID_HOME=/opt/android-sdk ./gradlew :core:data:testDebugUnitTest
+  --no-daemon` → real exit 0, **BUILD SUCCESSFUL in 35s** (2026-07-16). Suites:
+  InspectionContentSchemaTest 8/0/0/0, AnswerEncodingTest 1/0/0/0, PreferencesParsingTest
+  2/0/0/0, VehicleProfilePersistenceTest 2/0/0/0. Room re-exported schema v2 (compile-time
+  schema validation of the new entity passed). Evidence log:
+  scratchpad/gradle-data-test2.log.
+- **Honest limitation:** the *instrumented* ALTER-TABLE migration test (MigrationTestHelper
+  create v1 → runMigrationsAndValidate v2) was NOT run — it needs an emulator/device (none
+  here). Migration SQL correctness is currently backed only by Room's compile-time schema
+  validation + DEFAULT/annotation matching. That instrumented test stays a device gate
+  (Unit 6 / connected-tests todo). Also note: no `LastWagonDatabase/1.json` baseline schema
+  exists (v1 predates the rename), which that instrumented test will need generated first.
+- **Failures:** None in the unit itself. Two *tooling* traps hit and resolved: (a) both early
+  Gradle runs reported a masked exit 0 (trailing `echo` outside the redirect) while actually
+  BUILD FAILED — re-confirmed via the real `GRADLE_EXIT`/`BUILD` lines, consistent with the
+  known masked-pipeline failure mode; (b) Android-library unit tests need the SDK — pointed
+  Gradle at the already-present `/opt/android-sdk` via gitignored `local.properties` (no
+  dependency installed). Recorded in failures.md.
+- **Progress telemetry:** real progress (todo item closed) → `last_progress_iteration=1`,
+  `iterations_since_progress=0`.
+- **Next action:** Iteration 2 — Unit 2 (Study Mode: browse checklist by section; show
+  inspect-for, defects, sequence; surface the new provenance/flag metadata).
+- **Lock:** 06ee6370-b66f-4a46-85b7-772e049f1b92 held (execution run, not yet released).
+
+#### Iteration 2 — Unit 2: Study Mode (read-only, section-grouped browse)
+- **Unit:** Dedicated Study Mode (todos Track A #2). Previously STUDY and INSPECTION shared one
+  toggle-checklist list; Study Mode is now a distinct read-only browse.
+- **Changed files:** `core/designsystem/.../Components.kt` (new model-agnostic `WagonTag`
+  pill — text + accent, keeps designsystem free of feature model types);
+  `feature/learning/.../LearningScreens.kt` (split the mode branch: STUDY → new `StudyModeList`
+  grouping items under section headers by category/sequence, each item showing sequence,
+  verification-status tag, applicability-flag tags, and — on expand — inspect-for, common
+  sample conditions, and source citation; INSPECTION keeps the existing completion checklist).
+- **Design decisions:** (1) Study Mode is strictly read-only — no completion toggles (that is
+  Inspection Mode's role), matching the todo's "browse … show inspect-for, defects, sequence."
+  (2) Surfaces the schema-v2 metadata from Unit 1 so provenance/applicability are visible while
+  studying. (3) Flag/status → label+color mapping lives in the feature layer; the designsystem
+  tag stays generic. (4) FlowRow for tag wrapping (ExperimentalLayoutApi opt-in, localized).
+- **Verification:** `ANDROID_HOME=/opt/android-sdk ./gradlew
+  :feature:learning:compileDebugKotlin --no-daemon` → real exit 0, **BUILD SUCCESSFUL in 24s**
+  (2026-07-16), no compile errors/warnings. Compiles the changed designsystem + learning and
+  their transitive model/data deps. Evidence: scratchpad/gradle-learning.log.
+- **Honest limitation:** compile-only. No emulator here, so Study Mode's actual rendering,
+  section grouping on-screen, tag legibility, expand/collapse interaction, and accessibility
+  remain under the standing connected-Compose-test **device gate** (same exit check as prior
+  UI phases). Not claimed as visually verified.
+- **Failures:** None.
+- **Progress telemetry:** real progress (todo item closed) → `last_progress_iteration=2`,
+  `iterations_since_progress=0`.
+- **Next action:** Iteration 3 — Unit 3 (Real Inspection Mode: mark complete, visible
+  progress, reduce skipped, filter by vehicle config via flags — with IF_EQUIPPED as a
+  soft/show-with-skip flag per the advisor note, NOT a hard filter).
+- **Lock:** 06ee6370-b66f-4a46-85b7-772e049f1b92 held (execution run, not yet released).
+
+#### Iteration 3 — Unit 3: Real Inspection Mode (config-filtered)
+- **Unit:** Real Inspection Mode filtering by the driver's vehicle configuration via the
+  applicability flags, with visible required-progress (todos Track A #3).
+- **Changed files:** `core/model/.../Models.kt` (new `InspectionConfig`, `ItemApplicability`,
+  and pure `InspectionApplicability.evaluate`); new
+  `core/model/src/test/.../InspectionApplicabilityTest.kt` (6 tests);
+  `feature/learning/.../LearningScreens.kt` (Inspection branch reworked: vehicle-config
+  toggles, applicable / if-equipped / not-applicable partitioning, required-progress bar,
+  hidden-count note, shared `checklistItems` LazyListScope emitter, `InspectionConfigCard`/
+  `ConfigToggle`).
+- **Design decisions:** (1) The flags are tested against a NEW lightweight `InspectionConfig`
+  (isCombination, hasAirBrakes) held in local UI state — deliberately NOT the safety-critical
+  routing `VehicleProfile` (which has neither field and carries validation/reconfirmation
+  semantics). Config-selection persistence is deferred to Unit 6. (2) Per the iter-1 advisor
+  note, IF_EQUIPPED is SOFT: it never excludes an item (never hide equipment the vehicle may
+  have) — such items show in an "If equipped — verify if fitted" group with a skip hint. Hard
+  flags (COMBO/AIR) do include/exclude. (3) "Reduce skipped": required total = APPLIES items
+  only; NOT_APPLICABLE items are filtered out with a visible hidden-count so exclusion is
+  explicit, not an accidental skip; progress bar is completed-required / required-total.
+  (4) Filter logic lives in core:model as a pure function so it is unit-testable independent
+  of Compose.
+- **Verification:** `ANDROID_HOME=/opt/android-sdk ./gradlew :core:model:testDebugUnitTest
+  :feature:learning:compileDebugKotlin --no-daemon` → real exit 0, **BUILD SUCCESSFUL in 27s**
+  (2026-07-16). Suites: InspectionApplicabilityTest 6/0/0/0 (no-flags-always-applies, COMBO
+  and AIR include/exclude, all-hard-flags-required, IF_EQUIPPED soft, IF_EQUIPPED+unsatisfied-
+  hard still excluded), plus VehicleProfileTest 3/0/0/0 and InspectionProgressTest 1/0/0/0.
+  Learning module compiles. Evidence: scratchpad/gradle-unit3.log.
+- **Honest limitation:** the applicability *logic* is unit-tested; the Inspection Mode *UI*
+  (toggle interaction, list re-partitioning on config change, progress, accessibility) is
+  compile-verified only and remains under the connected-Compose device gate.
+- **Failures:** None.
+- **Progress telemetry:** real progress (todo item closed) → `last_progress_iteration=3`,
+  `iterations_since_progress=0`.
+- **Next action:** Iteration 4. NOTE a likely upcoming gate: Track A Unit 4 (mock-exam
+  engine) says "define behavior first" and includes **readiness scoring**, which is
+  safety-claim-sensitive under the no-false-claims constraint (the app must not imply exam
+  readiness). Plan: do the unblocked Unit 5 (daily safety question) next, then Unit 6 (local
+  progress), and surface Unit 4's behavior-definition + readiness-framing as a
+  human_review_gate rather than guessing requirements.
+- **Lock:** 06ee6370-b66f-4a46-85b7-772e049f1b92 held (execution run, not yet released).
+
+#### Iteration 4 — Unit 5: Daily safety question (one-per-day selection + streak)
+- **Unit:** Daily safety question mechanism — deterministic one-per-day selection, answer/
+  explanation, and a real streak (todos Track A #5).
+- **Changed files:** `core/model/.../Models.kt` (pure `DailySafety.selectForDay` +
+  `currentStreak`; `ContentRepository.getDailyQuestions`; `ProgressRepository.
+  observeCompletedDailyDays`); new `core/model/src/test/.../DailySafetyTest.kt` (7 tests);
+  `core/data/.../Database.kt` (new `DailyDayCompletionEntity` day-keyed table, DAO methods
+  getDailyQuestions/observeCompletedDailyDays/insert+clear day-completions, `resetProgress`
+  clears it, `@Database version=3`, additive `MIGRATION_2_3` CREATE TABLE, registered);
+  `core/data/.../Repositories.kt` (getDailyQuestions, observeCompletedDailyDays, day-keyed
+  completeDailyQuestion, real `dailyStreak`/`dailyCompleted` in the snapshot via
+  `DailySafety.currentStreak`; `epochDayOf` helper); `core/data/.../SampleContent.kt` (4
+  labeled-sample daily questions so selection/streak are demonstrable);
+  `core/testing/.../Fakes.kt` (new interface methods on both fakes);
+  `feature/learning/.../LearningScreens.kt` (DailyQuestionScreen selects today's question from
+  the pool and shows a streak tag); Room-exported schema v3.
+- **Design decisions:** (1) Streak needs day-based persistence, so added a NEW day-keyed table
+  (PK epochDay) rather than repurposing the questionId-keyed daily_completions (which REPLACE-
+  collapses repeats) — additive/non-destructive, legacy table left intact. (2) Selection is a
+  pure function ordered by id (independent of storage/iteration order) and cycles the pool by
+  UTC day; streak counts consecutive completed days and holds from yesterday until a day is
+  truly missed. Both are unit-tested. (3) epochDay = millis/86_400_000 (UTC). Timezone-aware
+  "local day" is a later refinement (noted for Unit 6 acceptance criteria).
+- **Verification:** `ANDROID_HOME=/opt/android-sdk ./gradlew testDebugUnitTest
+  compileDebugKotlin --no-daemon` (ALL modules) → real exit 0, **BUILD SUCCESSFUL in 47s**
+  (2026-07-16). New: DailySafetyTest 7/0/0/0. Full suite green (model 17, data 13, routing 24
+  — unchanged suites re-verified). Room exported+validated schema v3. All app/feature/testing
+  debug Kotlin compiles together (repository-interface additions propagated to both fakes and
+  the app container). Evidence: scratchpad/gradle-unit5.log.
+- **Honest limitation:** the daily *logic* (selection, streak) is unit-tested and the schema
+  migration is compile/Room-schema-validated, but the DailyQuestionScreen UI and the
+  *executed* v2→v3 ALTER/CREATE at runtime remain under the device gate (instrumented
+  MigrationTestHelper + connected-Compose tests). Not claimed as device-verified.
+- **Failures:** None.
+- **Progress telemetry:** real progress (todo item closed) → `last_progress_iteration=4`,
+  `iterations_since_progress=0`.
+
+### Run-summary — Execution Mode paused at human_review_gate (2026-07-16T22:59:17Z)
+- **Iterations completed:** 4 (units 1, 2, 3, 5). Budget used 4/25.
+- **Units finished + evidence:** (1) content-schema v2 migration — :core:data tests 8/8, schema
+  v2. (2) Study Mode read-only browse — learning compiles. (3) Real Inspection Mode config
+  filter — InspectionApplicabilityTest 6/6. (5) Daily safety question + streak — DailySafetyTest
+  7/7, schema v3. Whole-project `testDebugUnitTest compileDebugKotlin` green.
+- **Boundary + why:** `human_review_gate`. The two remaining Track-A units both need a human
+  decision before implementation: **Unit 4 (mock-exam engine)** is tagged "define behavior
+  first" and includes **readiness scoring**, which is safety-claim-sensitive (the app must not
+  imply CDL-exam readiness; constraints.md / blueprint no-false-claims rules) — its behavior +
+  framing must be defined/approved, not guessed. **Unit 6 (local progress)** needs objective
+  acceptance criteria *approved* (a requirements decision) and its "persistence/migration
+  tests" need either a device (instrumented MigrationTestHelper) or an added test dependency
+  (Robolectric) — the latter is the `destructive_operation_required` boundary (unplanned dep).
+- **Not done / still open:** Units 4 and 6; the standing device-gate reviews for all new UI and
+  the executed migrations; nothing pushed (no per-action push permission requested/granted).
+- **Next recommended action:** Human to (a) define/approve Unit 4 mock-exam behavior incl. how
+  (or whether) to present any "readiness" signal under the no-false-claims constraint, and
+  (b) approve Unit 6 local-progress acceptance criteria and choose the migration-test path
+  (device vs. adding Robolectric as a planned test dep). Then re-run the execute-loop pre-flight.
+- **Lock:** 06ee6370-b66f-4a46-85b7-772e049f1b92 released.

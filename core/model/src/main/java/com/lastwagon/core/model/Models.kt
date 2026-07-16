@@ -5,10 +5,56 @@ import kotlinx.coroutines.flow.Flow
 @JvmInline value class ContentId(val value: String)
 
 data class InspectionCategory(val id: ContentId, val title: String, val sequence: Int, val itemCount: Int)
+
+/** How well an inspection item's content is traceable to an authoritative source. Mirrors the
+ *  C / P / U statuses tracked in docs/pretrip-132-checklist.md. */
+enum class VerificationStatus { VERIFIED, PARTIAL, UNVERIFIED }
+
+/** Applicability flags used to filter items by the driver's vehicle configuration.
+ *  An item with no flags always applies. COMBO and AIR are hard include filters (an item so
+ *  flagged applies only to combination / air-brake-equipped vehicles); IF_EQUIPPED is a soft,
+ *  driver-judgment flag (the item applies only when the vehicle actually has that equipment). */
+enum class ApplicabilityFlag { COMBO, AIR, IF_EQUIPPED }
+
 data class InspectionItem(
     val id: ContentId, val categoryId: ContentId, val title: String, val inspectFor: String,
     val sampleDefects: String, val sequence: Int, val isSample: Boolean = true,
+    val sourceCitation: String = "",
+    val verificationStatus: VerificationStatus = VerificationStatus.UNVERIFIED,
+    val applicabilityFlags: Set<ApplicabilityFlag> = emptySet(),
 )
+
+/** The driver's inspection configuration — the predicates the hard applicability flags test
+ *  against. Kept separate from the safety-critical routing [VehicleProfile]. */
+data class InspectionConfig(val isCombination: Boolean = false, val hasAirBrakes: Boolean = false)
+
+/** Result of testing one item against an [InspectionConfig]. APPLIES and IF_EQUIPPED are both
+ *  shown to the driver; only IF_EQUIPPED is optional (skip when not fitted). NOT_APPLICABLE
+ *  items are filtered out of the active list for this configuration. */
+enum class ItemApplicability { APPLIES, IF_EQUIPPED, NOT_APPLICABLE }
+
+object InspectionApplicability {
+    /**
+     * Hard flags (COMBO, AIR) are include/exclude filters evaluated from the config. IF_EQUIPPED
+     * is a *soft* flag: it never excludes an item — hiding equipment the vehicle might actually
+     * have is the wrong failure mode — it only marks the item optional so the driver can skip it
+     * when not fitted. An item with no flags always APPLIES.
+     */
+    fun evaluate(flags: Set<ApplicabilityFlag>, config: InspectionConfig): ItemApplicability {
+        val hardSatisfied = (flags - ApplicabilityFlag.IF_EQUIPPED).all { flag ->
+            when (flag) {
+                ApplicabilityFlag.COMBO -> config.isCombination
+                ApplicabilityFlag.AIR -> config.hasAirBrakes
+                ApplicabilityFlag.IF_EQUIPPED -> true
+            }
+        }
+        return when {
+            !hardSatisfied -> ItemApplicability.NOT_APPLICABLE
+            ApplicabilityFlag.IF_EQUIPPED in flags -> ItemApplicability.IF_EQUIPPED
+            else -> ItemApplicability.APPLIES
+        }
+    }
+}
 data class InspectionProgress(val completedItemIds: Set<ContentId> = emptySet(), val totalItems: Int = 0) {
     val completedCount get() = completedItemIds.size
     val fraction get() = if (totalItems == 0) 0f else completedCount.toFloat() / totalItems
@@ -26,6 +72,28 @@ data class DailyQuestion(
     val id: ContentId, val prompt: String, val answers: List<AnswerChoice>,
     val correctAnswerId: ContentId, val explanation: String, val isSample: Boolean = true,
 )
+
+/** Pure logic for the daily safety question: deterministic one-per-day selection and streak
+ *  counting. `epochDay` is a UTC day index (millis / 86_400_000). */
+object DailySafety {
+    fun selectForDay(pool: List<DailyQuestion>, epochDay: Long): DailyQuestion? {
+        if (pool.isEmpty()) return null
+        // Stable ordering by id so selection doesn't depend on storage iteration order.
+        val ordered = pool.sortedBy { it.id.value }
+        val index = ((epochDay % ordered.size) + ordered.size) % ordered.size
+        return ordered[index.toInt()]
+    }
+
+    /** Consecutive completed days ending at `today`. If today isn't completed yet, the streak
+     *  counts back from yesterday, so it isn't reported as broken until a day is truly missed. */
+    fun currentStreak(completedDays: Set<Long>, today: Long): Int {
+        if (completedDays.isEmpty()) return 0
+        var day = if (today in completedDays) today else today - 1
+        var streak = 0
+        while (day in completedDays) { streak++; day-- }
+        return streak
+    }
+}
 enum class ThemePreference { DARK, LIGHT, SYSTEM }
 data class UserPreferences(
     val theme: ThemePreference = ThemePreference.DARK,
@@ -101,6 +169,8 @@ interface ContentRepository {
     fun observeTestCategories(): Flow<List<TestCategory>>
     suspend fun getPracticeQuestion(categoryId: ContentId): PracticeQuestion?
     suspend fun getDailyQuestion(): DailyQuestion?
+    /** The full pool of daily questions, for deterministic one-per-day selection. */
+    suspend fun getDailyQuestions(): List<DailyQuestion>
 }
 interface ProgressRepository {
     fun observeInspectionProgress(): Flow<InspectionProgress>
@@ -108,6 +178,8 @@ interface ProgressRepository {
     suspend fun setInspectionItemComplete(itemId: ContentId, complete: Boolean)
     suspend fun recordPracticeAnswer(questionId: ContentId, result: AnswerResult)
     suspend fun completeDailyQuestion(questionId: ContentId, correct: Boolean)
+    /** UTC day indices on which a daily question has been completed (for streak counting). */
+    fun observeCompletedDailyDays(): Flow<Set<Long>>
     suspend fun resetAllProgress()
 }
 interface PreferencesRepository {

@@ -73,6 +73,15 @@ import androidx.compose.ui.unit.dp
     }
 }
 
+/** Small pill label (status / applicability tag). Model-agnostic: the caller supplies the
+ *  text and accent so the design system stays free of feature model types. */
+@Composable fun WagonTag(text: String, accent: Color, modifier: Modifier = Modifier) {
+    Surface(color = accent.copy(alpha = .14f), shape = MaterialTheme.shapes.small, modifier = modifier) {
+        Text(text.uppercase(), Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            style = MaterialTheme.typography.labelMedium, color = accent)
+    }
+}
+
 @Composable fun SectionHeader(eyebrow: String, title: String, supporting: String? = null) {
     Column(verticalArrangement = Arrangement.spacedBy(WagonSpacing.xs)) {
         Text(eyebrow.uppercase(), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)

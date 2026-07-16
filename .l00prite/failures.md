@@ -44,3 +44,22 @@ Record failed approaches and why they should not be retried unless conditions ch
 - **Masked pipeline failure:** `./gradlew ... | tail` reported exit 0 because the pipeline
   status came from `tail` while the wrapper download had failed. Check `PIPESTATUS` or run
   without pipes before recording build evidence.
+
+### Build-environment setup (this Claude Code host) — 2026-07-16 (Execution run)
+
+- **Masked exit via trailing echo:** `./gradlew … > log 2>&1; echo "EXIT $?"` run in the
+  background reports the *echo's* success as the task exit code (0) even when Gradle BUILD
+  FAILED. The background-task completion notification's "exit code 0" is therefore NOT proof of
+  a green build. Always grep the log for `BUILD SUCCESSFUL|BUILD FAILED` and the captured
+  `GRADLE_EXIT=` line before recording verification. (Same family as the masked-pipeline note
+  above.)
+- **`SDK location not found` for Android-library unit tests:** unlike the earlier remote
+  session, THIS host both reaches `dl.google.com` AND ships a complete SDK at
+  `/opt/android-sdk` (cmdline-tools/latest, platforms/android-36, build-tools/36.0.0, licenses
+  accepted). Gradle just needs pointing at it. Fix: gitignored `local.properties` with
+  `sdk.dir=/opt/android-sdk` (and/or `export ANDROID_HOME=/opt/android-sdk` per invocation —
+  env vars do NOT persist across this harness's Bash calls). This installs nothing; do not
+  treat it as a dependency change. With it, `:core:data:testDebugUnitTest` builds green.
+- **Note vs prior session:** the failures.md "Google Maven blocked / standalone
+  kotlin-compiler workaround" note is env-specific to the older remote host and does NOT apply
+  here — prefer real `./gradlew` verification on this host.

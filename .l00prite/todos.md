@@ -9,14 +9,26 @@ iteration real build verification on GitHub runners. Sequence the loop units so 
 waits behind its gate:
 
 - **Track A — buildable now, against labeled sample content (no content-approval gate):**
-  1. Content-schema migration: per-item source citation, verification status, applicability
-     flags (`COMBO`/`AIR`/`IF-EQUIPPED`). (Room migration — reviewed.)
-  2. Study Mode: browse the checklist by section; show inspect-for, defects, sequence.
-  3. Real Inspection Mode: mark items complete, visible progress, reduce skipped items,
-     filter by the driver's vehicle configuration via the flags.
+  1. [x] 2026-07-16: Content-schema migration: per-item source citation, verification status,
+     applicability flags (`COMBO`/`AIR`/`IF-EQUIPPED`). Room v1→v2 additive migration, model
+     enums, CSV flag encoding, sample content updated; `:core:data:testDebugUnitTest` green
+     (8 new tests), schema v2 exported. Instrumented MigrationTestHelper test still a device
+     gate (see Unit 6).
+  2. [x] 2026-07-16: Study Mode — dedicated read-only browse grouped by section, showing each
+     item's sequence, inspect-for, common conditions, verification-status tag, applicability-
+     flag tags, and source citation. `:feature:learning:compileDebugKotlin` green; on-device
+     visual/accessibility review remains the connected-Compose device gate.
+  3. [x] 2026-07-16: Real Inspection Mode — vehicle-config toggles (combination, air brakes)
+     filter items via applicability flags; APPLIES/IF_EQUIPPED/NOT_APPLICABLE partitioning;
+     required-progress bar; hidden-not-applicable count. Pure `InspectionApplicability.evaluate`
+     unit-tested (6 tests). IF_EQUIPPED kept soft (show-with-skip). UI on-device review is the
+     connected-Compose device gate. Config-selection persistence deferred to unit 6.
   4. Mock-exam engine: randomized tests, scoring, missed-question review, test history,
      readiness scoring (define behavior first, then implement).
-  5. Daily safety question mechanism: one-per-day selection, answer/explanation, streak.
+  5. [x] 2026-07-16: Daily safety question — deterministic one-per-day selection from a labeled
+     sample pool, answer/explanation, and a real streak backed by a new day-keyed table
+     (schema v3). Pure selection + streak logic unit-tested (7 tests). UI + executed migration
+     remain device gates.
   6. Local progress: acceptance criteria + persistence/migration tests.
 - **Track B — behind human gates (docs approval + full-text verification):**
   7. Author the 132 checklist items as real content (original prose, per-item provenance).
@@ -54,9 +66,10 @@ import, and the truck-stop data-source research gate (Track C start).
   manual PDF and eCFR full text — needs a session/machine whose network can fetch them
   (this remote environment's policy blocks those hosts).
 - [ ] Define objective acceptance criteria for Study Mode and Real Inspection Mode.
-- [ ] Design the content-schema additions (per-item source citation, verification
-  date/status, applicability flags COMBO/AIR/IF-EQUIPPED) as a reviewed Room migration
-  before authoritative content import.
+- [x] 2026-07-16: Designed and implemented the content-schema additions (per-item source
+  citation, verification status, applicability flags COMBO/AIR/IF-EQUIPPED) as a reviewed
+  additive Room 1→2 migration (Track A unit 1). Instrumented migration validation remains a
+  device gate.
 - [ ] Run visual, accessibility, and connected Compose tests on representative phone and tablet hardware.
 - [ ] Review and approve the production foundation before importing authoritative content.
 - [ ] Implement CDL mock exams feature with randomized tests and readiness scoring.
