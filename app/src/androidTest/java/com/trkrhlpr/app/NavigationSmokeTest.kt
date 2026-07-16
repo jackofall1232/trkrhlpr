@@ -24,4 +24,10 @@ class NavigationSmokeTest {
         compose.onNodeWithText("Submit answer").performClick()
         compose.onNodeWithText("Daily check recorded").assertIsDisplayed()
     }
+
+    @Test fun routeMapOpensWithoutRequestingLocation() {
+        compose.onNodeWithText("Route map").performScrollTo().performClick()
+        compose.onNodeWithText("Vehicle profile").assertIsDisplayed()
+        compose.onNodeWithText("Confirm and save profile").assertIsDisplayed()
+    }
 }

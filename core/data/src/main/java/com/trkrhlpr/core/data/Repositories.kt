@@ -81,6 +81,93 @@ class DataStorePreferencesRepository(private val context: Context) : Preferences
     override suspend fun setLargeText(enabled: Boolean) { context.preferencesDataStore.edit { it[Keys.largeText] = enabled } }
 }
 
+class DataStoreVehicleProfileRepository(private val context: Context) : VehicleProfileRepository {
+    private object Keys {
+        val schemaVersion = intPreferencesKey("vehicle_profile_schema_version")
+        val vehicleType = stringPreferencesKey("vehicle_profile_type")
+        val heightMeters = stringPreferencesKey("vehicle_profile_height_meters")
+        val widthMeters = stringPreferencesKey("vehicle_profile_width_meters")
+        val lengthMeters = stringPreferencesKey("vehicle_profile_length_meters")
+        val grossWeightTonnes = stringPreferencesKey("vehicle_profile_gross_weight_tonnes")
+        val axleLoadTonnes = stringPreferencesKey("vehicle_profile_axle_load_tonnes")
+        val axleCount = intPreferencesKey("vehicle_profile_axle_count")
+        val hazmat = booleanPreferencesKey("vehicle_profile_hazmat")
+        val avoidTolls = booleanPreferencesKey("vehicle_profile_avoid_tolls")
+        val avoidFerries = booleanPreferencesKey("vehicle_profile_avoid_ferries")
+        val avoidUnpaved = booleanPreferencesKey("vehicle_profile_avoid_unpaved")
+        val confirmedAt = longPreferencesKey("vehicle_profile_confirmed_at")
+    }
+
+    override val profile = context.preferencesDataStore.data.map(::decodeVehicleProfile)
+
+    override suspend fun save(profile: VehicleProfile) {
+        require(VehicleProfileValidator.validate(profile).isEmpty()) { "Vehicle profile is invalid" }
+        context.preferencesDataStore.edit { p ->
+            p[Keys.schemaVersion] = VEHICLE_PROFILE_SCHEMA_VERSION
+            p[Keys.vehicleType] = profile.vehicleType.name
+            p[Keys.heightMeters] = profile.heightMeters.toString()
+            p[Keys.widthMeters] = profile.widthMeters.toString()
+            p[Keys.lengthMeters] = profile.lengthMeters.toString()
+            p[Keys.grossWeightTonnes] = profile.grossWeightTonnes.toString()
+            p[Keys.axleLoadTonnes] = profile.axleLoadTonnes.toString()
+            p[Keys.axleCount] = profile.axleCount
+            p[Keys.hazmat] = profile.hazmat
+            p[Keys.avoidTolls] = profile.avoidTolls
+            p[Keys.avoidFerries] = profile.avoidFerries
+            p[Keys.avoidUnpaved] = profile.avoidUnpavedRoads
+            p[Keys.confirmedAt] = profile.confirmedAtEpochMillis
+        }
+    }
+
+    override suspend fun clear() {
+        context.preferencesDataStore.edit { p ->
+            p.remove(Keys.schemaVersion)
+            p.remove(Keys.vehicleType)
+            p.remove(Keys.heightMeters)
+            p.remove(Keys.widthMeters)
+            p.remove(Keys.lengthMeters)
+            p.remove(Keys.grossWeightTonnes)
+            p.remove(Keys.axleLoadTonnes)
+            p.remove(Keys.axleCount)
+            p.remove(Keys.hazmat)
+            p.remove(Keys.avoidTolls)
+            p.remove(Keys.avoidFerries)
+            p.remove(Keys.avoidUnpaved)
+            p.remove(Keys.confirmedAt)
+        }
+    }
+
+    private fun decodeVehicleProfile(p: Preferences): VehicleProfile? {
+        return decodeStoredVehicleProfile(
+            p[Keys.schemaVersion], p[Keys.vehicleType], p[Keys.heightMeters], p[Keys.widthMeters],
+            p[Keys.lengthMeters], p[Keys.grossWeightTonnes], p[Keys.axleLoadTonnes],
+            p[Keys.axleCount], p[Keys.hazmat], p[Keys.avoidTolls], p[Keys.avoidFerries],
+            p[Keys.avoidUnpaved], p[Keys.confirmedAt],
+        )
+    }
+
+    private companion object { const val VEHICLE_PROFILE_SCHEMA_VERSION = 1 }
+}
+
+internal fun decodeStoredVehicleProfile(
+    schemaVersion: Int?, vehicleType: String?, heightMeters: String?, widthMeters: String?,
+    lengthMeters: String?, grossWeightTonnes: String?, axleLoadTonnes: String?,
+    axleCount: Int?, hazmat: Boolean?, avoidTolls: Boolean?, avoidFerries: Boolean?,
+    avoidUnpaved: Boolean?, confirmedAt: Long?,
+): VehicleProfile? {
+    if (schemaVersion != 1) return null
+    return runCatching {
+        VehicleProfile(
+            CommercialVehicleType.valueOf(requireNotNull(vehicleType)),
+            requireNotNull(heightMeters).toDouble(), requireNotNull(widthMeters).toDouble(),
+            requireNotNull(lengthMeters).toDouble(), requireNotNull(grossWeightTonnes).toDouble(),
+            requireNotNull(axleLoadTonnes).toDouble(), requireNotNull(axleCount), hazmat ?: false,
+            avoidTolls ?: false, avoidFerries ?: false, avoidUnpaved ?: false,
+            requireNotNull(confirmedAt),
+        )
+    }.getOrNull()?.takeIf { VehicleProfileValidator.validate(it).isEmpty() }
+}
+
 internal fun parseThemePreference(value: String?): ThemePreference =
     ThemePreference.entries.firstOrNull { it.name == value } ?: ThemePreference.DARK
 
