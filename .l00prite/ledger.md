@@ -255,3 +255,42 @@ Append one entry per agent run. Do not overwrite prior runs.
   grant/denial.
 - **Next action:** Complete the Phase 1 physical-device exit check before beginning Phase 2.
 - **Lock:** e47059cc-d5cf-48c9-b60a-759978ed8131 acquired for this implementation run.
+
+### Run 2026-07-16T17:18:36Z — Codex — Phase 1 lifecycle fix and Phase 2 vehicle profile
+- **Goal:** Address the Phase 1 lifecycle review and implement a validated,
+  driver-confirmed commercial-vehicle profile without beginning route calculation.
+- **Triggering event:** User reported review feedback after merging Phase 1 and explicitly
+  requested the small fix plus Phase 2 in one follow-up branch.
+- **Completed work:** Removed unconditional MapView start/resume calls, refreshed coarse
+  location permission state on every host resume, and tracked active start/resume states so
+  navigation disposal still performs required pause/stop cleanup before destroy. Added the
+  Phase 2 domain model, conversion utilities, plausibility validator, schema-versioned
+  DataStore repository, fake repository, profile editor/summary, driver confirmation and
+  reconfirmation, and map gating behind a saved profile. Captured vehicle type, dimensions,
+  gross/axle weights, axle count, hazmat, toll/ferry/unpaved avoidances, and confirmation time.
+- **Tests run / Verification:**
+  - command: `env ANDROID_HOME=/opt/android-sdk ./gradlew testDebugUnitTest
+    :app:assembleDebug :app:assembleDebugAndroidTest lintDebug`; exit_code: 0; summary:
+    all JVM tests, debug APK, instrumentation-test APK, and full lint suite passed;
+    timestamp: 2026-07-16T17:18:36Z.
+  - tests: unit conversion round trips; valid/invalid profile bounds; confirmation; current,
+    unknown, corrupt, and invalid persistence records; provider contract; existing data tests.
+  - command: `aapt dump permissions app/build/outputs/apk/debug/app-debug.apk`; exit_code: 0;
+    summary: Internet and coarse location present; fine location absent;
+    timestamp: 2026-07-16T17:18:36Z.
+  - command: `git diff --check`; exit_code: 0; summary: no whitespace errors;
+    timestamp: 2026-07-16T17:18:36Z.
+  - artifact: `app/build/outputs/apk/debug/app-debug.apk`; SHA-256:
+    `f12190246b97820d20e1d31254a1720f8c023f99cfb80c195183cf73b3d934c7`.
+- **Failures:** Initial compilation exposed a missing routing-to-model dependency, corrected
+  KeyboardOptions import, and heterogeneous preference-key removal; each was corrected
+  before the successful full suite.
+- **Decisions:** Inputs use US customary units for the initial US audience and are persisted
+  canonically in metric units for later routing-provider requests. Plausibility ranges are
+  deliberately broad input-error guards, not assertions of legal size/weight or route safety.
+  No route calculation, automatic defaults, or background location was added.
+- **Confidence:** High for compilation, persistence parsing, validation, and package
+  permissions; medium-high for UX until profile entry and map lifecycle are device-tested.
+- **Next action:** Review both phases on representative hardware, then begin Phase 3 only
+  after approving the routing API contract and credential handling.
+- **Lock:** 334326fe-19b9-46d9-806e-fcf649892fad acquired and released.

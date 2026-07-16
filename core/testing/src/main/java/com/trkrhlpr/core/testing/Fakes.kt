@@ -61,3 +61,10 @@ class FakePreferencesRepository(initial: UserPreferences = UserPreferences()) : 
     override suspend fun setReduceMotion(enabled: Boolean) { state.update { it.copy(reduceMotion = enabled) } }
     override suspend fun setLargeText(enabled: Boolean) { state.update { it.copy(largeText = enabled) } }
 }
+
+class FakeVehicleProfileRepository(initial: VehicleProfile? = null) : VehicleProfileRepository {
+    private val state = MutableStateFlow(initial)
+    override val profile = state
+    override suspend fun save(profile: VehicleProfile) { state.value = profile }
+    override suspend fun clear() { state.value = null }
+}

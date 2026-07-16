@@ -58,6 +58,11 @@ Durable project facts and decisions that future agents should preserve.
 - Phase 1 uses MapLibre Native Android 13.0.2 behind a replaceable `MapStyleProvider`.
   MapLibre demo world data is evaluation-only, visibly attributed, and not approved as a
   production truck-map or offline-prefetch provider.
+- Phase 2 stores one schema-versioned, confirmed commercial-vehicle profile in DataStore.
+  US customary inputs are converted to canonical metric values. The profile includes type,
+  dimensions, gross and axle weight, axle count, hazmat state, and supported avoidances.
+  Broad plausibility validation is not a legal-limit or route-safety determination, and
+  editing always requires the driver to reconfirm the current equipment and load.
 
 ## Avoid
 - Do not store random temporary notes, speculative ideas, or stale debugging output here.
