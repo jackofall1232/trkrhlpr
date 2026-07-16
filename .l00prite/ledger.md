@@ -484,3 +484,25 @@ Append one entry per agent run. Do not overwrite prior runs.
 - **Confidence:** High for the changed branch; unchanged elsewhere.
 - **Next action:** Keep watching PR #12 until merged or closed.
 - **Lock:** 4db86b82-3631-4b4c-937c-86a6ea8ea208 acquired and released.
+
+### Run 2026-07-16T19:30:38Z — Claude — PR #12 third review round
+- **Goal:** Address Codex findings on commit 04afa97.
+- **Triggering event:** Codex re-review webhooks on PR #12.
+- **Completed work:** (1) Download setup is now generation-stamped: cancel, delete, and
+  refresh invalidate in-flight list/delete/create chains, and a region created after
+  cancellation is discarded instead of adopted, so cancelling during "Preparing" really
+  cancels. (2) discardAllThen reports the first deletion error and creation is aborted,
+  so a replacement corridor is never created while an old one may still be stored.
+  (3) The route map now shows "Off-route warning UNAVAILABLE — needs approximate
+  location" whenever a route is displayed but no location fix is available to check the
+  corridor boundary, instead of silently skipping the stop-and-reassess safety net.
+- **Tests run / Verification:** OfflineCorridorManager and NetworkMonitor recompiled
+  standalone against MapLibre 13.0.2 and android-all API 36; exit 0. Pure-logic suites
+  unchanged (16 passing). Full Gradle suite still pending outside this environment.
+- **Failures:** None.
+- **Decisions:** All corridor lifecycle callbacks are generation-checked on the main
+  thread; safety warnings fail visible (unknown boundary is announced, never assumed
+  inside).
+- **Confidence:** High for the changed logic; device review remains the exit gate.
+- **Next action:** Keep watching PR #12 until merged or closed.
+- **Lock:** ddaf54d0-aad0-4924-9e06-928b67510399 acquired and released.

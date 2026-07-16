@@ -33,6 +33,13 @@ class OfflineCorridorManager(
 
     private var activeRegion: OfflineRegion? = null
 
+    /**
+     * Invalidates in-flight download setup. Cancel, delete, and refresh bump this so a
+     * pending list/delete/create callback chain from a superseded download stops instead
+     * of creating a corridor the user no longer wants. All access is on the main thread.
+     */
+    private var downloadGeneration = 0
+
     private val manager: OfflineManager by lazy {
         MapLibre.getInstance(appContext)
         OfflineManager.getInstance(appContext).also {
@@ -46,6 +53,7 @@ class OfflineCorridorManager(
      * else, including corridors downloaded for a different style provider.
      */
     fun refresh(currentRoute: CalculatedRoute?, activeStyleId: String) {
+        downloadGeneration++
         manager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>?) {
                 val regions = offlineRegions.orEmpty()
@@ -90,6 +98,7 @@ class OfflineCorridorManager(
         }
         _state.value = CorridorState.Preparing
         activeRegion = null
+        val generation = ++downloadGeneration
         val metadata = OfflineCorridor.metadataFor(route, style.id, detail, now())
         val definition = OfflineGeometryRegionDefinition(
             style.styleUri,
@@ -99,14 +108,28 @@ class OfflineCorridorManager(
             appContext.resources.displayMetrics.density,
         )
         // Clear any previous corridor first so only one download ever exists. Creation
-        // waits until every deletion has called back to avoid overlapping database work,
-        // and a listing failure aborts the download rather than risking a second corridor.
+        // waits until every deletion succeeds; a listing or deletion failure aborts the
+        // download, and a cancellation (generation bump) stops the chain at every step.
         manager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>?) {
-                discardAllThen(offlineRegions.orEmpty()) { create(definition, metadata) }
+                if (generation != downloadGeneration) return
+                discardAllThen(
+                    offlineRegions.orEmpty(),
+                    onFailure = { error ->
+                        if (generation == downloadGeneration) {
+                            _state.value = CorridorState.Failed(
+                                "The previous offline corridor could not be deleted: " +
+                                    "$error. Try the download again.",
+                            )
+                        }
+                    },
+                ) {
+                    if (generation == downloadGeneration) create(definition, metadata, generation)
+                }
             }
 
             override fun onError(error: String) {
+                if (generation != downloadGeneration) return
                 _state.value = CorridorState.Failed(
                     "Existing offline corridors could not be checked: $error. " +
                         "Try the download again.",
@@ -119,6 +142,7 @@ class OfflineCorridorManager(
     fun cancel() = delete()
 
     fun delete() {
+        downloadGeneration++
         val region = activeRegion
         activeRegion = null
         if (region == null) {
@@ -140,16 +164,26 @@ class OfflineCorridorManager(
         })
     }
 
-    private fun create(definition: OfflineGeometryRegionDefinition, metadata: CorridorMetadata) {
+    private fun create(
+        definition: OfflineGeometryRegionDefinition,
+        metadata: CorridorMetadata,
+        generation: Int,
+    ) {
         manager.createOfflineRegion(
             definition,
             OfflineCorridor.encodeMetadata(metadata),
             object : OfflineManager.CreateOfflineRegionCallback {
                 override fun onCreate(offlineRegion: OfflineRegion) {
+                    if (generation != downloadGeneration) {
+                        // Cancelled while the region was being created; remove it again.
+                        discard(offlineRegion)
+                        return
+                    }
                     adopt(offlineRegion, metadata)
                 }
 
                 override fun onError(error: String) {
+                    if (generation != downloadGeneration) return
                     _state.value = CorridorState.Failed(
                         "The offline corridor download could not start: $error",
                     )
@@ -222,22 +256,37 @@ class OfflineCorridorManager(
         })
     }
 
-    /** Deletes all [regions], then runs [onComplete]; callbacks arrive on the main thread. */
-    private fun discardAllThen(regions: Array<out OfflineRegion>, onComplete: () -> Unit) {
+    /**
+     * Deletes all [regions]. Runs [onComplete] only when every deletion succeeded;
+     * any failure reports the first error to [onFailure] instead, so a caller never
+     * creates a replacement corridor while an old one may still be stored. Callbacks
+     * arrive on the main thread.
+     */
+    private fun discardAllThen(
+        regions: Array<out OfflineRegion>,
+        onFailure: (String) -> Unit,
+        onComplete: () -> Unit,
+    ) {
         var remaining = regions.size
+        var firstError: String? = null
         if (remaining == 0) {
             onComplete()
             return
+        }
+        val finish = {
+            val error = firstError
+            if (error == null) onComplete() else onFailure(error)
         }
         regions.forEach { region ->
             region.setDownloadState(OfflineRegion.STATE_INACTIVE)
             region.delete(object : OfflineRegion.OfflineRegionDeleteCallback {
                 override fun onDelete() {
-                    if (--remaining == 0) onComplete()
+                    if (--remaining == 0) finish()
                 }
 
                 override fun onError(error: String) {
-                    if (--remaining == 0) onComplete()
+                    if (firstError == null) firstError = error
+                    if (--remaining == 0) finish()
                 }
             })
         }

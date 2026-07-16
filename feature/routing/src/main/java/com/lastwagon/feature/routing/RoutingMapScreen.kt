@@ -71,6 +71,7 @@ fun RoutingMapScreen(
     }
     var locationDenied by remember { mutableStateOf(false) }
     var offCorridor by remember { mutableStateOf(false) }
+    var boundaryCheckActive by remember { mutableStateOf(false) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -158,6 +159,7 @@ fun RoutingMapScreen(
         val readyMap = map
         val geometry = route?.geometry.orEmpty()
         if (readyMap == null || !locationGranted || geometry.size < 2) {
+            boundaryCheckActive = false
             offCorridor = false
             return@LaunchedEffect
         }
@@ -167,11 +169,17 @@ fun RoutingMapScreen(
                     readyMap.locationComponent.lastKnownLocation
                 } else null
             }.getOrNull()
-            offCorridor = if (location == null) false else {
+            if (location == null) {
+                // No usable fix: the boundary cannot be checked, and that state is
+                // surfaced instead of silently reporting "inside the corridor".
+                boundaryCheckActive = false
+                offCorridor = false
+            } else {
+                boundaryCheckActive = true
                 val distance = GeoMath.distanceToPolylineMeters(
                     GeoPoint(location.latitude, location.longitude), geometry,
                 )
-                OfflineCorridor.isOffCorridor(
+                offCorridor = OfflineCorridor.isOffCorridor(
                     distance,
                     if (location.hasAccuracy()) location.accuracy.toDouble() else null,
                 )
@@ -212,6 +220,11 @@ fun RoutingMapScreen(
                         24 * 60 * 60 * 1000L
                     ) Text("Route: OFFLINE / STALE", style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.error)
+                    if (!boundaryCheckActive) Text(
+                        "Off-route warning UNAVAILABLE — needs approximate location",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.error,
+                    )
                 }
                 when (corridorState) {
                     is CorridorState.Ready -> Text(
