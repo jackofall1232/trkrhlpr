@@ -1,20 +1,14 @@
 # Prioritized TODOs
 
 ## Next
-- [ ] Routing Phase 0: approve the safety contract, qualified terminology, route states,
-  degraded behavior, driver-review workflow, and release legal-review gate.
-- [ ] Routing Phase 1: implement a read-only MapLibre map after approving a tile provider's
-  licensing, attribution, privacy, caching, and offline terms.
+- [ ] Complete Phase 1 physical phone/tablet review: rendering, lifecycle, controls,
+  approximate-location grant/denial, network loss, and accessibility.
 - [ ] Routing Phase 2: implement a validated, driver-confirmed commercial-vehicle profile.
 - [ ] Routing Phase 3: implement replaceable online HGV routing with ORS as the initial
   provider and full request/response provenance.
 - [ ] Routing Phase 4: require route overview and driver review before navigation.
 - [ ] Routing Phase 5: implement licensed corridor pre-fetching, local route persistence,
   explicit offline/stale state, and safe off-corridor behavior (routing MVP boundary).
-- [ ] Implement MapLibre GL Native Android wrapper for offline-first map viewing.
-- [ ] Implement OpenRouteService (ORS) API client for truck-safe (HGV) route calculation.
-- [ ] Build "Route Corridor" tile pre-fetching and local geometry persistence logic.
-- [ ] Update Android manifest to request Internet and location permissions for mapping/routing.
 - [ ] Research authoritative FMCSA and official CDL-manual sources for the 131-point checklist.
 - [ ] Define the exact checklist scope, sequence, vehicle configurations, and defect criteria.
 - [ ] Define objective acceptance criteria for Study Mode and Real Inspection Mode.
@@ -25,8 +19,6 @@
 - [ ] Implement CDL mock exams feature with randomized tests and readiness scoring.
 - [ ] Define test-history, missed-question review, randomized-test, and readiness-scoring behavior.
 - [ ] Implement CDL mock exams feature based on the defined behavior.
-- [ ] Design and implement STAA-compliant truck routing subsystem.
-- [ ] Integrate bridge height awareness and clearance warnings into routing.
 - [ ] Implement comprehensive truck stop locations dataset and search features.
 
 ## Later
@@ -43,6 +35,10 @@
 
 ## Done
 - Move completed items here with dates when helpful.
+- [x] 2026-07-16: Completed Routing Phase 0 safety contract and terminology approval.
+- [x] 2026-07-16: Implemented Routing Phase 1 read-only MapLibre evaluation map, replaceable
+  style provider, explicit attribution/limitations, zoom controls, and opt-in approximate
+  location with denial handling; device review remains an exit check.
 - [x] 2026-07-16: Approved and documented the phased commercial-truck routing plan,
   qualified safety language, mandatory driver review, and Phase 5 MVP boundary.
 - [x] 2026-07-13: Confirmed product direction, first milestone, roadmap exclusions, technology, and mission.
