@@ -30,9 +30,16 @@ branding choice, not an accuracy fix.
 
 ## Scope and vehicle applicability
 
-- **Primary configuration:** Class A tractor + single semi-trailer, air brakes, air-ride or
-  leaf-spring suspension — the most common configuration for the target audience. All 131
-  items apply to it.
+- **131 is the full enumeration, not a per-vehicle count.** The 131 items are the complete
+  set for a fully-equipped Class A tractor + single semi-trailer with air brakes. The number
+  of items that actually *apply* to a given vehicle is always ≤ 131 and depends on its
+  equipment — a leaf-spring tractor with no cargo lift, no sliding fifth wheel, and no
+  washers has fewer applicable items than one with all of those. Real Inspection Mode shows
+  the applicable count for the driver's configuration; the app must not imply every vehicle
+  has 131 live points.
+- **Primary configuration for authoring:** Class A tractor + single semi-trailer, air
+  brakes — the most common configuration for the target audience, and the basis on which the
+  enumeration was built.
 - **Applicability flags:** items carry flags so other configurations shrink the list
   honestly instead of showing untestable items: `COMBO` (tractor-trailer only), `AIR`
   (air brakes), `IF-EQUIPPED` (air ride, sliding fifth wheel, cargo lift, washers, etc.).
@@ -154,7 +161,7 @@ Perform with help of the dash switches; walk the full vehicle for each function.
 | 56 | Backing lights | Operate in reverse | S11 | C |
 | 57 | Clearance/marker/ID lights — tractor | All operate; amber forward, red rear | S11, 393.9 | C |
 | 58 | Clearance/marker/ID lights — trailer (`COMBO`) | All operate; correct colors | S11, 393.9 | C |
-| 59 | Reflectors/conspicuity | Clean, unbroken, none missing; red rear, amber elsewhere | S11, 393 Subpart B | C |
+| 59 | Reflectors/conspicuity | Clean, unbroken, none missing; correct colors — reflex reflectors amber at the front and front-side, **red at the rear and rear-side**; conspicuity sheeting is a **red-and-white** pattern, not amber (§ 393.11 reflector color table; § 393.13 conspicuity) | S11, 393.11/.13 | C |
 
 ### 6. Side of tractor (items 60–66)
 
@@ -242,18 +249,24 @@ Checked at each drive axle; dual wheels throughout.
 
 ### 10. Brake checks — performed last (items 122–131)
 
+**Safety prerequisite (applies to this whole section):** before releasing the parking
+brakes for any engine-off leakage or pop-out test, chock the wheels or otherwise secure the
+vehicle against rolling. Several of these tests release the service and/or parking brakes
+with the engine off; on any grade an unsecured tractor-trailer can roll. Perform brake tests
+on level ground where possible, wheels chocked.
+
 | # | Item | Check | Source | Status |
 |---|---|---|---|---|
 | 122 | Air build-up rate (`AIR`) | Pressure builds within the normal time/range (commonly stated as 85→100 psi within 45 s; **figure needs verification against manual Section 5/11**) | S11/S5 | U |
-| 123 | Governor cut-out (`AIR`) | Compressor stops at ~120–140 psi or manufacturer spec | S11 | C |
+| 123 | Governor cut-out (`AIR`) | Compressor stops at the manufacturer-set cut-out, commonly ~120–140 psi. There is **no federal maximum** cut-out pressure — § 393.51 governs only the low-air warning and gauge, not cut-out — so a high-but-in-spec cut-out is not itself a defect | S11 | C |
 | 124 | Governor cut-in (`AIR`) | Compressor restarts at the specified lower pressure (**figure needs verification**) | S5 | U |
 | 125 | Static leakage test (`AIR`) | Engine off, brakes released: pressure loss ≤ ~2 psi/min single vehicle, ≤ ~3 psi/min combination (standard manual figures — distinct from the applied-test figures below; **exact Section 11/5 wording pending full-text verification**) | S11/S5 | U |
 | 126 | Applied leakage test (`AIR`) | Engine off, service brake fully applied: loss ≤ ~3 psi/min single vehicle, ≤ ~4 psi/min combination | S5 | C |
 | 127 | Low air pressure warning (`AIR`) | Warning activates **before the pressure drops below 60 psi** during pump-down | S11/S5 | C |
-| 128 | Spring brake pop-out (`AIR`) | Parking brakes apply automatically at **20–40 psi** | S11/S5 | C |
-| 129 | Tractor parking brake test | Parking brake set (trailer brakes released): vehicle holds against a gentle pull forward | S11 | C |
-| 130 | Trailer brake test (`COMBO`) | Trailer brakes set/hand valve applied: combination holds against a gentle pull | S11 | P |
-| 131 | Service brake check | At ~5 mph, apply the service brake: firm stop, no pulling to either side, no delay | S11 | P |
+| 128 | Spring / emergency brake pop-out (`AIR`) | Continue the pump-down: the tractor parking-brake (spring) valve — and, on a combination, the trailer air-supply valve / tractor-protection valve — must close automatically in the **20–45 psi** range, applying the parking/emergency brakes | S11/S5 | C |
+| 129 | Tractor parking brake test | With wheels chocked removed only after this test: parking brake set (trailer brakes released), gently pull forward against the tractor parking brake — it must hold | S11 | C |
+| 130 | Trailer brake test (`COMBO`) | **Tractor parking brake released**, trailer brakes set (trailer air-supply/hand valve applied): gently pull forward against the trailer brakes alone — they must hold (releasing the tractor brake first is what makes this test the trailer's, not the tractor's) | S11 | P |
+| 131 | Service brake check | With both parking brakes released, roll at ~5 mph and apply the service brake: firm stop, no pulling to either side, no delay | S11 | P |
 
 Hydraulic-brake variant (replaces the `AIR` items above): pump the pedal three times, apply
 firm pressure, hold five seconds — the pedal must not depress; failure is disqualifying on
@@ -292,11 +305,22 @@ cross-checked against this checklist at the table-of-contents level:
   (emergency exits) — bus items belong to the future Passenger/School Bus content, not the
   Class A checklist.
 - **Verification-pass candidates raised by the cross-check:** the OOSC lists the
-  *tractor-protection system* and *air reservoir* as distinct brake-system areas. The
-  classic Section 11 in-cab air-brake sequence covers the trailer air-supply valve behavior
-  within items 125–128; the full-text pass must confirm whether Section 11 names the
-  tractor protection valve and air-tank check explicitly, and if so fold that wording into
-  items 125–128 (count unchanged).
+  *tractor-protection system* and *air reservoir* as distinct brake-system areas. Item 128
+  (reworded above) now covers the tractor-protection/trailer-air-supply valve *pop-out*
+  during pump-down. The full-text pass must confirm Section 11's exact wording for the
+  air-reservoir/air-tank check and fold it into the compressor items if named.
+
+### Known gap flagged in review (open decision for the verification pass)
+
+A combination-vehicle **trailer air-supply / breakaway test is not yet a distinct item** and
+must not be treated as already covered: item 128 tests that the valves *pop out* on
+pump-down, but it does not exercise the full sequence of charging the trailer, then pulling
+the trailer air-supply knob and confirming the **trailer emergency (breakaway) brakes
+actually apply**. That is a genuinely separate combination brake-safety check. Resolving it
+during the full-text verification pass is likely to **add one item (making the count 132)**
+or require merging two granular items to hold at 131. That count change is a content-
+accuracy decision for the human review gate, not something to resolve silently here — the
+honest position for now is that the check is *missing*, not *included*.
 
 ## App-mapping notes
 

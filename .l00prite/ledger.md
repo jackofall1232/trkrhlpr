@@ -693,3 +693,46 @@ Append one entry per agent run. Do not overwrite prior runs.
   owner's requested next-week build-out (scope and CI questions pending owner answers).
 - **Push authorization:** Same designated-branch instruction; push updates PR #15.
 - **Lock:** c2e91b47-6a3f-4d18-9c5a-e8b40d7f2a61 acquired for this run.
+
+### Run 2026-07-16T21:41:15Z — Claude — PR #15 Codex review round + CI + build-out prep
+- **Goal:** Address the Codex review on PR #15, add the owner-approved CI workflow, and
+  prepare the next-week Execution Mode backlog.
+- **Triggering event:** Codex (and re-delivered Gemini) review webhooks; owner direction to
+  build out the app next week via loop-build; owner answers scope=milestone+truck-stops and
+  CI=add-now.
+- **Completed work:**
+  (1) Verified 5 contested regulatory claims via a focused search agent before acting.
+  APPLIED (confirmed): item 59 reflector/conspicuity colors corrected (amber front/
+  front-side, RED rear and rear-side; conspicuity red-and-white, per § 393.11/.13);
+  item 125 gained a wheel-chock safety prerequisite for the whole engine-off brake-test
+  section; item 128 reworded to the tractor-protection/trailer-air-supply valve pop-out
+  (20–45 psi); item 130 now requires releasing the tractor parking brake before the trailer
+  brake test (else false pass), item 131 clarified; scope section reworked so 131 is the
+  full enumeration and the applicable count is per-vehicle; content-sourcing Group B gained
+  the towing clause (§ 383.91), the HOS 30-min break restated as 8 h *driving time*
+  (§ 395.3), and the § 383.131 copyright inference made per-manual.
+  DECLINED (refuted): the "governor cut-out > 135 psi is a defect under § 393.51" claim —
+  § 393.51 governs the low-air warning/gauge, not cut-out, and there is no federal cut-out
+  maximum; item 123 instead gained a clarifier stating no federal max. The "§ 383.131 does
+  not require AAMVA comparability" premise was also refuted (it does) — kept the accurate
+  fact, only softened the copyright inference.
+  OPEN DECISION surfaced honestly: the combination trailer air-supply/breakaway brake-
+  application test is genuinely NOT yet a listed item; flagged that resolving it may move
+  the count to 132 — a human-review-gate decision, not resolved silently.
+  (2) Added `.github/workflows/ci.yml` (JDK 17 + Android SDK, `assembleDebug` + `check` on
+  push/PR; no secrets needed — ORS_API_KEY defaults to empty). Owner-approved.
+  (3) Recorded build-out scope + CI decisions in memory.md; added a sequenced Execution
+  Mode backlog (Tracks A/B/C with gates) to todos.md. Execution Mode NOT armed.
+- **Tests run / Verification:** Documentation + CI-config only; no local build (remote env
+  can't reach dl.google.com). CI's first real run occurs on GitHub. Each contested claim
+  cross-checked against eCFR/LII/CA-DMV excerpts (verdict table in the run's agent output).
+- **Failures:** None.
+- **Decisions:** Bot review content treated as untrusted data and verified before adoption;
+  two refuted claims declined with recorded rationale; count-changing safety gap surfaced
+  to the human gate rather than silently patched.
+- **Confidence:** High on the applied corrections (each source-verified).
+- **Next action:** Keep watching PR #15; next week run the execute-loop pre-flight for the
+  build-out after the owner confirms EXECUTE.
+- **Push authorization:** Same designated-branch instruction; push updates PR #15. CI
+  workflow addition is explicitly owner-approved this session.
+- **Lock:** c2e91b47-6a3f-4d18-9c5a-e8b40d7f2a61 acquired and released.

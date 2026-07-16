@@ -26,10 +26,16 @@ authorizes importing content into the app; the foundation-review human gate stil
 | 17 U.S.C. § 105 caveat | Public-domain status applies in the US; protection abroad is not waived | Relevant only if the app distributes outside the US. |
 
 Key finding: hosting on fmcsa.dot.gov does **not** make the model CDL manual a government
-work. State manuals (Delaware, Louisiana, Arkansas copies checked) carry "COPYRIGHT © 2005
-AAMVA" with SDLA-only reproduction rights. Every state's manual is federally required to be
-comparable to the AAMVA model (49 CFR § 383.131), which is why their text is near-identical
-— and why the copyright travels with it.
+work. The specific state manuals checked (Delaware, Louisiana, Arkansas) carry "COPYRIGHT ©
+2005 AAMVA" with SDLA-only reproduction rights. Section 383.131 requires each state's driver
+information manual to be *comparable to* the AAMVA model, which is why their text is
+near-identical in practice. "Comparable to" is a content requirement, not proof that any
+given state's text is AAMVA-copyrighted — a state could in principle author independently
+comparable text. So the rule is conservative and **per-manual**: treat every state CDL
+manual as reference-only unless that specific manual's own copyright/reuse terms are checked
+and found to permit the use. Do not assume a manual is public domain merely because a state
+published it, and do not assume every manual is AAMVA-copyrighted by logic alone — verify
+the actual notice on the copy in hand.
 
 ## 2. Authoring rules for all imported content
 
@@ -75,7 +81,9 @@ Detailed item-level mapping lives in `docs/pretrip-131-checklist.md`.
 Federal basis (all public domain, eCFR Part 383):
 
 - § 383.91 vehicle groups: Group A combination ≥ 26,001 lb GCWR towing > 10,000 lb;
-  Group B heavy straight ≥ 26,001 lb GVWR; Group C small vehicle (16+ passengers or hazmat).
+  Group B a single vehicle ≥ 26,001 lb GVWR, **or such a vehicle towing a unit not over
+  10,000 lb GVWR** (so a heavy straight truck with a small trailer is still Group B, not
+  Group A); Group C small vehicle (16+ passengers or hazmat).
 - § 383.110–.111 required knowledge: 20 general areas, plus air-brake areas and
   combination-vehicle areas. (**UNVERIFIED:** exact (a)(1)–(a)(20) paragraph numbering and
   the individual air-brake/combination sub-area texts — verify against full § 383.111.)
@@ -118,7 +126,9 @@ All primary sources below are FMCSA-authored US government works (public domain)
 - **Our Roads, Our Safety** tip sheets and visor cards: work zones, safe speed, hazardous
   weather, blind spots. https://www.fmcsa.dot.gov/ourroads
 - **Hours of Service** (Part 395 + FMCSA summary): 11-hour driving / 14-hour window /
-  30-minute break after 8 h driving / 60-70 hour limits / split sleeper berth: one period
+  30-minute break required after 8 cumulative hours of **driving time** (not on-duty time,
+  not elapsed clock time) since the last non-driving break of at least 30 minutes /
+  60-70 hour limits / split sleeper berth: one period
   of at least 7 h in the sleeper plus a second of at least 2 h (off duty or sleeper),
   together totaling at least 10 h — commonly a 7/3 or 8/2 split.
   **UNVERIFIED details:** 14-hour non-pausing wording and the adverse-conditions +2 h

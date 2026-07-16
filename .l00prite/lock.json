@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "lock_id": "c2e91b47-6a3f-4d18-9c5a-e8b40d7f2a61",
-  "owner_agent": "claude",
-  "owner_session": "claude/131-pretrip-accuracy-review-7p7u9g",
+  "owner_agent": null,
+  "owner_session": null,
   "acquired_at": "2026-07-16T21:12:12Z",
   "expires_at": "2026-07-16T22:12:12Z",
   "ttl_seconds": 3600,
-  "purpose": "respond to PR #15 Gemini review (three doc corrections) and prepare next-week Execution Mode backlog",
+  "purpose": null,
   "protected_paths": [
     "ledger.md",
     "memory.md",
@@ -18,5 +18,5 @@
     "reviews/",
     "sessions/"
   ],
-  "status": "active"
+  "status": "released"
 }

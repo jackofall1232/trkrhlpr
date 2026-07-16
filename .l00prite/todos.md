@@ -1,5 +1,35 @@
 # Prioritized TODOs
 
+## Next-week build-out plan (Execution Mode, owner-requested 2026-07-16)
+
+Scope: **first milestone + truck-stop directory**. Routing Phases 6-8 excluded. Execution
+Mode is NOT armed — next week starts with the `execute-loop.md` pre-flight display and an
+explicit in-session EXECUTE confirmation. CI (`.github/workflows/ci.yml`) now gives each
+iteration real build verification on GitHub runners. Sequence the loop units so gated work
+waits behind its gate:
+
+- **Track A — buildable now, against labeled sample content (no content-approval gate):**
+  1. Content-schema migration: per-item source citation, verification status, applicability
+     flags (`COMBO`/`AIR`/`IF-EQUIPPED`). (Room migration — reviewed.)
+  2. Study Mode: browse the checklist by section; show inspect-for, defects, sequence.
+  3. Real Inspection Mode: mark items complete, visible progress, reduce skipped items,
+     filter by the driver's vehicle configuration via the flags.
+  4. Mock-exam engine: randomized tests, scoring, missed-question review, test history,
+     readiness scoring (define behavior first, then implement).
+  5. Daily safety question mechanism: one-per-day selection, answer/explanation, streak.
+  6. Local progress: acceptance criteria + persistence/migration tests.
+- **Track B — behind human gates (docs approval + full-text verification):**
+  7. Author the 131 checklist items as real content (original prose, per-item provenance).
+  8. Author CDL class + endorsement practice questions and daily questions (original prose).
+  9. Import real content, replacing labeled sample content (needs foundation approval).
+- **Track C — behind its own research gate:**
+  10. Research public truck-stop data sources (licensing, freshness, offline storage).
+  11. Truck-stop dataset + search feature.
+
+Gates that will pause the loop: content-doc approval (Track B start), full-text verification
+of the 13 flagged checklist items (needs network to eCFR/FMCSA), foundation approval before
+import, and the truck-stop data-source research gate (Track C start).
+
 ## Next
 - [ ] Complete Phase 1 physical phone/tablet review: rendering, lifecycle, controls,
   approximate-location grant/denial, network loss, and accessibility.

@@ -63,6 +63,21 @@ Durable project facts and decisions that future agents should preserve.
   it is used for category-coverage cross-checks, never as a source of shipped text or
   figures, and must not be committed to the repository. Public defect criteria come from
   Appendix A to 49 CFR Part 396.
+- **Next-week build-out (owner, 2026-07-16):** the owner wants a full build-out into a
+  complete, useful app via Execution Mode (`.l00prite/prompts/execute-loop.md`). Approved
+  scope = **first milestone + truck-stop directory** (Study Mode, Real Inspection Mode,
+  CDL class + endorsement practice tests, mock exams, daily question, local progress, and
+  the truck-stop dataset/search). Routing Phases 6-8 stay out of this build-out. Truck
+  stops require their own public-data-source research gate (licensing/freshness) before
+  implementation. Execution Mode is NOT armed yet — it requires the pre-flight display and
+  an explicit in-session EXECUTE confirmation next week; this session only prepared the
+  backlog.
+- **CI (owner-approved 2026-07-16):** `.github/workflows/ci.yml` added — JDK 17 +
+  Android SDK, `./gradlew assembleDebug check` on push/PR. Purpose: give the remote
+  build-out loop real build verification, since remote sessions cannot reach dl.google.com
+  but GitHub runners can. The build needs no secrets (ORS_API_KEY defaults to empty in
+  app/build.gradle.kts). First real run happens on GitHub; if it fails, that is signal to
+  fix, tracked via the PR-watch on #15.
 
 ## Facts
 
