@@ -668,3 +668,28 @@ Append one entry per agent run. Do not overwrite prior runs.
   verification pass (now including the tractor-protection/air-reservoir wording check).
 - **Push authorization:** Same designated-branch instruction as prior runs in this session.
 - **Lock:** 8f3d92a1-4c67-4e2b-b0d9-27a5e4c8f1b3 acquired and released.
+
+### Run 2026-07-16T21:12:12Z — Claude — PR #15 first review round (Gemini)
+- **Goal:** Triage and address the Gemini bot review on PR #15 (content docs).
+- **Triggering event:** Gemini review webhooks (one summary, three inline comments).
+- **Completed work:** All three findings were classified as substantively correct against
+  our own recorded research and fixed: (1) `content-sourcing.md` HOS line rewrote the
+  misleading "sleeper-berth 7+2 split" to the accurate rule — ≥7 h sleeper + ≥2 h second
+  period, together totaling ≥10 h (7/3 or 8/2); (2) checklist item 125 dropped the false
+  "sources conflict" framing (static vs applied tests were conflated) and now states the
+  standard static figures ≤~2 psi/min single / ≤~3 psi/min combination, still status U
+  pending full-text verification; (3) item 127 disambiguated to "before the pressure
+  drops below 60 psi". Gemini's suggested citation "49 CFR 396.5 / Appendix A" for leak
+  rates was NOT adopted (unverified and almost certainly wrong — figures stay cited to
+  manual Sections 11/5). Verification-ledger wording updated to match.
+- **Tests run / Verification:** Documentation-only edits; no build. Cross-checked each fix
+  against the 2026-07-16 research agents' recorded excerpts (FMCSA split-sleeper FAQ;
+  Section 5 air-brake figures).
+- **Failures:** None.
+- **Decisions:** Bot review content treated as untrusted data; each point verified against
+  recorded research before adoption; incorrect citation declined.
+- **Confidence:** High.
+- **Next action:** Keep watching PR #15; prepare the Execution Mode backlog for the
+  owner's requested next-week build-out (scope and CI questions pending owner answers).
+- **Push authorization:** Same designated-branch instruction; push updates PR #15.
+- **Lock:** c2e91b47-6a3f-4d18-9c5a-e8b40d7f2a61 acquired for this run.

@@ -247,9 +247,9 @@ Checked at each drive axle; dual wheels throughout.
 | 122 | Air build-up rate (`AIR`) | Pressure builds within the normal time/range (commonly stated as 85→100 psi within 45 s; **figure needs verification against manual Section 5/11**) | S11/S5 | U |
 | 123 | Governor cut-out (`AIR`) | Compressor stops at ~120–140 psi or manufacturer spec | S11 | C |
 | 124 | Governor cut-in (`AIR`) | Compressor restarts at the specified lower pressure (**figure needs verification**) | S5 | U |
-| 125 | Static leakage test (`AIR`) | Engine off, brakes released: pressure loss within limits — sources conflict between ≤ 2 psi/min (single) / ≤ 3 psi/min (combination) and the applied-test figures; **exact Section 11 wording needs verification** | S11/S5 | U |
+| 125 | Static leakage test (`AIR`) | Engine off, brakes released: pressure loss ≤ ~2 psi/min single vehicle, ≤ ~3 psi/min combination (standard manual figures — distinct from the applied-test figures below; **exact Section 11/5 wording pending full-text verification**) | S11/S5 | U |
 | 126 | Applied leakage test (`AIR`) | Engine off, service brake fully applied: loss ≤ ~3 psi/min single vehicle, ≤ ~4 psi/min combination | S5 | C |
-| 127 | Low air pressure warning (`AIR`) | Warning activates **before 60 psi** as pressure is pumped down | S11/S5 | C |
+| 127 | Low air pressure warning (`AIR`) | Warning activates **before the pressure drops below 60 psi** during pump-down | S11/S5 | C |
 | 128 | Spring brake pop-out (`AIR`) | Parking brakes apply automatically at **20–40 psi** | S11/S5 | C |
 | 129 | Tractor parking brake test | Parking brake set (trailer brakes released): vehicle holds against a gentle pull forward | S11 | C |
 | 130 | Trailer brake test (`COMBO`) | Trailer brakes set/hand valve applied: combination holds against a gentle pull | S11 | P |
@@ -266,8 +266,8 @@ the state test (corroborated: GA, ID, FL Section 11 materials).
   AAMVA-derived wording confirmed in MI, NY, PA, GA, WA copies).
 - **Partial (P):** 10 items (13, 33, 66, 70, 81, 95, 99, 114, 130, 131) — standard Section
   11 content echoed by secondary sources; official wording not yet captured in excerpts.
-- **Unverified figures (U):** 3 items (122, 124, 125) — figures conflict or were not
-  captured; must be read from the manual/regulation full text.
+- **Unverified figures (U):** 3 items (122, 124, 125) — figures not yet captured from the
+  official full text; must be read from the manual/regulation before shipping.
 - **Before any of this ships:** a line-by-line pass against the FMCSA-hosted model manual
   PDF (July 2014) and eCFR full text in a network-capable session, resolving every P and U;
   then the existing human review gates (foundation approval, content import approval,

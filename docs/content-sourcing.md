@@ -118,7 +118,9 @@ All primary sources below are FMCSA-authored US government works (public domain)
 - **Our Roads, Our Safety** tip sheets and visor cards: work zones, safe speed, hazardous
   weather, blind spots. https://www.fmcsa.dot.gov/ourroads
 - **Hours of Service** (Part 395 + FMCSA summary): 11-hour driving / 14-hour window /
-  30-minute break after 8 h driving / 60-70 hour limits / sleeper-berth 7+2 split.
+  30-minute break after 8 h driving / 60-70 hour limits / split sleeper berth: one period
+  of at least 7 h in the sleeper plus a second of at least 2 h (off duty or sleeper),
+  together totaling at least 10 h — commonly a 7/3 or 8/2 split.
   **UNVERIFIED details:** 14-hour non-pausing wording and the adverse-conditions +2 h
   extension were corroborated only from secondary excerpts; re-verify on the official page,
   and watch the 2025 split-sleeper pilot. https://www.fmcsa.dot.gov/regulations/hours-service/summary-hours-service-regulations
