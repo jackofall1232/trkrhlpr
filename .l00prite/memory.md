@@ -8,8 +8,22 @@ Durable project facts and decisions that future agents should preserve.
   Play support is not required for the first production milestone.
 - **Architecture Decision:** Map routing will use the "Route Corridor" strategy.
   - **Visuals:** MapLibre GL Native for Android (offline-capable vector tiles).
-  - **Routing:** Online OpenRouteService (ORS) backend using the `driving-hgv` profile for truck-oriented route calculation (subject to map/constraint data coverage; do not assume bridge-clearance avoidance without validated height data).
-  - **Offline Capability:** The app will fetch the exact route polyline from ORS and save it locally, simultaneously pre-fetching MapLibre tiles along the route corridor. This allows navigation to remain visually intact and reliable during cell dead zones. Re-routing offline is not supported, but visual re-orientation is.
+  - **Routing:** OpenRouteService (ORS) is the initial online routing provider, using its
+    `driving-hgv` profile and the driver-confirmed vehicle profile. The provider remains
+    replaceable. Results are routing assistance based on available data, not a guarantee
+    of safety, clearance, legality, or STAA compliance.
+  - **Offline Capability:** The app will save selected route geometry and pre-fetch map
+    resources along a bounded route corridor only from a provider whose terms permit it.
+    The saved route remains visible through cell dead zones. Offline rerouting is not
+    supported; leaving the corridor requires the driver to stop and reassess.
+  - **Safety Contract:** The app must expose unverified, driver-reviewed, data-warning,
+    and offline/stale route states. The driver must verify routes against signs, official
+    restrictions, permits, dispatch instructions, and current conditions. Missing data is
+    unknown, never proof of clearance. Release wording requires legal review and must not
+    assume that a disclaimer transfers liability.
+  - **Delivery Plan:** Implement the approved phases in
+    `docs/truck-routing-plan.md`; the Offline Route Corridor at Phase 5 is the MVP boundary,
+    with guided navigation and restriction assurance gated separately.
 - The confirmed technology direction is native Kotlin, Jetpack Compose, Android SDK 36
   (Android 16), and an offline-first architecture.
 - The first production milestone covers the 131-point pre-trip inspection, Study Mode,
