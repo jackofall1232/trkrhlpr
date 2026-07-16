@@ -14,7 +14,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "trkrhlpr"
+rootProject.name = "lastwagon"
 
 include(
     ":app",

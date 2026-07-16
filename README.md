@@ -1,7 +1,9 @@
-# trkrhlpr
+# Last Wagon
 
-An offline-first Android companion designed to help commercial drivers perform safer
-inspections, keep learning, and reduce preventable violations.
+Last Wagon (repository `trkrhlpr`) is an offline-first Android companion designed to help
+commercial drivers perform safer inspections, keep learning, and reduce preventable
+violations. "Last Wagon" is the final product name and appears as the app label,
+application id (`com.lastwagon.app`), and throughout the code and documentation.
 
 > **Foundation status:** Current content is representative interface data only. It is not
 > an authoritative pre-trip procedure, CDL question bank, regulation, or substitute for
