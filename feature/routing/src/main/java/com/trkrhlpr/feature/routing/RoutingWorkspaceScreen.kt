@@ -29,23 +29,33 @@ fun RoutingWorkspaceScreen(
     val savedRoute by routeRepository.lastRoute.collectAsStateWithLifecycle(initialValue = null)
     var editing by rememberSaveable { mutableStateOf(false) }
     var planning by rememberSaveable { mutableStateOf(false) }
+    var reviewing by rememberSaveable { mutableStateOf(false) }
     var showMap by rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
-    if (showMap) {
+    if (showMap && canOpenRouteMap(savedRoute)) {
         Column(modifier.fillMaxSize()) {
             TextButton(onClick = { showMap = false }, modifier = Modifier.padding(horizontal = 8.dp)) {
                 Text("Back to vehicle profile")
             }
             RoutingMapScreen(Modifier.weight(1f), route = savedRoute)
         }
+    } else if (reviewing && savedRoute != null && profile != null) {
+        RouteReviewScreen(
+            route = requireNotNull(savedRoute),
+            currentProfile = requireNotNull(profile),
+            routeRepository = routeRepository,
+            onBack = { reviewing = false },
+            onReviewed = { reviewing = false; showMap = true },
+            modifier = modifier,
+        )
     } else if (planning && profile != null) {
         RoutePlanner(
             profile = requireNotNull(profile),
             routingProvider = routingProvider,
             routeRepository = routeRepository,
             onBack = { planning = false },
-            onRouteSaved = { planning = false; showMap = true },
+            onRouteSaved = { planning = false; reviewing = true },
             modifier = modifier,
         )
     } else if (profile == null || editing) {
@@ -62,7 +72,8 @@ fun RoutingWorkspaceScreen(
             onEdit = { editing = true },
             savedRoute = savedRoute,
             onPlanRoute = { planning = true },
-            onOpenMap = { showMap = true },
+            onReviewRoute = { reviewing = true },
+            onOpenMap = { if (canOpenRouteMap(savedRoute)) showMap = true },
             onDeleteRoute = { scope.launch { routeRepository.clear() } },
             modifier = modifier,
         )
@@ -177,6 +188,7 @@ private fun VehicleProfileSummary(
     onEdit: () -> Unit,
     savedRoute: CalculatedRoute?,
     onPlanRoute: () -> Unit,
+    onReviewRoute: () -> Unit,
     onOpenMap: () -> Unit,
     onDeleteRoute: () -> Unit,
     modifier: Modifier = Modifier,
@@ -196,9 +208,21 @@ private fun VehicleProfileSummary(
         OutlinedButton(onClick = onEdit, modifier = Modifier.fillMaxWidth()) { Text("Edit and reconfirm") }
         Button(onClick = onPlanRoute, modifier = Modifier.fillMaxWidth()) { Text("Calculate route preview") }
         if (savedRoute != null) {
-            OutlinedButton(onClick = onOpenMap, modifier = Modifier.fillMaxWidth()) {
-                Text("Open saved unreviewed route")
+            if (savedRoute.hasCurrentDriverReview) {
+                Text("Route state: DRIVER REVIEWED", color = MaterialTheme.colorScheme.tertiary)
+                OutlinedButton(onClick = onOpenMap, modifier = Modifier.fillMaxWidth()) {
+                    Text("Open reviewed route")
+                }
+            } else {
+                Text("Route state: UNVERIFIED", color = MaterialTheme.colorScheme.error)
+                OutlinedButton(onClick = onReviewRoute, modifier = Modifier.fillMaxWidth()) {
+                    Text("Review saved route")
+                }
             }
+            if (savedRoute.warnings.isNotEmpty())
+                Text("Route state: DATA WARNING", color = MaterialTheme.colorScheme.error)
+            if (savedRoute.isStale())
+                Text("Route state: OFFLINE / STALE", color = MaterialTheme.colorScheme.error)
             TextButton(onClick = onDeleteRoute, modifier = Modifier.fillMaxWidth()) {
                 Text("Delete saved route")
             }
@@ -254,7 +278,7 @@ private fun RoutePlanner(
             items(route.warnings) { warning -> Text("Warning: $warning", color = MaterialTheme.colorScheme.error) }
             item {
                 Button(onClick = onRouteSaved, modifier = Modifier.fillMaxWidth()) {
-                    Text("View unreviewed route on map")
+                    Text("Review route before map access")
                 }
             }
         }
@@ -293,6 +317,134 @@ private fun RoutePlanner(
             }
         }
         item { TextButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) { Text("Back to vehicle profile") } }
+    }
+}
+
+@Composable
+private fun RouteReviewScreen(
+    route: CalculatedRoute,
+    currentProfile: VehicleProfile,
+    routeRepository: RouteRepository,
+    onBack: () -> Unit,
+    onReviewed: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var checkedOfficialSources by rememberSaveable { mutableStateOf(false) }
+    var checkedVehicleAndLoad by rememberSaveable { mutableStateOf(false) }
+    var acceptsRealWorldPriority by rememberSaveable { mutableStateOf(false) }
+    var recording by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+    val profileMatches = route.request.vehicleProfile.confirmedAtEpochMillis ==
+        currentProfile.confirmedAtEpochMillis
+    val canRecord = profileMatches && checkedOfficialSources && checkedVehicleAndLoad &&
+        acceptsRealWorldPriority && !recording
+
+    LazyColumn(
+        modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        item {
+            Text("Mandatory route review", style = MaterialTheme.typography.headlineMedium)
+            Text("Route state: UNVERIFIED", color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.titleMedium)
+            if (route.warnings.isNotEmpty()) Text("Route state: DATA WARNING",
+                color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.titleMedium)
+            if (route.isStale()) Text("Route state: OFFLINE / STALE",
+                color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.titleMedium)
+        }
+        item {
+            Text("Route overview", style = MaterialTheme.typography.titleLarge)
+            Text("Origin: ${route.request.origin.latitude}, ${route.request.origin.longitude}")
+            Text("Destination: ${route.request.destination.latitude}, ${route.request.destination.longitude}")
+            Text("${route.distanceMeters.toMilesText()} mi · ${route.durationSeconds.toDurationText()}")
+        }
+        item {
+            val vehicle = route.request.vehicleProfile
+            Text("Vehicle used for calculation", style = MaterialTheme.typography.titleLarge)
+            Text(vehicle.vehicleType.displayName)
+            Text("Height ${vehicle.heightMeters.toFeetText()} ft · Width ${vehicle.widthMeters.toFeetText()} ft")
+            Text("Length ${vehicle.lengthMeters.toFeetText()} ft · ${vehicle.axleCount} axles")
+            Text("Gross ${vehicle.grossWeightTonnes.toPoundsText()} lb · Axle ${vehicle.axleLoadTonnes.toPoundsText()} lb")
+            Text(if (vehicle.hazmat) "Hazmat: yes" else "Hazmat: no")
+        }
+        if (!profileMatches) item {
+            Text("The current vehicle profile no longer matches this route. Recalculate it.",
+                color = MaterialTheme.colorScheme.error)
+        }
+        item { Text("Warnings and data gaps", style = MaterialTheme.typography.titleLarge) }
+        items(route.warnings) { warning -> Text("• $warning", color = MaterialTheme.colorScheme.error) }
+        item {
+            Text("Restriction segments reported: ${route.roadAccessRestrictionSegments}")
+            Text("Missing restriction data is unknown, never proof of clearance.",
+                color = MaterialTheme.colorScheme.error)
+        }
+        item { Text("Route steps", style = MaterialTheme.typography.titleLarge) }
+        items(route.steps) { step ->
+            Text("${step.instruction} · ${step.distanceMeters.toMilesText()} mi")
+        }
+        item {
+            Text("Provider provenance", style = MaterialTheme.typography.titleLarge)
+            Text("${route.provenance.providerId} · ${route.provenance.routingProfile}")
+            Text("Request: ${route.provenance.requestId}")
+            Text("Response SHA-256: ${route.provenance.responseSha256}",
+                style = MaterialTheme.typography.labelSmall)
+            route.provenance.graphDate?.let { Text("Routing graph date: $it") }
+            route.provenance.responseAttribution?.let { Text(it) }
+        }
+        item {
+            ReviewCheckbox(
+                checkedOfficialSources,
+                "I compared this route with applicable official restrictions, permits, and dispatch instructions.",
+            ) { checkedOfficialSources = it }
+        }
+        item {
+            ReviewCheckbox(
+                checkedVehicleAndLoad,
+                "I verified the vehicle and load shown above are current.",
+            ) { checkedVehicleAndLoad = it }
+        }
+        item {
+            ReviewCheckbox(
+                acceptsRealWorldPriority,
+                "I understand road signs, law enforcement, permits, closures, weather, and real-world conditions override this app.",
+            ) { acceptsRealWorldPriority = it }
+        }
+        error?.let { message -> item { Text(message, color = MaterialTheme.colorScheme.error) } }
+        item {
+            Button(
+                enabled = canRecord,
+                onClick = {
+                    recording = true
+                    error = null
+                    scope.launch {
+                        try {
+                            val recorded = routeRepository.recordReview(RouteReview(
+                                route.provenance.requestId,
+                                route.request.vehicleProfile.confirmedAtEpochMillis,
+                                System.currentTimeMillis(),
+                            ))
+                            if (recorded) onReviewed()
+                            else error = "The route or vehicle profile changed. Reopen the review."
+                        } catch (_: Exception) {
+                            error = "The review acknowledgment could not be saved locally."
+                        } finally {
+                            recording = false
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+            ) { Text("Record driver review") }
+        }
+        item { TextButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) { Text("Back without reviewing") } }
+    }
+}
+
+@Composable
+private fun ReviewCheckbox(checked: Boolean, label: String, onCheckedChange: (Boolean) -> Unit) {
+    Row(verticalAlignment = Alignment.Top) {
+        Checkbox(checked = checked, onCheckedChange = onCheckedChange)
+        Text(label, Modifier.padding(top = 12.dp))
     }
 }
 
@@ -366,3 +518,6 @@ private fun Double.toDurationText(): String {
     val totalMinutes = (this / 60.0).toInt()
     return "${totalMinutes / 60} hr ${totalMinutes % 60} min"
 }
+private fun CalculatedRoute.isStale(now: Long = System.currentTimeMillis()) =
+    now - provenance.receivedAtEpochMillis > 24 * 60 * 60 * 1000L
+internal fun canOpenRouteMap(route: CalculatedRoute?) = route?.hasCurrentDriverReview == true

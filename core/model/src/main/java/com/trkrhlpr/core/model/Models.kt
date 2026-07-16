@@ -156,6 +156,13 @@ data class RouteProvenance(
     val graphDate: String?,
 )
 
+data class RouteReview(
+    val routeRequestId: String,
+    val vehicleProfileConfirmedAtEpochMillis: Long,
+    val reviewedAtEpochMillis: Long,
+    val acknowledgmentVersion: Int = 1,
+)
+
 data class CalculatedRoute(
     val request: RouteRequest,
     val geometry: List<GeoPoint>,
@@ -165,7 +172,14 @@ data class CalculatedRoute(
     val warnings: List<String>,
     val roadAccessRestrictionSegments: Int,
     val provenance: RouteProvenance,
+    val review: RouteReview? = null,
 )
+
+val CalculatedRoute.hasCurrentDriverReview: Boolean get() = review?.let {
+    it.routeRequestId == provenance.requestId &&
+        it.vehicleProfileConfirmedAtEpochMillis == request.vehicleProfile.confirmedAtEpochMillis &&
+        it.reviewedAtEpochMillis > 0 && it.acknowledgmentVersion == 1
+} == true
 
 enum class RouteFailureKind {
     MISSING_CREDENTIAL, INVALID_REQUEST, NETWORK, TIMEOUT, RATE_LIMITED,
@@ -192,5 +206,6 @@ interface RoutingProvider {
 interface RouteRepository {
     val lastRoute: Flow<CalculatedRoute?>
     suspend fun save(route: CalculatedRoute)
+    suspend fun recordReview(review: RouteReview): Boolean
     suspend fun clear()
 }

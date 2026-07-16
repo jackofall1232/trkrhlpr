@@ -80,5 +80,13 @@ class FakeRouteRepository(initial: CalculatedRoute? = null) : RouteRepository {
     private val state = MutableStateFlow(initial)
     override val lastRoute = state
     override suspend fun save(route: CalculatedRoute) { state.value = route }
+    override suspend fun recordReview(review: RouteReview): Boolean {
+        val route = state.value ?: return false
+        if (route.provenance.requestId != review.routeRequestId ||
+            route.request.vehicleProfile.confirmedAtEpochMillis != review.vehicleProfileConfirmedAtEpochMillis
+        ) return false
+        state.value = route.copy(review = review)
+        return true
+    }
     override suspend fun clear() { state.value = null }
 }

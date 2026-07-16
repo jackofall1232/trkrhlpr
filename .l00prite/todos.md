@@ -5,7 +5,8 @@
   approximate-location grant/denial, network loss, and accessibility.
 - [ ] Complete Phase 3 keyed ORS integration/device review: valid route, no-route, timeout,
   quota/authorization error, corrupt response, map fit/overlay, and route deletion.
-- [ ] Routing Phase 4: require route overview and driver review before navigation.
+- [ ] Complete Phase 4 device/accessibility review: long overview scrolling, warning
+  visibility, acknowledgment persistence, bypass attempts, stale state, and profile changes.
 - [ ] Routing Phase 5: implement licensed corridor pre-fetching, local route persistence,
   explicit offline/stale state, and safe off-corridor behavior (routing MVP boundary).
 - [ ] Research authoritative FMCSA and official CDL-manual sources for the 131-point checklist.
@@ -44,6 +45,9 @@
 - [x] 2026-07-16: Implemented Routing Phase 3 replaceable ORS HGV provider, explicit failure
   states, exact redacted request/response provenance, atomic saved-route storage, unreviewed
   coordinate-based route preview, warning handling, and MapLibre geometry overlay.
+- [x] 2026-07-16: Implemented Routing Phase 4 mandatory overview and driver-review gate,
+  exact route/profile-bound acknowledgment persistence, visible route states, legacy-route
+  migration as unverified, and fail-closed map access.
 - [x] 2026-07-16: Approved and documented the phased commercial-truck routing plan,
   qualified safety language, mandatory driver review, and Phase 5 MVP boundary.
 - [x] 2026-07-13: Confirmed product direction, first milestone, roadmap exclusions, technology, and mission.

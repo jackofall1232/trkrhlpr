@@ -75,6 +75,13 @@ Durable project facts and decisions that future agents should preserve.
 - Development ORS keys come from an uncommitted `ORS_API_KEY` Gradle property/environment
   value. They are embedded in the APK and must be treated as extractable. Production key
   handling requires a separate security decision before distribution.
+- Phase 4 requires a full route overview and three separate driver acknowledgments before
+  route-map access. The persisted review is bound to the exact provider request ID, vehicle
+  profile confirmation time, review time, and acknowledgment schema. Legacy, mismatched,
+  corrupt, or changed-profile records fail closed as unverified. Review is not certification.
+- Route surfaces visibly expose `UNVERIFIED`, `DRIVER REVIEWED`, `DATA WARNING`, and
+  `OFFLINE / STALE` states. Signs, officials, permits, closures, weather, and real-world
+  conditions always override the application.
 
 ## Avoid
 - Do not store random temporary notes, speculative ideas, or stale debugging output here.

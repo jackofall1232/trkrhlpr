@@ -23,6 +23,7 @@ The production foundation is native Kotlin and Jetpack Compose, targeting Androi
 - an online, read-only MapLibre evaluation map with optional approximate location
 - a locally stored, validated, driver-confirmed commercial-vehicle profile
 - an unreviewed ORS HGV route preview using coordinate entry and local route provenance
+- a mandatory route-overview and driver-review gate before route-map access
 
 Truck-stop discovery and commercial-truck routing/GPS remain future research items and
 remain outside the production milestone. Phase 3 can calculate and display an explicitly
@@ -117,6 +118,8 @@ The key is compiled into the APK and can be extracted; do not distribute a build
 a privileged or unrestricted key. Production credential handling requires a separate
 security review. Route coordinates, geometry, request parameters, warnings, and provider
 provenance are stored in the app's private files and can be deleted from the profile screen.
+Review acknowledgments are bound to the exact route request and confirmed vehicle profile;
+they are records of review, not certifications of legality, clearance, or safety.
 
 ## Content policy
 

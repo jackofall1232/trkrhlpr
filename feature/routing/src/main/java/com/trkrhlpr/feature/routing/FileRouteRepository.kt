@@ -28,6 +28,15 @@ class FileRouteRepository(context: Context) : RouteRepository {
         state.value = route
     }
 
+    override suspend fun recordReview(review: RouteReview): Boolean {
+        val route = state.value ?: return false
+        if (route.provenance.requestId != review.routeRequestId ||
+            route.request.vehicleProfile.confirmedAtEpochMillis != review.vehicleProfileConfirmedAtEpochMillis
+        ) return false
+        save(route.copy(review = review))
+        return true
+    }
+
     override suspend fun clear() = withContext(Dispatchers.IO) {
         if (file.exists()) check(file.delete()) { "Could not delete saved route" }
         state.value = null
@@ -38,7 +47,7 @@ internal fun readRouteFile(file: File): CalculatedRoute? =
     runCatching { if (file.exists()) decodeRoute(file.readText()) else null }.getOrNull()
 
 internal fun encodeRoute(route: CalculatedRoute): String = buildJsonObject {
-    put("schema_version", 1)
+    put("schema_version", 2)
     putJsonObject("request") {
         putPoint("origin", route.request.origin)
         putPoint("destination", route.request.destination)
@@ -65,11 +74,17 @@ internal fun encodeRoute(route: CalculatedRoute): String = buildJsonObject {
         putNullable("engine_version", p.engineVersion); putNullable("engine_build_date", p.engineBuildDate)
         putNullable("graph_date", p.graphDate)
     }
+    route.review?.let { review -> putJsonObject("review") {
+        put("route_request_id", review.routeRequestId)
+        put("vehicle_confirmed_at", review.vehicleProfileConfirmedAtEpochMillis)
+        put("reviewed_at", review.reviewedAtEpochMillis)
+        put("acknowledgment_version", review.acknowledgmentVersion)
+    } }
 }.toString()
 
 internal fun decodeRoute(value: String): CalculatedRoute? = runCatching {
     val root = Json.parseToJsonElement(value).jsonObject
-    require(root["schema_version"]?.jsonPrimitive?.int == 1)
+    require(root["schema_version"]?.jsonPrimitive?.int in 1..2)
     val request = root.getValue("request").jsonObject
     val vehicle = request.getValue("vehicle").jsonObject.toVehicle()
     val routeRequest = RouteRequest(
@@ -77,6 +92,10 @@ internal fun decodeRoute(value: String): CalculatedRoute? = runCatching {
         request.getValue("destination").jsonObject.toPoint(), vehicle,
     )
     val provenance = root.getValue("provenance").jsonObject
+    val review = root["review"]?.jsonObject?.let {
+        RouteReview(it.string("route_request_id"), it.long("vehicle_confirmed_at"),
+            it.long("reviewed_at"), it.int("acknowledgment_version"))
+    }
     CalculatedRoute(
         routeRequest,
         root.getValue("geometry").jsonArray.map { it.jsonObject.toPoint() },
@@ -99,10 +118,12 @@ internal fun decodeRoute(value: String): CalculatedRoute? = runCatching {
             provenance.optionalString("engine_version"), provenance.optionalString("engine_build_date"),
             provenance.optionalString("graph_date"),
         ),
+        review,
     ).takeIf { route ->
         route.geometry.size >= 2 && route.geometry.all { it.isValid } &&
             route.distanceMeters.isFinite() && route.distanceMeters >= 0 &&
-            VehicleProfileValidator.validate(route.request.vehicleProfile).isEmpty()
+            VehicleProfileValidator.validate(route.request.vehicleProfile).isEmpty() &&
+            (route.review == null || route.hasCurrentDriverReview)
     }
 }.getOrNull()
 
