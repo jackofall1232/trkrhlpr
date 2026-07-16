@@ -32,3 +32,15 @@ Record failed approaches and why they should not be retried unless conditions ch
 ## Blockers
 - None blocking the committed foundation. Physical phone/tablet review and connected tests
   remain a human review gate because this host has neither a device nor KVM.
+
+### Remote-session network policy — 2026-07-16
+
+- **Google Maven blocked:** The Claude Code remote environment's proxy allowlist blocked
+  `dl.google.com` (and maven.google.com redirects there), so AGP/androidx/Android SDK
+  components could not be fetched and full Gradle Android builds were impossible there.
+  Maven Central and services.gradle.org were reachable. Workaround: standalone
+  kotlin-compiler from Maven Central to compile and JUnit-test pure Kotlin logic, plus
+  compile checks against the MapLibre classes.jar and Robolectric android-all API 36.
+- **Masked pipeline failure:** `./gradlew ... | tail` reported exit 0 because the pipeline
+  status came from `tail` while the wrapper download had failed. Check `PIPESTATUS` or run
+  without pipes before recording build evidence.
