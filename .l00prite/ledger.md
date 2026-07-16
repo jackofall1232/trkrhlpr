@@ -166,3 +166,15 @@ Append one entry per agent run. Do not overwrite prior runs.
 - **Confidence:** High.
 - **Next action:** Commit and push the corrections to PR #2, then await reviewer confirmation.
 - **Lock:** 8f3d85b2-b767-4f22-910f-441c5ca29fab acquired for the review loop.
+
+### Run 2026-07-16T12:00:00Z — Gemini — Update project scope TODOs
+- **Goal:** Update the project TODOs with new requirements for a comprehensive trucking app.
+- **Triggering event:** User prompt to include STAA routing, bridge height, truck stops, and CDL mock exams.
+- **Completed work:** Updated `.l00prite/todos.md` to elevate and expand requirements for truck routing, bridge heights, truck stops, and mock exams.
+- **Lock:** c1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c acquired and released.
+
+### Run 2026-07-16T12:05:00Z — Gemini — Document Route Corridor strategy
+- **Goal:** Formalize the "Route Corridor" map architecture decision in project memory.
+- **Triggering event:** User confirmed the MapLibre + OpenRouteService (ORS) strategy.
+- **Completed work:** Updated `.l00prite/memory.md` to document the decision to use MapLibre vector tiles and an ORS backend for truck-safe route geometry, with offline tile pre-fetching. Updated `.l00prite/todos.md` with prioritized tasks for implementing this architecture.
+- **Lock:** b7a2d4f8-e1c9-4b36-a857-9c12b4e6d3f0 acquired and released.
