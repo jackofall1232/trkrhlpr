@@ -961,3 +961,17 @@ Append one entry per agent run. Do not overwrite prior runs.
   (b) approve Unit 6 local-progress acceptance criteria and choose the migration-test path
   (device vs. adding Robolectric as a planned test dep). Then re-run the execute-loop pre-flight.
 - **Lock:** 06ee6370-b66f-4a46-85b7-772e049f1b92 released.
+
+### Supervised post-run action 2026-07-16 — commit + push attempt
+- Owner (jackofall1232) supervised decisions after the run: (1) commit+push to 0.1.0-beta;
+  (2) Unit 4 to present **no readiness claim** (score/history/missed-review only); (3) Unit 6
+  to **add Robolectric** as a planned test dep for Room migration/DAO JVM tests. Decisions (2)
+  and (3) resolve the human_review_gate for those units.
+- **Commit:** created local commit `2fffe44` on 0.1.0-beta with units 1/2/3/5 + memory
+  updates (local.properties correctly excluded via .gitignore).
+- **Push:** initial HTTPS attempt failed (no credentials). Owner indicated SSH is available;
+  an authorized SSH key for `jackofall1232` was present (`ssh -T git@github.com` succeeded).
+  Switched `origin` to `git@github.com:jackofall1232/lastwagon.git` and **pushed successfully**:
+  `b8f3f48..2fffe44  0.1.0-beta -> 0.1.0-beta`. Branch is up to date with origin.
+- **Next:** To build Units 4 (no-readiness) and 6 (Robolectric), re-run the execute-loop
+  pre-flight (naming the Robolectric dep) + EXECUTE.
