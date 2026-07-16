@@ -38,62 +38,6 @@ data class ProgressSnapshot(
     val dailyCompleted: Boolean = false, val dailyStreak: Int = 0,
 )
 
-enum class CommercialVehicleType {
-    TRACTOR_TRAILER, STRAIGHT_TRUCK, BUS, DELIVERY, OTHER,
-}
-
-data class VehicleProfile(
-    val vehicleType: CommercialVehicleType,
-    val heightMeters: Double,
-    val widthMeters: Double,
-    val lengthMeters: Double,
-    val grossWeightTonnes: Double,
-    val axleLoadTonnes: Double,
-    val axleCount: Int,
-    val hazmat: Boolean,
-    val avoidTolls: Boolean,
-    val avoidFerries: Boolean,
-    val avoidUnpavedRoads: Boolean,
-    val confirmedAtEpochMillis: Long,
-)
-
-enum class VehicleProfileField { HEIGHT, WIDTH, LENGTH, GROSS_WEIGHT, AXLE_LOAD, AXLE_COUNT, CONFIRMATION }
-data class VehicleProfileValidationError(val field: VehicleProfileField, val message: String)
-
-object VehicleProfileValidator {
-    fun validate(profile: VehicleProfile): List<VehicleProfileValidationError> = buildList {
-        checkRange(profile.heightMeters, 1.0, 6.0, VehicleProfileField.HEIGHT, "Height must be between 1 and 6 m.")
-        checkRange(profile.widthMeters, 1.0, 4.0, VehicleProfileField.WIDTH, "Width must be between 1 and 4 m.")
-        checkRange(profile.lengthMeters, 2.0, 40.0, VehicleProfileField.LENGTH, "Length must be between 2 and 40 m.")
-        checkRange(profile.grossWeightTonnes, 1.0, 100.0, VehicleProfileField.GROSS_WEIGHT,
-            "Gross weight must be between 1 and 100 metric tonnes.")
-        checkRange(profile.axleLoadTonnes, 0.5, 30.0, VehicleProfileField.AXLE_LOAD,
-            "Axle load must be between 0.5 and 30 metric tonnes.")
-        if (profile.axleLoadTonnes > profile.grossWeightTonnes) add(VehicleProfileValidationError(
-            VehicleProfileField.AXLE_LOAD, "Axle load cannot exceed gross weight."))
-        if (profile.axleCount !in 2..20) add(VehicleProfileValidationError(
-            VehicleProfileField.AXLE_COUNT, "Axle count must be between 2 and 20."))
-        if (profile.confirmedAtEpochMillis <= 0) add(VehicleProfileValidationError(
-            VehicleProfileField.CONFIRMATION, "Confirm the current vehicle and load before saving."))
-    }
-
-    private fun MutableList<VehicleProfileValidationError>.checkRange(
-        value: Double, minimum: Double, maximum: Double,
-        field: VehicleProfileField, message: String,
-    ) {
-        if (!value.isFinite() || value !in minimum..maximum) add(VehicleProfileValidationError(field, message))
-    }
-}
-
-object VehicleUnitConversions {
-    private const val METERS_PER_FOOT = 0.3048
-    private const val POUNDS_PER_METRIC_TONNE = 2204.62262185
-    fun feetToMeters(feet: Double) = feet * METERS_PER_FOOT
-    fun metersToFeet(meters: Double) = meters / METERS_PER_FOOT
-    fun poundsToMetricTonnes(pounds: Double) = pounds / POUNDS_PER_METRIC_TONNE
-    fun metricTonnesToPounds(tonnes: Double) = tonnes * POUNDS_PER_METRIC_TONNE
-}
-
 interface ContentRepository {
     suspend fun ensureSampleContent()
     fun observeInspectionCategories(): Flow<List<InspectionCategory>>
@@ -115,9 +59,4 @@ interface PreferencesRepository {
     suspend fun setTheme(theme: ThemePreference)
     suspend fun setReduceMotion(enabled: Boolean)
     suspend fun setLargeText(enabled: Boolean)
-}
-interface VehicleProfileRepository {
-    val profile: Flow<VehicleProfile?>
-    suspend fun save(profile: VehicleProfile)
-    suspend fun clear()
 }

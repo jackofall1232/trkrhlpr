@@ -38,7 +38,6 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":feature:dashboard"))
     implementation(project(":feature:learning"))
-    implementation(project(":feature:routing"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)

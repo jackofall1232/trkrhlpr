@@ -19,12 +19,10 @@ The production foundation is native Kotlin and Jetpack Compose, targeting Androi
 - local progress and confirmed reset flow
 - Room-backed versioned content/progress storage
 - DataStore-backed theme and accessibility preferences
-- offline core tools with no account or analytics
-- an online, read-only MapLibre evaluation map with optional approximate location
-- a locally stored, validated, driver-confirmed commercial-vehicle profile
+- offline operation with no account, analytics, or Internet permission
 
 Truck-stop discovery and commercial-truck routing/GPS remain future research items and
-have no implementation in this foundation. The map preview does not calculate routes.
+have no implementation in this foundation.
 
 ## Project structure
 
@@ -37,7 +35,6 @@ have no implementation in this foundation. The map preview does not calculate ro
 | `core:testing` | Shared test fixtures and dependencies |
 | `feature:dashboard` | Home, progress, settings, and about |
 | `feature:learning` | Inspection, practice-test, and daily-question representative flows |
-| `feature:routing` | Vehicle-profile workflow, read-only map, and replaceable style provider |
 
 ## Prerequisites
 
@@ -95,12 +92,9 @@ update process must be designed before distributing a release APK.
 
 ## Data and privacy
 
-Core inspection and learning operation remains local and offline. The map preview uses the
-Internet to load evaluation map data and requests approximate location only after the user
-selects the location control; map viewing continues if permission is denied. The app has no
-accounts, cloud sync, ads, purchases, or analytics. The confirmed vehicle profile is stored
-locally in DataStore. Resetting progress removes local completion records while leaving the
-vehicle profile and bundled sample content installed.
+Core operation is local and offline. The app requests no Internet permission and contains
+no accounts, cloud sync, ads, purchases, analytics, maps, or location access. Resetting
+progress removes local completion records while leaving bundled sample content installed.
 
 ## Content policy
 
