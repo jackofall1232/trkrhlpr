@@ -178,3 +178,31 @@ Append one entry per agent run. Do not overwrite prior runs.
 - **Triggering event:** User confirmed the MapLibre + OpenRouteService (ORS) strategy.
 - **Completed work:** Updated `.l00prite/memory.md` to document the decision to use MapLibre vector tiles and an ORS backend for truck-safe route geometry, with offline tile pre-fetching. Updated `.l00prite/todos.md` with prioritized tasks for implementing this architecture.
 - **Lock:** b7a2d4f8-e1c9-4b36-a857-9c12b4e6d3f0 acquired and released.
+
+### Run 2026-07-16T16:22:26Z — Codex — Approve phased truck-routing plan
+- **Goal:** Persist the human-approved, manageable implementation plan for commercial-truck
+  map routing and prepare it for review against `0.0.1-alpha`.
+- **Triggering event:** User approved the proposed phases and requested durable memory plus
+  a mergeable pull request.
+- **Completed work:** Added `docs/truck-routing-plan.md` with Phases 0–8, explicit exit
+  criteria, a Phase 5 offline Route Corridor MVP boundary, and later gates for guided
+  navigation, restriction assurance, and controlled release. Replaced guarantee and
+  STAA-compliance claims in durable memory and the blueprint with qualified decision-support
+  language, mandatory driver verification, explicit degraded states, and legal review.
+  Reorganized routing TODOs by phase and updated state/heartbeat for human review.
+- **Tests run / Verification:**
+  - command: `git diff --check`; exit_code: 0; summary: no whitespace errors;
+    timestamp: 2026-07-16T16:22:26Z.
+  - command: parse `.l00prite/lock.json`, `state.json`, and `heartbeat.json` with Node;
+    exit_code: 0; summary: modified protocol JSON remained valid;
+    timestamp: 2026-07-16T16:22:26Z.
+  - command: scan for superseded guarantee/STAA TODO wording; exit_code: 0;
+    summary: no superseded claims remained; timestamp: 2026-07-16T16:22:26Z.
+- **Failures:** Ruby and jq were unavailable for JSON validation; Node validation succeeded.
+- **Decision:** Planning only; no routing code, dependencies, permissions, providers, or
+  external data were added. Routing remains outside the first production milestone.
+- **Confidence:** High for plan consistency; implementation, provider licensing, field
+  validation, and legal review remain future gated work.
+- **Next action:** Review and merge the plan PR, then begin Phase 0 as a separately approved
+  unit before any map implementation.
+- **Lock:** 2c9671d7-a175-45f1-a604-31e53281087e acquired and released.
