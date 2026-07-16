@@ -4,6 +4,7 @@
 - [ ] Implement MapLibre GL Native Android wrapper for offline-first map viewing.
 - [ ] Implement OpenRouteService (ORS) API client for truck-safe (HGV) route calculation.
 - [ ] Build "Route Corridor" tile pre-fetching and local geometry persistence logic.
+- [ ] Update Android manifest to request Internet and location permissions for mapping/routing.
 - [ ] Research authoritative FMCSA and official CDL-manual sources for the 131-point checklist.
 - [ ] Define the exact checklist scope, sequence, vehicle configurations, and defect criteria.
 - [ ] Define objective acceptance criteria for Study Mode and Real Inspection Mode.
@@ -11,7 +12,8 @@
 - [ ] Define daily safety-question sourcing, review, and update rules.
 - [ ] Run visual, accessibility, and connected Compose tests on representative phone and tablet hardware.
 - [ ] Review and approve the production foundation before importing authoritative content.
-- [ ] Implement CDL mock exams feature with randomized tests and readiness scoring.
+- [ ] Define test-history, missed-question review, randomized-test, and readiness-scoring behavior.
+- [ ] Implement CDL mock exams feature based on the defined behavior.
 - [ ] Design and implement STAA-compliant truck routing subsystem.
 - [ ] Integrate bridge height awareness and clearance warnings into routing.
 - [ ] Implement comprehensive truck stop locations dataset and search features.
