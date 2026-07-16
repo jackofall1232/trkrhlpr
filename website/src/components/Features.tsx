@@ -8,7 +8,7 @@ const FEATURES = [
   },
   {
     title: "Pre-trip inspection helper",
-    body: "A 131-point checklist with study mode and real inspection mode, ordered the way you actually walk the truck — with progress you can see at a glance.",
+    body: "A 132-point checklist with study mode and real inspection mode, ordered the way you actually walk the truck — with progress you can see at a glance.",
     motif: HopperCanopyMotif,
   },
   {

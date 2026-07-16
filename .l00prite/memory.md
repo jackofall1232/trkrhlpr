@@ -35,7 +35,7 @@ Durable project facts and decisions that future agents should preserve.
     with guided navigation and restriction assurance gated separately.
 - The confirmed technology direction is native Kotlin, Jetpack Compose, Android SDK 36
   (Android 16), and an offline-first architecture.
-- The first production milestone covers the 131-point pre-trip inspection, Study Mode,
+- The first production milestone covers the 132-point pre-trip inspection, Study Mode,
   Real Inspection Mode, CDL practice tests, a daily safety question, and local progress.
 - The national truck-stop directory, truck GPS/routing, online accounts, and cloud
   synchronization are future roadmap items excluded from the first milestone.
@@ -49,6 +49,40 @@ Durable project facts and decisions that future agents should preserve.
 - Manual constructor injection is sufficient for the current dependency graph.
 - Room stores versioned content/progress; DataStore stores theme/accessibility preferences.
 - SDK-36-compatible pins include Core 1.17.0 and Lifecycle 2.10.0.
+- **The pre-trip checklist is 132 points** (owner-approved 2026-07-16). It began as a
+  working "131"; during PR #15 review a genuinely missing combination safety check — the
+  trailer air-supply/breakaway test — was found, and the owner approved adding it as a
+  distinct item (item 129), moving the count to 132. The count is Last Wagon's product
+  enumeration, NOT an official term; no official source defines any fixed count, so this was
+  an accuracy decision, not branding. Definition: `docs/pretrip-132-checklist.md` (file
+  renamed from -131-); sourcing/licensing: `docs/content-sourcing.md`. Both content docs
+  were **owner-approved on 2026-07-16** (the docs human-review gate is passed); real content
+  authoring may proceed once the foundation is approved and the flagged items are
+  full-text-verified.
+- The AAMVA model CDL manual (including the FMCSA-hosted PDF) is AAMVA-copyrighted with
+  SDLA-only reproduction rights: verification reference only — never copy its prose or
+  commit the PDF. CFR text and FMCSA-authored materials are public domain (17 U.S.C.
+  § 105). AAMVA's secure test item pool and commercial question banks are never sourced.
+- The owner supplied a January 1, 2004 CVSA Out-of-Service Criteria scan (2026-07-16) as
+  an internal reference only: CVSA-copyrighted and long superseded (annual revisions), so
+  it is used for category-coverage cross-checks, never as a source of shipped text or
+  figures, and must not be committed to the repository. Public defect criteria come from
+  Appendix A to 49 CFR Part 396.
+- **Next-week build-out (owner, 2026-07-16):** the owner wants a full build-out into a
+  complete, useful app via Execution Mode (`.l00prite/prompts/execute-loop.md`). Approved
+  scope = **first milestone + truck-stop directory** (Study Mode, Real Inspection Mode,
+  CDL class + endorsement practice tests, mock exams, daily question, local progress, and
+  the truck-stop dataset/search). Routing Phases 6-8 stay out of this build-out. Truck
+  stops require their own public-data-source research gate (licensing/freshness) before
+  implementation. Execution Mode is NOT armed yet — it requires the pre-flight display and
+  an explicit in-session EXECUTE confirmation next week; this session only prepared the
+  backlog.
+- **CI (owner-approved 2026-07-16):** `.github/workflows/ci.yml` added — JDK 17 +
+  Android SDK, `./gradlew assembleDebug check` on push/PR. Purpose: give the remote
+  build-out loop real build verification, since remote sessions cannot reach dl.google.com
+  but GitHub runners can. The build needs no secrets (ORS_API_KEY defaults to empty in
+  app/build.gradle.kts). First real run happens on GitHub; if it fails, that is signal to
+  fix, tracked via the PR-watch on #15.
 
 ## Facts
 

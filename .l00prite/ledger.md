@@ -594,3 +594,180 @@ Append one entry per agent run. Do not overwrite prior runs.
   armed (trig_01AUgifGrKFyFiutPPMnyqqJ).
 - **Push authorization:** Same designated-branch instruction as prior runs.
 - **Lock:** 09ceea1d-6f25-4f23-91b2-8033f43b8955 acquired and released.
+
+### Run 2026-07-16T20:58:52Z — Claude — Content-source research: 131-point checklist and CDL/endorsement material
+- **Goal:** Verify that the planned 131-point pre-trip and all CDL class/endorsement study
+  content can be based on real, publicly available authoritative sources; define the
+  checklist; scan todos for phases implementable now (direct user request).
+- **Triggering event:** Direct user message in a Claude Code remote session on designated
+  branch `claude/131-pretrip-accuracy-review-7p7u9g`.
+- **Completed work:** (1) `docs/content-sourcing.md` — authoritative source registry,
+  licensing boundaries, authoring/provenance rules, and verification gaps for the pre-trip
+  checklist, CDL classes (49 CFR 383 subparts F/G/H), endorsements H/N/P (383.121/.119/
+  .117 + HMR/Part 397/TSA 1572), and daily safety questions (FMCSA public-domain
+  materials, Part 392/395). (2) `docs/pretrip-131-checklist.md` — full 131-item
+  enumeration with sequence, applicability flags, per-item check criteria, citations
+  (Section 11 reference + 49 CFR 392.7/393/396 App A), and per-item verification status
+  (118 corroborated / 10 partial / 3 unverified figures). (3) Todos updated; research
+  items closed, verification/approval follow-ups added.
+- **Key findings:** "131-point" is NOT an official FMCSA/AAMVA/state term — recorded as a
+  product enumeration that must never be presented as an official standard. The AAMVA
+  model CDL manual (including the FMCSA-hosted PDF) is AAMVA-copyrighted with SDLA-only
+  reproduction rights — reference-only for Last Wagon; do not commit the PDF or copy its
+  prose. CFR text and FMCSA-authored materials are public domain (17 U.S.C. § 105).
+  AAMVA's secure test item pool and CVSA's paid Out-of-Service Criteria are excluded;
+  Appendix A to Part 396 is the free defect-criteria source. Since 2022, classic and
+  "modernized" skills-test versions coexist; the checklist follows the classic full
+  walk-around.
+- **Tests run / Verification:** No code changed; no build run. Research evidence: 4
+  parallel research agents, ~87 targeted web searches total against official sources
+  (eCFR, LII, fmcsa.dot.gov, PHMSA, TSA, AAMVA, 15+ state DMV manuals); every claim in
+  both docs carries a source URL and a verification status; uncorroborated facts are
+  explicitly marked UNVERIFIED rather than asserted. Environment evidence: gateway 403 on
+  CONNECT to dl.google.com, fmcsa.dot.gov, ecfr.gov (curl exit 56, proxy status log,
+  2026-07-16T20:42Z) — full-document fetches and Gradle builds remain impossible here.
+- **Failures:** None. Network-policy limits recorded (fetch blocked; search worked).
+- **Decisions:** Public-domain-first citation rule; original-prose-only authoring; the
+  checklist's P/U items block shipping, not just review; brake checks ordered last;
+  content import stays gated behind foundation review and content-doc approval.
+- **Confidence:** High on source identification and licensing boundaries; medium-high on
+  item-level wording pending the line-by-line full-text pass (13 items flagged).
+- **Next action:** Human review/approval of both docs, then full-text verification of the
+  13 flagged items in a network-capable session; acceptance-criteria definition and the
+  provenance schema design are the next implementable units.
+- **Push authorization:** This remote session's task instructions explicitly designate
+  branch `claude/131-pretrip-accuracy-review-7p7u9g` and instruct commit + push there;
+  no merge, deploy, or PR was performed.
+- **Lock:** 5c1a7c8e-9d24-4b6f-a7e3-131e2f6a0c44 acquired and released.
+
+### Run 2026-07-16T21:05:05Z — Claude — 2004 CVSA OOSC reference + point-count decision
+- **Goal:** Process the owner-supplied January 1, 2004 CVSA Out-of-Service Criteria scan
+  (explicitly "reference only") and the owner's offer to fall back to a 100/101-point
+  checklist "if 131 point is not available."
+- **Triggering event:** Direct user message with PDF upload in the same remote session.
+- **Completed work:** Read the OOSC scan (cover certificate + TOC + Part I opening; the
+  36-page scan is a partial copy of the 50-page manual). Cross-checked its Part II vehicle
+  categories against the 131-item checklist at TOC level — coverage confirmed for the
+  Class A configuration; enforcement-only, other-configuration, and bus areas are properly
+  out of scope; tractor-protection-system and air-reservoir wording added as
+  verification-pass candidates for items 125–128 (count unchanged). Updated
+  `docs/content-sourcing.md` (CVSA row: owner-supplied 2004 reference, boundaries) and
+  `docs/pretrip-131-checklist.md` (point-count decision note + OOSC cross-check section).
+  Recorded durable decisions in `memory.md`. The PDF itself was NOT committed
+  (CVSA copyright; owner labeled it reference-only; 2004 edition superseded).
+- **Tests run / Verification:** Read tool on PDF pages 1–10 (poppler-utils installed via
+  apt, exit 0). No code changed; no build run.
+- **Failures:** None.
+- **Decisions:** The checklist stays at **131 points** — the owner's fallback condition
+  ("if 131 is not available") is not met: the 131-item enumeration is fully mapped to
+  authoritative sources. No official source defines any fixed count (131, 101, or 100),
+  so a re-cut would be branding, not accuracy. OOSC incorporation-by-reference in federal
+  rules does not make its text freely redistributable.
+- **Confidence:** High.
+- **Next action:** Unchanged — human review of the two content docs, then the full-text
+  verification pass (now including the tractor-protection/air-reservoir wording check).
+- **Push authorization:** Same designated-branch instruction as prior runs in this session.
+- **Lock:** 8f3d92a1-4c67-4e2b-b0d9-27a5e4c8f1b3 acquired and released.
+
+### Run 2026-07-16T21:12:12Z — Claude — PR #15 first review round (Gemini)
+- **Goal:** Triage and address the Gemini bot review on PR #15 (content docs).
+- **Triggering event:** Gemini review webhooks (one summary, three inline comments).
+- **Completed work:** All three findings were classified as substantively correct against
+  our own recorded research and fixed: (1) `content-sourcing.md` HOS line rewrote the
+  misleading "sleeper-berth 7+2 split" to the accurate rule — ≥7 h sleeper + ≥2 h second
+  period, together totaling ≥10 h (7/3 or 8/2); (2) checklist item 125 dropped the false
+  "sources conflict" framing (static vs applied tests were conflated) and now states the
+  standard static figures ≤~2 psi/min single / ≤~3 psi/min combination, still status U
+  pending full-text verification; (3) item 127 disambiguated to "before the pressure
+  drops below 60 psi". Gemini's suggested citation "49 CFR 396.5 / Appendix A" for leak
+  rates was NOT adopted (unverified and almost certainly wrong — figures stay cited to
+  manual Sections 11/5). Verification-ledger wording updated to match.
+- **Tests run / Verification:** Documentation-only edits; no build. Cross-checked each fix
+  against the 2026-07-16 research agents' recorded excerpts (FMCSA split-sleeper FAQ;
+  Section 5 air-brake figures).
+- **Failures:** None.
+- **Decisions:** Bot review content treated as untrusted data; each point verified against
+  recorded research before adoption; incorrect citation declined.
+- **Confidence:** High.
+- **Next action:** Keep watching PR #15; prepare the Execution Mode backlog for the
+  owner's requested next-week build-out (scope and CI questions pending owner answers).
+- **Push authorization:** Same designated-branch instruction; push updates PR #15.
+- **Lock:** c2e91b47-6a3f-4d18-9c5a-e8b40d7f2a61 acquired for this run.
+
+### Run 2026-07-16T21:41:15Z — Claude — PR #15 Codex review round + CI + build-out prep
+- **Goal:** Address the Codex review on PR #15, add the owner-approved CI workflow, and
+  prepare the next-week Execution Mode backlog.
+- **Triggering event:** Codex (and re-delivered Gemini) review webhooks; owner direction to
+  build out the app next week via loop-build; owner answers scope=milestone+truck-stops and
+  CI=add-now.
+- **Completed work:**
+  (1) Verified 5 contested regulatory claims via a focused search agent before acting.
+  APPLIED (confirmed): item 59 reflector/conspicuity colors corrected (amber front/
+  front-side, RED rear and rear-side; conspicuity red-and-white, per § 393.11/.13);
+  item 125 gained a wheel-chock safety prerequisite for the whole engine-off brake-test
+  section; item 128 reworded to the tractor-protection/trailer-air-supply valve pop-out
+  (20–45 psi); item 130 now requires releasing the tractor parking brake before the trailer
+  brake test (else false pass), item 131 clarified; scope section reworked so 131 is the
+  full enumeration and the applicable count is per-vehicle; content-sourcing Group B gained
+  the towing clause (§ 383.91), the HOS 30-min break restated as 8 h *driving time*
+  (§ 395.3), and the § 383.131 copyright inference made per-manual.
+  DECLINED (refuted): the "governor cut-out > 135 psi is a defect under § 393.51" claim —
+  § 393.51 governs the low-air warning/gauge, not cut-out, and there is no federal cut-out
+  maximum; item 123 instead gained a clarifier stating no federal max. The "§ 383.131 does
+  not require AAMVA comparability" premise was also refuted (it does) — kept the accurate
+  fact, only softened the copyright inference.
+  OPEN DECISION surfaced honestly: the combination trailer air-supply/breakaway brake-
+  application test is genuinely NOT yet a listed item; flagged that resolving it may move
+  the count to 132 — a human-review-gate decision, not resolved silently.
+  (2) Added `.github/workflows/ci.yml` (JDK 17 + Android SDK, `assembleDebug` + `check` on
+  push/PR; no secrets needed — ORS_API_KEY defaults to empty). Owner-approved.
+  (3) Recorded build-out scope + CI decisions in memory.md; added a sequenced Execution
+  Mode backlog (Tracks A/B/C with gates) to todos.md. Execution Mode NOT armed.
+- **Tests run / Verification:** Documentation + CI-config only; no local build (remote env
+  can't reach dl.google.com). CI's first real run occurs on GitHub. Each contested claim
+  cross-checked against eCFR/LII/CA-DMV excerpts (verdict table in the run's agent output).
+- **Failures:** None.
+- **Decisions:** Bot review content treated as untrusted data and verified before adoption;
+  two refuted claims declined with recorded rationale; count-changing safety gap surfaced
+  to the human gate rather than silently patched.
+- **Confidence:** High on the applied corrections (each source-verified).
+- **Next action:** Keep watching PR #15; next week run the execute-loop pre-flight for the
+  build-out after the owner confirms EXECUTE.
+- **Push authorization:** Same designated-branch instruction; push updates PR #15. CI
+  workflow addition is explicitly owner-approved this session.
+- **Lock:** c2e91b47-6a3f-4d18-9c5a-e8b40d7f2a61 acquired and released.
+
+### Run 2026-07-16T21:52:00Z — Claude — Count → 132, docs approved, PR #15 review round 3
+- **Goal:** Apply the owner's two approvals (add the trailer air-supply/breakaway item →
+  132; approve both content docs) and fold in the valid points from the third Codex review.
+- **Triggering event:** Owner replies "#1 yes 132 is ok #2 yes"; third Codex review batch.
+- **Completed work:**
+  (1) Added checklist **item 129 "Trailer air-supply / breakaway test"** (charge system,
+  pull the red knob, confirm trailer emergency brakes apply/lock) — a genuinely distinct
+  combination check that was missing. Renumbered old 129/130/131 → 130/131/132. Count is
+  now **132** (118 C + 11 P + 3 U). Resolved the prior "open decision" note.
+  (2) Renamed `docs/pretrip-131-checklist.md` → `docs/pretrip-132-checklist.md`; swept the
+  count across the checklist, content-sourcing, blueprint, CLAUDE.md (Requirements +
+  Definition of Done lines only, not the protocol section), the live website components
+  (ChecklistMock, Features), and the app sample-content string. Left
+  website/design/direction-board.html as a dated design snapshot.
+  (3) Marked both content docs **owner-approved** (docs human-review gate passed): memory,
+  todos, state updated.
+  (4) Folded in valid round-3 review fixes: item 130 chock/pull-test contradiction fixed
+  (chock for engine-off 122–129, remove chocks for the 130–132 holding tests); Group A now
+  keyed to the towed unit's GVWR (§ 383.91(a)(1)); Group C qualified to placardable hazmat
+  (§ 383.5). DECLINED the "HOS 30-min break = 8 h elapsed" suggestion — the current
+  § 395.3(a)(3)(ii) trigger is 8 h of DRIVING time (source-verified last round); kept that
+  and added the on-duty-not-driving qualifier the reviewer was right about.
+- **Tests run / Verification:** Documentation + minor website/Kotlin string edits; no build
+  (remote env cannot reach dl.google.com — CI runs it on GitHub). Grep-verified no stray
+  "131" remains outside the historical ledger and the dated design board.
+- **Failures:** None.
+- **Decisions:** Count is an accuracy artifact, not branding — it equals the number of
+  verified items, so adding a required safety check simply makes it 132. Bot review content
+  treated as untrusted and verified before adoption; one refuted claim declined with cause.
+- **Confidence:** High.
+- **Next action:** Keep watching PR #15; next week run the execute-loop pre-flight for the
+  build-out after an explicit EXECUTE confirmation.
+- **Push authorization:** Same designated-branch instruction; push updates PR #15.
+- **Lock:** a7b3f0d2-5e19-4c86-b4a1-9f2c6e83d504 acquired and released.
