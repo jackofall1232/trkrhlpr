@@ -41,17 +41,20 @@ class OfflineCorridorManager(
     }
 
     /**
-     * Reconciles stored corridors against the current saved route: adopts a matching
-     * corridor (resuming an interrupted download), deletes everything else.
+     * Reconciles stored corridors against the current saved route and active map style:
+     * adopts a matching corridor (resuming an interrupted download), deletes everything
+     * else, including corridors downloaded for a different style provider.
      */
-    fun refresh(currentRoute: CalculatedRoute?) {
+    fun refresh(currentRoute: CalculatedRoute?, activeStyleId: String) {
         manager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>?) {
                 val regions = offlineRegions.orEmpty()
                 var adopted = false
                 regions.forEach { region ->
                     val metadata = OfflineCorridor.decodeMetadata(region.metadata)
-                    if (!adopted && metadata != null && OfflineCorridor.matches(metadata, currentRoute)) {
+                    if (!adopted && metadata != null &&
+                        OfflineCorridor.matches(metadata, currentRoute, activeStyleId)
+                    ) {
                         adopted = true
                         adopt(region, metadata)
                     } else {
@@ -95,11 +98,11 @@ class OfflineCorridorManager(
             detail.maxZoom,
             appContext.resources.displayMetrics.density,
         )
-        // Clear any previous corridor first so only one download ever exists.
+        // Clear any previous corridor first so only one download ever exists. Creation
+        // waits until every deletion has called back to avoid overlapping database work.
         manager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>?) {
-                offlineRegions.orEmpty().forEach { discard(it) }
-                create(definition, metadata)
+                discardAllThen(offlineRegions.orEmpty()) { create(definition, metadata) }
             }
 
             override fun onError(error: String) {
@@ -213,5 +216,26 @@ class OfflineCorridorManager(
             override fun onDelete() = Unit
             override fun onError(error: String) = Unit
         })
+    }
+
+    /** Deletes all [regions], then runs [onComplete]; callbacks arrive on the main thread. */
+    private fun discardAllThen(regions: Array<out OfflineRegion>, onComplete: () -> Unit) {
+        var remaining = regions.size
+        if (remaining == 0) {
+            onComplete()
+            return
+        }
+        regions.forEach { region ->
+            region.setDownloadState(OfflineRegion.STATE_INACTIVE)
+            region.delete(object : OfflineRegion.OfflineRegionDeleteCallback {
+                override fun onDelete() {
+                    if (--remaining == 0) onComplete()
+                }
+
+                override fun onError(error: String) {
+                    if (--remaining == 0) onComplete()
+                }
+            })
+        }
     }
 }

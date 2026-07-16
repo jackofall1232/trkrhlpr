@@ -28,7 +28,7 @@ fun RoutingWorkspaceScreen(
     routingProvider: RoutingProvider,
     routeRepository: RouteRepository,
     modifier: Modifier = Modifier,
-    styleProvider: MapStyleProvider = OpenFreeMapLibertyStyleProvider,
+    styleProvider: MapStyleProvider = OpenFreeMapLibertyStyleProvider(),
     corridorManager: OfflineCorridorManager? = null,
     networkMonitor: NetworkMonitor? = null,
 ) {
@@ -48,10 +48,11 @@ fun RoutingWorkspaceScreen(
     // A corridor is only ever kept for the exact saved route; anything else is deleted.
     // Collect the repository flow directly: its first emission is the real persisted
     // state, so a stored corridor is never discarded on the pre-load null placeholder.
-    LaunchedEffect(routeRepository, corridor) {
+    LaunchedEffect(routeRepository, corridor, styleProvider) {
+        val activeStyleId = styleProvider.style().id
         routeRepository.lastRoute
             .distinctUntilChangedBy { it?.provenance?.requestId to it?.review }
-            .collect { corridor.refresh(it) }
+            .collect { corridor.refresh(it, activeStyleId) }
     }
 
     if (showMap && canOpenRouteMap(savedRoute)) {

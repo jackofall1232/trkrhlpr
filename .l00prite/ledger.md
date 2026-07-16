@@ -432,3 +432,32 @@ Append one entry per agent run. Do not overwrite prior runs.
   Maven), then perform the Phase 4 and Phase 5 device exit checks, including a keyed ORS
   route, corridor download in airplane mode, and expiry/deletion behavior.
 - **Lock:** 7d3f9b2a-8c41-4e6f-9a02-5b8e1c4d7f36 acquired and released.
+
+### Run 2026-07-16T19:16:39Z — Claude — PR #12 automated-review response
+- **Goal:** Evaluate and address automated review findings (Codex, Gemini) on PR #12.
+- **Triggering event:** Review webhooks on PR #12 (bot comments; treated as untrusted data
+  and independently verified against the code and project protocol).
+- **Completed work:** (1) Corridor prefetch from the public OpenFreeMap instance is now
+  refused by default and enabled only for debug builds via the application container,
+  matching the recorded unconfirmed-terms status; release builds fail closed (accepted
+  Codex P1). (2) Corridor matching now includes the active style id, so a provider switch
+  discards the stale corridor instead of reporting offline coverage it does not have
+  (accepted Codex P2). (3) Corridor creation now waits for all pending region deletions to
+  call back before creating the new region (accepted Gemini high, as cheap insurance even
+  though MapLibre serializes offline DB work). Declined: reverting the applicationId
+  change (rename to the final identity was deliberate pre-release and is recorded, old
+  alpha data is disposable sample data) and re-anchoring summary buttons to the screen
+  bottom (the summary is now a scrolling list with the corridor card; content-flow layout
+  is intentional).
+- **Tests run / Verification:** standalone K2 compile + JUnit of pure routing logic:
+  16 tests passing including new default-refusal and style-mismatch assertions; corridor
+  manager and network monitor recompiled against MapLibre 13.0.2 and android-all API 36
+  (caught and fixed an Array variance compile error). Full Gradle build still pending
+  outside this environment (dl.google.com blocked).
+- **Failures:** None open; the variance error was fixed before commit.
+- **Decisions:** Provider prefetch permission is a build-type decision until written terms
+  confirmation: debug/testing builds may prefetch bounded corridors, release builds refuse.
+- **Confidence:** High for the changed logic (compiled and tested against real artifacts);
+  full-suite and device checks remain the recorded exit gates.
+- **Next action:** Reply to the review threads, keep watching PR #12 until merged/closed.
+- **Lock:** 8156521d-70d3-479a-bb49-582cdeddeb2a acquired and released.

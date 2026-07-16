@@ -113,9 +113,14 @@ object OfflineCorridor {
         )
     }.getOrNull()
 
-    /** A corridor is only valid for the exact reviewed route and vehicle profile. */
-    fun matches(metadata: CorridorMetadata, route: CalculatedRoute?): Boolean =
+    /**
+     * A corridor is only valid for the exact reviewed route, vehicle profile, and active
+     * map style. A corridor downloaded for another style holds the wrong style and tile
+     * resources, so it must be discarded rather than reported as offline coverage.
+     */
+    fun matches(metadata: CorridorMetadata, route: CalculatedRoute?, activeStyleId: String): Boolean =
         route != null &&
+            metadata.styleId == activeStyleId &&
             metadata.routeRequestId == route.provenance.requestId &&
             metadata.vehicleProfileConfirmedAtEpochMillis ==
             route.request.vehicleProfile.confirmedAtEpochMillis

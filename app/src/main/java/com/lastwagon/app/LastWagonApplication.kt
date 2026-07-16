@@ -32,7 +32,10 @@ class AppContainer(application: Application) {
     val vehicleProfileRepository: VehicleProfileRepository = DataStoreVehicleProfileRepository(application)
     val routingProvider: RoutingProvider = OrsRoutingProvider(BuildConfig.ORS_API_KEY)
     val routeRepository: RouteRepository = FileRouteRepository(application)
-    val mapStyleProvider: MapStyleProvider = OpenFreeMapLibertyStyleProvider
+    // Corridor prefetch stays disabled outside debug/testing builds until the provider's
+    // offline-storage terms are confirmed in writing (docs/map-provider-evaluation.md).
+    val mapStyleProvider: MapStyleProvider =
+        OpenFreeMapLibertyStyleProvider(developmentPrefetchEnabled = BuildConfig.DEBUG)
     val networkMonitor = NetworkMonitor(application)
     val corridorManager = OfflineCorridorManager(application)
 }

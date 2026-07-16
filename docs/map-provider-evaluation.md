@@ -42,6 +42,11 @@ Sources: [openfreemap.org](https://openfreemap.org/),
 
 ### Safeguards applied in the implementation
 
+- Because the prefetch clause is unconfirmed, `OpenFreeMapLibertyStyleProvider` refuses
+  corridor prefetching by default; it is enabled only for debug (development/testing)
+  builds through the application container. Release builds fail closed until the terms
+  are confirmed in writing and this document is updated. Interactive map viewing is
+  unaffected either way.
 - Corridor downloads are bounded by a hard tile-count cap (`OfflineCorridor.MAX_TILES`)
   and a small zoom range chosen per detail level, keeping a single route corridor in the
   low thousands of tiles at most — interactive-viewing magnitude, not bulk mirroring.

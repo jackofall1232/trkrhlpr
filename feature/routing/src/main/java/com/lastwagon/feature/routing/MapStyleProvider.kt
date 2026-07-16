@@ -34,13 +34,20 @@ object MapLibreDemoStyleProvider : MapStyleProvider {
  * safeguards, and the outstanding production confirmation are recorded in
  * `docs/map-provider-evaluation.md`; corridor downloads stay bounded by
  * [OfflineCorridor.MAX_TILES].
+ *
+ * Because written confirmation of offline-region prefetching from the public instance is
+ * still outstanding, prefetch permission defaults to refused and may only be enabled for
+ * development/testing builds ([developmentPrefetchEnabled], wired to the debug build type
+ * in the application container). Interactive map viewing carries no such restriction.
  */
-object OpenFreeMapLibertyStyleProvider : MapStyleProvider {
+class OpenFreeMapLibertyStyleProvider(
+    private val developmentPrefetchEnabled: Boolean = false,
+) : MapStyleProvider {
     override fun style() = MapStyleDescriptor(
         id = "openfreemap-liberty",
         styleUri = "https://tiles.openfreemap.org/styles/liberty",
         attribution = "OpenFreeMap © OpenMapTiles · Data from OpenStreetMap",
         usageNotice = "General street map — not commercial-truck restriction data",
-        offlinePrefetchPermitted = true,
+        offlinePrefetchPermitted = developmentPrefetchEnabled,
     )
 }

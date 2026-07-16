@@ -37,14 +37,16 @@ class OfflineCorridorTest {
         assertNull(OfflineCorridor.decodeMetadata(unknownSchema.encodeToByteArray()))
     }
 
-    @Test fun corridorMatchesOnlyTheExactRouteAndProfile() {
-        assertTrue(OfflineCorridor.matches(metadata, route))
-        assertFalse(OfflineCorridor.matches(metadata, null))
-        assertFalse(OfflineCorridor.matches(metadata.copy(routeRequestId = "other"), route))
+    @Test fun corridorMatchesOnlyTheExactRouteProfileAndStyle() {
+        assertTrue(OfflineCorridor.matches(metadata, route, "openfreemap-liberty"))
+        assertFalse(OfflineCorridor.matches(metadata, null, "openfreemap-liberty"))
+        assertFalse(OfflineCorridor.matches(metadata.copy(routeRequestId = "other"), route, "openfreemap-liberty"))
         val reconfirmedProfile = route.copy(
             request = route.request.copy(vehicleProfile = profile.copy(confirmedAtEpochMillis = 2L)),
         )
-        assertFalse(OfflineCorridor.matches(metadata, reconfirmedProfile))
+        assertFalse(OfflineCorridor.matches(metadata, reconfirmedProfile, "openfreemap-liberty"))
+        // A corridor downloaded for another style holds the wrong offline resources.
+        assertFalse(OfflineCorridor.matches(metadata, route, "self-hosted-production"))
     }
 
     @Test fun corridorExpiresAfterTheConfiguredWindow() {
@@ -59,12 +61,16 @@ class OfflineCorridorTest {
     }
 
     @Test fun downloadsAreRefusedWithoutReviewOrPrefetchPermission() {
-        val prefetchStyle = OpenFreeMapLibertyStyleProvider.style()
+        val prefetchStyle = OpenFreeMapLibertyStyleProvider(developmentPrefetchEnabled = true).style()
         assertNull(OfflineCorridor.downloadRefusalReason(route, prefetchStyle))
         assertNotNull(OfflineCorridor.downloadRefusalReason(null, prefetchStyle))
         assertNotNull(OfflineCorridor.downloadRefusalReason(route.copy(review = null), prefetchStyle))
         assertNotNull(
             OfflineCorridor.downloadRefusalReason(route, MapLibreDemoStyleProvider.style()),
+        )
+        // Until provider terms are confirmed in writing, the default configuration refuses.
+        assertNotNull(
+            OfflineCorridor.downloadRefusalReason(route, OpenFreeMapLibertyStyleProvider().style()),
         )
     }
 

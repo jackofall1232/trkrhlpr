@@ -18,13 +18,17 @@ class MapStyleProviderTest {
     }
 
     @Test
-    fun openFreeMapProviderPermitsCorridorPrefetchWithAttribution() {
-        val style = OpenFreeMapLibertyStyleProvider.style()
+    fun openFreeMapProviderRefusesPrefetchUnlessDevelopmentEnabled() {
+        val style = OpenFreeMapLibertyStyleProvider().style()
 
         assertEquals("openfreemap-liberty", style.id)
         assertTrue(style.styleUri.startsWith("https://tiles.openfreemap.org/"))
         assertTrue(style.attribution.contains("OpenFreeMap"))
         assertTrue(style.attribution.contains("OpenStreetMap"))
-        assertTrue(style.offlinePrefetchPermitted)
+        assertFalse(style.offlinePrefetchPermitted)
+        assertTrue(
+            OpenFreeMapLibertyStyleProvider(developmentPrefetchEnabled = true)
+                .style().offlinePrefetchPermitted,
+        )
     }
 }
