@@ -639,3 +639,32 @@ Append one entry per agent run. Do not overwrite prior runs.
   branch `claude/131-pretrip-accuracy-review-7p7u9g` and instruct commit + push there;
   no merge, deploy, or PR was performed.
 - **Lock:** 5c1a7c8e-9d24-4b6f-a7e3-131e2f6a0c44 acquired and released.
+
+### Run 2026-07-16T21:05:05Z — Claude — 2004 CVSA OOSC reference + point-count decision
+- **Goal:** Process the owner-supplied January 1, 2004 CVSA Out-of-Service Criteria scan
+  (explicitly "reference only") and the owner's offer to fall back to a 100/101-point
+  checklist "if 131 point is not available."
+- **Triggering event:** Direct user message with PDF upload in the same remote session.
+- **Completed work:** Read the OOSC scan (cover certificate + TOC + Part I opening; the
+  36-page scan is a partial copy of the 50-page manual). Cross-checked its Part II vehicle
+  categories against the 131-item checklist at TOC level — coverage confirmed for the
+  Class A configuration; enforcement-only, other-configuration, and bus areas are properly
+  out of scope; tractor-protection-system and air-reservoir wording added as
+  verification-pass candidates for items 125–128 (count unchanged). Updated
+  `docs/content-sourcing.md` (CVSA row: owner-supplied 2004 reference, boundaries) and
+  `docs/pretrip-131-checklist.md` (point-count decision note + OOSC cross-check section).
+  Recorded durable decisions in `memory.md`. The PDF itself was NOT committed
+  (CVSA copyright; owner labeled it reference-only; 2004 edition superseded).
+- **Tests run / Verification:** Read tool on PDF pages 1–10 (poppler-utils installed via
+  apt, exit 0). No code changed; no build run.
+- **Failures:** None.
+- **Decisions:** The checklist stays at **131 points** — the owner's fallback condition
+  ("if 131 is not available") is not met: the 131-item enumeration is fully mapped to
+  authoritative sources. No official source defines any fixed count (131, 101, or 100),
+  so a re-cut would be branding, not accuracy. OOSC incorporation-by-reference in federal
+  rules does not make its text freely redistributable.
+- **Confidence:** High.
+- **Next action:** Unchanged — human review of the two content docs, then the full-text
+  verification pass (now including the tractor-protection/air-reservoir wording check).
+- **Push authorization:** Same designated-branch instruction as prior runs in this session.
+- **Lock:** 8f3d92a1-4c67-4e2b-b0d9-27a5e4c8f1b3 acquired and released.

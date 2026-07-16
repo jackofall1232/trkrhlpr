@@ -49,6 +49,20 @@ Durable project facts and decisions that future agents should preserve.
 - Manual constructor injection is sufficient for the current dependency graph.
 - Room stores versioned content/progress; DataStore stores theme/accessibility preferences.
 - SDK-36-compatible pins include Core 1.17.0 and Lifecycle 2.10.0.
+- **The pre-trip checklist stays at 131 points** (owner confirmed the count question
+  2026-07-16 by offering 100/101 only "if 131 point is not available" — it is available).
+  "131" is Last Wagon's product enumeration, not an official term; no official source
+  defines any fixed point count. Definition: `docs/pretrip-131-checklist.md`; sourcing and
+  licensing rules: `docs/content-sourcing.md`.
+- The AAMVA model CDL manual (including the FMCSA-hosted PDF) is AAMVA-copyrighted with
+  SDLA-only reproduction rights: verification reference only — never copy its prose or
+  commit the PDF. CFR text and FMCSA-authored materials are public domain (17 U.S.C.
+  § 105). AAMVA's secure test item pool and commercial question banks are never sourced.
+- The owner supplied a January 1, 2004 CVSA Out-of-Service Criteria scan (2026-07-16) as
+  an internal reference only: CVSA-copyrighted and long superseded (annual revisions), so
+  it is used for category-coverage cross-checks, never as a source of shipped text or
+  figures, and must not be committed to the repository. Public defect criteria come from
+  Appendix A to 49 CFR Part 396.
 
 ## Facts
 

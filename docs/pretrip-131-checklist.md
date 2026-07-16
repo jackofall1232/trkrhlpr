@@ -21,6 +21,13 @@ The app must present it as "Last Wagon's 131-point checklist, built from the CDL
 inspection test and federal regulations," and must never call it an official standard,
 an official count, or a guarantee of test coverage or legal compliance.
 
+Point-count decision (owner, 2026-07-16): the owner offered to fall back to a 100- or
+101-point checklist if 131 was not available. No fixed count — 131, 101, or 100 — exists in
+any official source, so all are product enumerations; and the 131-item enumeration below is
+fully mapped to authoritative content, so no fallback is needed. 131 stands (it also
+matches the blueprint and existing UI copy). Re-cutting to another count would be a
+branding choice, not an accuracy fix.
+
 ## Scope and vehicle applicability
 
 - **Primary configuration:** Class A tractor + single semi-trailer, air brakes, air-ride or
@@ -265,6 +272,31 @@ the state test (corroborated: GA, ID, FL Section 11 materials).
   PDF (July 2014) and eCFR full text in a network-capable session, resolving every P and U;
   then the existing human review gates (foundation approval, content import approval,
   safety wording review).
+
+### CVSA OOSC coverage cross-check (owner-supplied 2004 edition, reference only)
+
+The owner provided a January 1, 2004 CVSA Out-of-Service Criteria scan (see
+`docs/content-sourcing.md` for its licensing boundaries — reference only, not committed,
+never a source of shipped text or figures). Its Part II vehicle categories were
+cross-checked against this checklist at the table-of-contents level:
+
+- **Covered by the 131 items:** brake systems (drums, linings, hoses, low-pressure warning,
+  air loss, parking brakes, compressor), coupling (fifth wheel, upper/lower coupler),
+  exhaust, frame, fuel system, lamps/turn signals, safe loading/tie-downs, steering
+  (free play, column, gear box, pitman arm, tie rod/drag links, nuts), suspension (spring
+  assemblies, air suspension, torque/tracking components), tires (steer vs other), wheels/
+  rims/hubs, windshield wipers.
+- **OOSC areas out of this checklist's scope:** enforcement-only measures (brake
+  adjustment-limit charts), other configurations (pintle hooks, drawbar/tongue,
+  saddlemounts, electric/vacuum brakes, van body rails as separate items), and buses
+  (emergency exits) — bus items belong to the future Passenger/School Bus content, not the
+  Class A checklist.
+- **Verification-pass candidates raised by the cross-check:** the OOSC lists the
+  *tractor-protection system* and *air reservoir* as distinct brake-system areas. The
+  classic Section 11 in-cab air-brake sequence covers the trailer air-supply valve behavior
+  within items 125–128; the full-text pass must confirm whether Section 11 names the
+  tractor protection valve and air-tank check explicitly, and if so fold that wording into
+  items 125–128 (count unchanged).
 
 ## App-mapping notes
 
