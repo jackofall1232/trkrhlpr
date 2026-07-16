@@ -20,6 +20,12 @@
   --cream: #f0e9dc;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 @layer utilities {
   /* "Archivo Expanded" is not a separate Google Fonts family — it is the
      wdth=125 cut of the Archivo variable font. next/font loads the wdth
@@ -30,7 +36,7 @@
   }
 }
 
-/* ============ Hero scene (ported from design/direction-board.html) ============ */
+/* ============ Hero scene ============ */
 
 .hero-sky {
   background: linear-gradient(
@@ -43,23 +49,45 @@
   );
 }
 
+/* Film grain over the big gradient — hides banding and gives the flat
+   vector scene some tooth. */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.hero-stars {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 55%;
+  width: 100%;
+}
+
+.star-tw {
+  animation: star-twinkle 5s ease-in-out infinite;
+}
+
+/* Interpolates from each star's own attribute opacity. */
+@keyframes star-twinkle {
+  50% {
+    opacity: 0.05;
+  }
+}
+
 .hero-sun {
   position: absolute;
   left: 50%;
   top: 58%;
   width: 220px;
   height: 220px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    #ffdfa8 0%,
-    var(--amber-bright) 40%,
-    var(--amber) 70%,
-    transparent 100%
-  );
   transform: translate(-50%, -50%);
   opacity: 0.9;
-  filter: blur(1px);
 }
 
 .hero-ridge {
@@ -111,6 +139,65 @@
   }
 }
 
+/* Exhaust puffs drift up-and-back and fade; each starts from its own
+   attribute opacity. */
+.rig-smoke circle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: smoke-drift 2.4s ease-out infinite;
+}
+
+.rig-smoke circle:nth-child(2) {
+  animation-delay: 0.5s;
+}
+.rig-smoke circle:nth-child(3) {
+  animation-delay: 1s;
+}
+.rig-smoke circle:nth-child(4) {
+  animation-delay: 0.25s;
+}
+.rig-smoke circle:nth-child(5) {
+  animation-delay: 0.75s;
+}
+.rig-smoke circle:nth-child(6) {
+  animation-delay: 1.25s;
+}
+
+@keyframes smoke-drift {
+  to {
+    opacity: 0;
+    transform: translate(-8px, -10px);
+  }
+}
+
+/* Ghost rig crossing the download section's bottom border. */
+.mini-rig-track {
+  position: absolute;
+  bottom: -3px;
+  left: -140px;
+  width: 120px;
+  opacity: 0.4;
+  animation: travel-mini 32s linear infinite;
+}
+
+@keyframes travel-mini {
+  0% {
+    left: -140px;
+  }
+  100% {
+    left: 104%;
+  }
+}
+
+/* Soft dawn glow behind the download CTA. */
+.glow-amber {
+  background: radial-gradient(
+    ellipse 60% 55% at 50% 45%,
+    rgba(244, 161, 92, 0.09),
+    transparent 70%
+  );
+}
+
 /* ============ Route line that draws itself on scroll ============ */
 
 .route-draw {
@@ -123,10 +210,32 @@
   stroke-dashoffset: 0;
 }
 
+/* "You are here" marker on the route mock. */
+.you-dot {
+  animation: dot-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes dot-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .rig-track {
     animation: none;
     left: 20%;
+  }
+
+  .mini-rig-track {
+    animation: none;
+    left: 12%;
+  }
+
+  .rig-smoke circle,
+  .star-tw,
+  .you-dot {
+    animation: none;
   }
 
   .route-draw {

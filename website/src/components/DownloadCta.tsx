@@ -1,6 +1,12 @@
+import RigIllustration from "./RigIllustration";
+
 export default function DownloadCta() {
   return (
-    <section id="download" className="border-b border-cream/10 px-[8vw] py-24 text-center">
+    <section
+      id="download"
+      className="relative overflow-hidden border-b border-cream/10 px-[8vw] py-24 text-center"
+    >
+      <div className="glow-amber pointer-events-none absolute inset-0" aria-hidden="true" />
       <span className="mb-4 block font-mono text-xs uppercase tracking-[0.15em] text-amber">
         03 — Get the app
       </span>
@@ -21,6 +27,19 @@ export default function DownloadCta() {
       </a>
       <div className="mt-6 font-mono text-[11px] uppercase tracking-[0.1em] text-steel">
         DIRECT APK · ANDROID · GOOGLE PLAY COMING SOON
+      </div>
+      {/* Ghost rig rolling along the section's bottom border. */}
+      <div aria-hidden="true">
+        <RigIllustration
+          className="mini-rig-track"
+          colors={{
+            body: "#8A8378",
+            glass: "rgba(26,20,16,0.45)",
+            smoke: "#8A8378",
+            ribs: "rgba(26,20,16,0.6)",
+            light: "#FFB870",
+          }}
+        />
       </div>
     </section>
   );

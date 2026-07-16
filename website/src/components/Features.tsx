@@ -28,12 +28,22 @@ export default function Features() {
         Three jobs, one app
       </h2>
       <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {FEATURES.map(({ title, body, motif: Motif }) => (
+        {FEATURES.map(({ title, body, motif: Motif }, i) => (
           <article
             key={title}
-            className="rounded-md border border-cream/10 bg-gradient-to-br from-plum-deep to-charcoal p-8"
+            className="group relative rounded-md border border-cream/10 bg-gradient-to-br from-plum-deep to-charcoal p-8 transition-colors duration-300 hover:border-amber/40"
           >
-            <Motif />
+            <span
+              className="absolute right-6 top-6 font-mono text-[11px] text-steel"
+              aria-hidden="true"
+            >
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            {/* Horizontal drift on hover — same travel-the-horizon motion
+                language as the hero, never bounce. */}
+            <div className="transition-transform duration-500 ease-linear motion-safe:group-hover:translate-x-2">
+              <Motif />
+            </div>
             <h3 className="font-display mt-6 text-lg font-bold">{title}</h3>
             <p className="mt-3 text-sm leading-relaxed text-steel-light">{body}</p>
           </article>

@@ -29,10 +29,15 @@ export default function HowItWorks() {
         From the yard to the horizon
       </h2>
       <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_1.2fr]">
-        <ol className="space-y-8">
+        <ol className="relative space-y-8">
+          {/* Dashed route line threading the steps together. */}
+          <div
+            className="absolute bottom-6 left-[9px] top-3 border-l border-dashed border-steel/30"
+            aria-hidden="true"
+          />
           {STEPS.map((step) => (
-            <li key={step.n} className="flex gap-5">
-              <span className="font-mono text-sm text-rust" aria-hidden="true">
+            <li key={step.n} className="relative flex gap-5">
+              <span className="bg-near-black py-1 font-mono text-sm text-rust" aria-hidden="true">
                 {step.n}
               </span>
               <div>

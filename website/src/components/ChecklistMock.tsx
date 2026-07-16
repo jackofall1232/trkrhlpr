@@ -15,6 +15,19 @@ export default function ChecklistMock() {
           </div>
         </div>
       </div>
+      <div className="mb-4">
+        <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.1em] text-steel">
+          <span>Progress</span>
+          <span className="text-amber">87 of 131</span>
+        </div>
+        <div
+          className="mt-2 h-1 rounded-full bg-cream/10"
+          role="img"
+          aria-label="Inspection progress: 87 of 131 items complete"
+        >
+          <div className="h-1 w-2/3 rounded-full bg-gradient-to-r from-rust to-amber" />
+        </div>
+      </div>
       <ul>
         <li className="flex items-center gap-3 border-t border-cream/10 py-3.5">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber/10" aria-hidden="true">

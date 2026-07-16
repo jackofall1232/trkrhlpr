@@ -57,10 +57,16 @@ export function RidgelineMotif() {
   );
 }
 
-export function CanopyGlyph({ className }: { className?: string }) {
+export function CanopyGlyph({
+  className,
+  stroke = "#1A1410",
+}: {
+  className?: string;
+  stroke?: string;
+}) {
   return (
     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" className={className} aria-hidden="true">
-      <path d="M3,17 L3,11 Q3,8 8,8 L18,8 Q21,8 21,11 L21,17" stroke="#1A1410" strokeWidth="2" />
+      <path d="M3,17 L3,11 Q3,8 8,8 L18,8 Q21,8 21,11 L21,17" stroke={stroke} strokeWidth="2" />
     </svg>
   );
 }

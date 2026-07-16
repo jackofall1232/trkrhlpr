@@ -2,13 +2,13 @@ import RigScene from "./RigScene";
 
 export default function Hero() {
   return (
-    <section className="hero-sky relative flex min-h-screen flex-col justify-end overflow-hidden p-[8vw]">
+    <section className="hero-sky grain relative flex min-h-screen flex-col justify-end overflow-hidden p-[8vw]">
       <RigScene />
       <div className="relative z-10 mb-16 max-w-2xl lg:mb-8">
         <span className="inline-block rounded-sm bg-amber-bright px-2.5 py-1 font-mono text-xs uppercase tracking-[0.15em] text-near-black">
           Route planning for the long haul
         </span>
-        <h1 className="font-display mb-6 mt-5 text-[clamp(48px,8vw,96px)] font-extrabold leading-[0.95] tracking-[-0.01em] text-near-black">
+        <h1 className="font-display mb-6 mt-5 text-[clamp(48px,8vw,96px)] font-extrabold leading-[0.95] tracking-[-0.01em] text-near-black [text-shadow:0_2px_0_rgba(255,255,255,0.08)]">
           Last Wagon
         </h1>
         <p className="max-w-[460px] text-lg font-medium text-near-black/90 sm:text-xl">

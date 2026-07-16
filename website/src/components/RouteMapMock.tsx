@@ -58,7 +58,10 @@ export default function RouteMapMock() {
         />
         <circle cx="35" cy="130" r="6" fill="#F4A15C" />
         <circle cx="305" cy="130" r="6" fill="#F4A15C" />
-        <circle cx="170" cy="30" r="5" fill="#C4502A" />
+        {/* Waypoint stops along the corridor, plus the pulsing rig position. */}
+        <circle cx="123" cy="41.5" r="3" fill="#C7C0B4" opacity="0.7" />
+        <circle cx="217" cy="41.5" r="3" fill="#C7C0B4" opacity="0.7" />
+        <circle className="you-dot" cx="170" cy="30" r="5" fill="#C4502A" />
       </svg>
       <div className="mt-5 border-t border-cream/10 pt-4 font-mono text-[13px] uppercase tracking-[0.05em] text-steel-light">
         ETA 04:12 · MILE 1,204 · DIESEL $3.89/GAL

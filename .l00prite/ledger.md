@@ -541,3 +541,30 @@ Append one entry per agent run. Do not overwrite prior runs.
   that per-branch instruction is the recorded authorization for this push. No merge,
   deploy, or PR was performed.
 - **Lock:** 48f940f2-67fd-4d6a-90f6-1cdfa0d7a49d acquired and released.
+
+### Run 2026-07-16T20:06:22Z — Claude — Website design-improvement pass
+- **Goal:** Improve on the direction-board draft where warranted; the user explicitly
+  released the verbatim-port constraint ("if you see room for design improvement you may
+  make improvements").
+- **Triggering event:** Direct user message in the same remote session.
+- **Completed work:** Hero: starfield with staggered twinkle, horizon-haze slats masked
+  into the sun disc, film-grain overlay to kill gradient banding, animated exhaust puffs
+  (unclipped via extended viewBox), headlight and wheel-rim details on the rig; slim
+  overlay header (canopy glyph wordmark + always-reachable GET THE APK); feature cards
+  gained mono indices, amber border hover, and horizontal motif drift; how-it-works steps
+  threaded with a dashed route connector; route mock gained waypoint stops and a pulsing
+  position dot; checklist mock gained an 87-of-131 progress bar; download section gained
+  a radial amber glow and a low-opacity steel ghost rig traveling its bottom border. Rig
+  geometry refactored into color-parameterized RigIllustration; smooth anchor scrolling
+  (motion-safe only). All new motion is steady/linear per the motion language.
+- **Tests run / Verification:** Clean static `npm run build`; Chromium screenshots at
+  1440px and 390px; reduced-motion computed-style checks (hero rig parked at 20%, ghost
+  rig at 12%, smoke/twinkle/pulse animations off, route line pre-drawn).
+- **Failures:** None.
+- **Decisions:** Palette, type system, and motif language stay locked; improvements are
+  execution-level only. Ghost rig at 0.4 opacity so it reads as texture, not content.
+- **Confidence:** High; visually verified.
+- **Next action:** User review; CTA copy, signed-APK link, and Vercel deploy still
+  pending explicit approval.
+- **Push authorization:** Same designated-branch instruction as the prior run.
+- **Lock:** 78b835f0-1d51-4250-950a-0833b3c01f44 acquired and released.
