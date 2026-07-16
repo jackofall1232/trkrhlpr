@@ -568,3 +568,29 @@ Append one entry per agent run. Do not overwrite prior runs.
   pending explicit approval.
 - **Push authorization:** Same designated-branch instruction as the prior run.
 - **Lock:** 78b835f0-1d51-4250-950a-0833b3c01f44 acquired and released.
+
+### Run 2026-07-16T20:23:12Z — Claude — PR #13 review response (Codex + Gemini)
+- **Goal:** Triage the first review round on PR #13 (marketing website).
+- **Triggering event:** Codex and Gemini review webhooks.
+- **Completed work:** Codex raised three P1s that the feature copy claims unbuilt or
+  unverified capabilities (truck-stop directory, verified 131-point checklist,
+  "authoritative" CDL material). The findings match the blueprint's scope, so they were
+  escalated to the human owner rather than self-resolved; the owner decided the copy
+  stays ("there will be those things before the public sees the site") — recorded here
+  as the authorization to leave launch-scope claims in place, revisitable before any
+  public deployment. Gemini fixes applied: direction-board.html now loads the real
+  Archivo variable font (wdth axis; the old "Archivo Expanded" family URL returned 400)
+  with font-stretch:125% on display selectors, and the header wordmark links to "/"
+  instead of "#". Gemini's useId suggestion declined: RigScene is a single-use server
+  component with namespaced SVG ids; converting it to a client component would ship JS
+  for decorative art.
+- **Tests run / Verification:** Clean static build; corrected Google Fonts URL verified
+  HTTP 200 (old URL 400).
+- **Failures:** None.
+- **Decisions:** Marketing copy describes v1 launch scope per explicit owner decision;
+  technical review fixes applied where they improve correctness without cost.
+- **Confidence:** High.
+- **Next action:** Keep watching PR #13 until merged or closed; hourly self check-in
+  armed (trig_01AUgifGrKFyFiutPPMnyqqJ).
+- **Push authorization:** Same designated-branch instruction as prior runs.
+- **Lock:** 09ceea1d-6f25-4f23-91b2-8033f43b8955 acquired and released.

@@ -5,7 +5,7 @@ import { CanopyGlyph } from "./motifs";
 export default function SiteHeader() {
   return (
     <header className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-[8vw] py-6">
-      <a href="#" className="flex items-center gap-2.5" aria-label="Last Wagon — home">
+      <a href="/" className="flex items-center gap-2.5" aria-label="Last Wagon — home">
         <CanopyGlyph stroke="#F4A15C" />
         <span className="font-mono text-xs uppercase tracking-[0.2em] text-cream">
           Last Wagon

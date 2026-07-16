@@ -6,7 +6,9 @@
 <title>Last Wagon — Visual Direction</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<!-- "Archivo Expanded" is not a Google Fonts family; the expanded cut is the
+     wdth=125 axis of the Archivo variable font, selected via font-stretch. -->
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62.5..125,100..900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --near-black: #1A1410;
@@ -21,7 +23,7 @@
     --steel-light: #C7C0B4;
     --cream: #F0E9DC;
 
-    --font-display: 'Archivo Expanded', sans-serif;
+    --font-display: 'Archivo', sans-serif;
     --font-body: 'Archivo', sans-serif;
     --font-mono: 'Space Mono', monospace;
   }
@@ -54,6 +56,11 @@
     font-family: var(--font-display);
     font-weight: 800;
     letter-spacing: -0.01em;
+  }
+
+  /* Every display-type user gets the expanded (wdth=125) cut. */
+  h1, h2, h3, .display-big, .swatch-name, .ui-mock-title {
+    font-stretch: 125%;
   }
 
   /* ============ HERO / SIGNATURE ============ */
