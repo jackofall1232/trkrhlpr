@@ -1,6 +1,9 @@
 # Prioritized TODOs
 
 ## Next
+- [ ] Implement MapLibre GL Native Android wrapper for offline-first map viewing.
+- [ ] Implement OpenRouteService (ORS) API client for truck-safe (HGV) route calculation.
+- [ ] Build "Route Corridor" tile pre-fetching and local geometry persistence logic.
 - [ ] Research authoritative FMCSA and official CDL-manual sources for the 131-point checklist.
 - [ ] Define the exact checklist scope, sequence, vehicle configurations, and defect criteria.
 - [ ] Define objective acceptance criteria for Study Mode and Real Inspection Mode.
@@ -8,14 +11,15 @@
 - [ ] Define daily safety-question sourcing, review, and update rules.
 - [ ] Run visual, accessibility, and connected Compose tests on representative phone and tablet hardware.
 - [ ] Review and approve the production foundation before importing authoritative content.
+- [ ] Implement CDL mock exams feature with randomized tests and readiness scoring.
+- [ ] Design and implement STAA-compliant truck routing subsystem.
+- [ ] Integrate bridge height awareness and clearance warnings into routing.
+- [ ] Implement comprehensive truck stop locations dataset and search features.
 
 ## Later
 - [ ] Define accessibility, privacy, local-data retention, backup, export, reset, and migration requirements.
 - [ ] Define APK signing, sideload distribution, and update strategy.
-- [ ] Define test-history, missed-question review, randomized-test, and readiness-scoring behavior.
 - [ ] Define inspection timestamps, notes, and optional defect-reporting behavior.
-- [ ] After the core product is stable, research an open national truck-stop dataset subsystem.
-- [ ] Long term, research safety-critical open-source commercial-truck GPS and routing.
 - [ ] Consider School Bus, Doubles/Triples, and other CDL categories after the initial scope.
 - [ ] Revisit online accounts and cloud synchronization only after explicit future approval.
 
