@@ -771,3 +771,21 @@ Append one entry per agent run. Do not overwrite prior runs.
   build-out after an explicit EXECUTE confirmation.
 - **Push authorization:** Same designated-branch instruction; push updates PR #15.
 - **Lock:** a7b3f0d2-5e19-4c86-b4a1-9f2c6e83d504 acquired and released.
+
+### Run 2026-07-16T22:00:20Z — Claude — PR #15 merged
+- **Goal:** Record the merge outcome and close out the PR-watch.
+- **Triggering event:** GitHub webhook — PR #15 merged into 0.0.6-alpha; session
+  auto-unsubscribed.
+- **Completed work:** Recorded the merge in state/heartbeat. The content docs
+  (`docs/content-sourcing.md`, `docs/pretrip-132-checklist.md`), the CI workflow
+  (`.github/workflows/ci.yml`), the count=132 sweep, and the build-out backlog are now on
+  the base branch. Deleted the hourly self-check-in trigger
+  (trig_01562ErpcTSHKXAE8W7PkFaK) — the PR is a terminal state.
+- **Tests run / Verification:** N/A (outcome-recording only).
+- **Failures:** None.
+- **Decisions:** PR #15 is finished and must not be reopened/reused. Next-week build-out is
+  a fresh change on a branch restarted from the latest default branch.
+- **Confidence:** High.
+- **Next action:** Await the owner's go for the next-week Execution Mode build-out
+  (execute-loop pre-flight + EXECUTE on a fresh branch).
+- **Lock:** b8d4c1e6-2f70-4a93-8c15-3e6a9d0b7f22 acquired and released.
