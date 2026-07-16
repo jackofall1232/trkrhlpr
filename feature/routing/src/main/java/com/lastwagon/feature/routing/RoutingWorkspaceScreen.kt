@@ -11,11 +11,15 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lastwagon.core.model.*
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.launch
+import java.text.DateFormat
+import java.util.Date
 import java.util.Locale
 
 @Composable
@@ -24,21 +28,44 @@ fun RoutingWorkspaceScreen(
     routingProvider: RoutingProvider,
     routeRepository: RouteRepository,
     modifier: Modifier = Modifier,
+    styleProvider: MapStyleProvider = OpenFreeMapLibertyStyleProvider,
+    corridorManager: OfflineCorridorManager? = null,
+    networkMonitor: NetworkMonitor? = null,
 ) {
+    val context = LocalContext.current
+    val corridor = corridorManager ?: remember { OfflineCorridorManager(context) }
+    val monitor = networkMonitor ?: remember { NetworkMonitor(context) }
     val profile by repository.profile.collectAsStateWithLifecycle(initialValue = null)
     val savedRoute by routeRepository.lastRoute.collectAsStateWithLifecycle(initialValue = null)
+    val corridorState by corridor.state.collectAsStateWithLifecycle()
+    val online by monitor.online.collectAsStateWithLifecycle()
     var editing by rememberSaveable { mutableStateOf(false) }
     var planning by rememberSaveable { mutableStateOf(false) }
     var reviewing by rememberSaveable { mutableStateOf(false) }
     var showMap by rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
+    // A corridor is only ever kept for the exact saved route; anything else is deleted.
+    // Collect the repository flow directly: its first emission is the real persisted
+    // state, so a stored corridor is never discarded on the pre-load null placeholder.
+    LaunchedEffect(routeRepository, corridor) {
+        routeRepository.lastRoute
+            .distinctUntilChangedBy { it?.provenance?.requestId to it?.review }
+            .collect { corridor.refresh(it) }
+    }
+
     if (showMap && canOpenRouteMap(savedRoute)) {
         Column(modifier.fillMaxSize()) {
             TextButton(onClick = { showMap = false }, modifier = Modifier.padding(horizontal = 8.dp)) {
                 Text("Back to vehicle profile")
             }
-            RoutingMapScreen(Modifier.weight(1f), route = savedRoute)
+            RoutingMapScreen(
+                Modifier.weight(1f),
+                styleProvider = styleProvider,
+                route = savedRoute,
+                online = online,
+                corridorState = corridorState,
+            )
         }
     } else if (reviewing && savedRoute != null && profile != null) {
         RouteReviewScreen(
@@ -54,6 +81,7 @@ fun RoutingWorkspaceScreen(
             profile = requireNotNull(profile),
             routingProvider = routingProvider,
             routeRepository = routeRepository,
+            online = online,
             onBack = { planning = false },
             onRouteSaved = { planning = false; reviewing = true },
             modifier = modifier,
@@ -74,7 +102,18 @@ fun RoutingWorkspaceScreen(
             onPlanRoute = { planning = true },
             onReviewRoute = { reviewing = true },
             onOpenMap = { if (canOpenRouteMap(savedRoute)) showMap = true },
-            onDeleteRoute = { scope.launch { routeRepository.clear() } },
+            onDeleteRoute = {
+                corridor.delete()
+                scope.launch { routeRepository.clear() }
+            },
+            corridorState = corridorState,
+            mapStyle = styleProvider.style(),
+            online = online,
+            onDownloadCorridor = { detail ->
+                savedRoute?.let { corridor.download(it, styleProvider.style(), detail) }
+            },
+            onCancelCorridor = { corridor.cancel() },
+            onDeleteCorridor = { corridor.delete() },
             modifier = modifier,
         )
     }
@@ -191,40 +230,192 @@ private fun VehicleProfileSummary(
     onReviewRoute: () -> Unit,
     onOpenMap: () -> Unit,
     onDeleteRoute: () -> Unit,
+    corridorState: CorridorState,
+    mapStyle: MapStyleDescriptor,
+    online: Boolean,
+    onDownloadCorridor: (CorridorDetail) -> Unit,
+    onCancelCorridor: () -> Unit,
+    onDeleteCorridor: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier.fillMaxSize().padding(20.dp),
+    LazyColumn(
+        modifier.fillMaxSize(),
+        contentPadding = PaddingValues(20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("Confirmed vehicle profile", style = MaterialTheme.typography.headlineMedium)
-        Text(profile.vehicleType.displayName, style = MaterialTheme.typography.titleLarge)
-        Text("Height ${profile.heightMeters.toFeetText()} ft · Width ${profile.widthMeters.toFeetText()} ft")
-        Text("Length ${profile.lengthMeters.toFeetText()} ft · ${profile.axleCount} axles")
-        Text("Gross ${profile.grossWeightTonnes.toPoundsText()} lb · Axle load ${profile.axleLoadTonnes.toPoundsText()} lb")
-        Text(if (profile.hazmat) "Hazmat: yes" else "Hazmat: no")
-        Text("Reconfirm after any equipment or load change.", color = MaterialTheme.colorScheme.error)
-        Spacer(Modifier.weight(1f))
-        OutlinedButton(onClick = onEdit, modifier = Modifier.fillMaxWidth()) { Text("Edit and reconfirm") }
-        Button(onClick = onPlanRoute, modifier = Modifier.fillMaxWidth()) { Text("Calculate route preview") }
+        item {
+            Text("Confirmed vehicle profile", style = MaterialTheme.typography.headlineMedium)
+            Text(profile.vehicleType.displayName, style = MaterialTheme.typography.titleLarge)
+            Text("Height ${profile.heightMeters.toFeetText()} ft · Width ${profile.widthMeters.toFeetText()} ft")
+            Text("Length ${profile.lengthMeters.toFeetText()} ft · ${profile.axleCount} axles")
+            Text("Gross ${profile.grossWeightTonnes.toPoundsText()} lb · Axle load ${profile.axleLoadTonnes.toPoundsText()} lb")
+            Text(if (profile.hazmat) "Hazmat: yes" else "Hazmat: no")
+            Text("Reconfirm after any equipment or load change.", color = MaterialTheme.colorScheme.error)
+        }
+        if (!online) item {
+            Text("OFFLINE — saved data only. New routes cannot be calculated.",
+                color = MaterialTheme.colorScheme.error)
+        }
+        item {
+            OutlinedButton(onClick = onEdit, modifier = Modifier.fillMaxWidth()) { Text("Edit and reconfirm") }
+        }
+        item {
+            Button(onClick = onPlanRoute, modifier = Modifier.fillMaxWidth()) { Text("Calculate route preview") }
+        }
         if (savedRoute != null) {
-            if (savedRoute.hasCurrentDriverReview) {
-                Text("Route state: DRIVER REVIEWED", color = MaterialTheme.colorScheme.tertiary)
-                OutlinedButton(onClick = onOpenMap, modifier = Modifier.fillMaxWidth()) {
-                    Text("Open reviewed route")
+            item {
+                if (savedRoute.hasCurrentDriverReview) {
+                    Text("Route state: DRIVER REVIEWED", color = MaterialTheme.colorScheme.tertiary)
+                    OutlinedButton(onClick = onOpenMap, modifier = Modifier.fillMaxWidth()) {
+                        Text("Open reviewed route")
+                    }
+                } else {
+                    Text("Route state: UNVERIFIED", color = MaterialTheme.colorScheme.error)
+                    OutlinedButton(onClick = onReviewRoute, modifier = Modifier.fillMaxWidth()) {
+                        Text("Review saved route")
+                    }
                 }
-            } else {
-                Text("Route state: UNVERIFIED", color = MaterialTheme.colorScheme.error)
-                OutlinedButton(onClick = onReviewRoute, modifier = Modifier.fillMaxWidth()) {
-                    Text("Review saved route")
+                if (savedRoute.warnings.isNotEmpty())
+                    Text("Route state: DATA WARNING", color = MaterialTheme.colorScheme.error)
+                if (!online || savedRoute.isStale())
+                    Text("Route state: OFFLINE / STALE", color = MaterialTheme.colorScheme.error)
+            }
+            if (savedRoute.hasCurrentDriverReview) {
+                item {
+                    OfflineCorridorCard(
+                        route = savedRoute,
+                        corridorState = corridorState,
+                        mapStyle = mapStyle,
+                        online = online,
+                        onDownload = onDownloadCorridor,
+                        onCancel = onCancelCorridor,
+                        onDelete = onDeleteCorridor,
+                    )
                 }
             }
-            if (savedRoute.warnings.isNotEmpty())
-                Text("Route state: DATA WARNING", color = MaterialTheme.colorScheme.error)
-            if (savedRoute.isStale())
-                Text("Route state: OFFLINE / STALE", color = MaterialTheme.colorScheme.error)
-            TextButton(onClick = onDeleteRoute, modifier = Modifier.fillMaxWidth()) {
-                Text("Delete saved route")
+            item {
+                TextButton(onClick = onDeleteRoute, modifier = Modifier.fillMaxWidth()) {
+                    Text("Delete saved route")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun OfflineCorridorCard(
+    route: CalculatedRoute,
+    corridorState: CorridorState,
+    mapStyle: MapStyleDescriptor,
+    online: Boolean,
+    onDownload: (CorridorDetail) -> Unit,
+    onCancel: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    OutlinedCard(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Offline route corridor", style = MaterialTheme.typography.titleLarge)
+            Text(
+                "Saves map data along this reviewed route for viewing without a connection. " +
+                    "Offline viewing never updates restrictions and never reroutes.",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            when (corridorState) {
+                is CorridorState.None, is CorridorState.Failed -> {
+                    if (corridorState is CorridorState.Failed) {
+                        Text(corridorState.message, color = MaterialTheme.colorScheme.error)
+                    }
+                    val refusal = OfflineCorridor.downloadRefusalReason(route, mapStyle)
+                    if (refusal != null) {
+                        Text(refusal, color = MaterialTheme.colorScheme.error)
+                    } else if (!online) {
+                        Text("Reconnect to download the corridor for offline use.",
+                            color = MaterialTheme.colorScheme.error)
+                    } else {
+                        var selected by rememberSaveable { mutableStateOf(CorridorDetail.STANDARD) }
+                        var menuOpen by remember { mutableStateOf(false) }
+                        val estimate = remember(route.provenance.requestId, selected) {
+                            OfflineCorridor.estimateTileCount(route.geometry, selected)
+                        }
+                        Box {
+                            OutlinedButton(onClick = { menuOpen = true }, modifier = Modifier.fillMaxWidth()) {
+                                Text(selected.displayName, Modifier.weight(1f))
+                                Icon(Icons.Rounded.ArrowDropDown, null)
+                            }
+                            DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                                CorridorDetail.entries.forEach { detail ->
+                                    DropdownMenuItem(text = { Text(detail.displayName) }, onClick = {
+                                        selected = detail
+                                        menuOpen = false
+                                    })
+                                }
+                            }
+                        }
+                        Text(
+                            "About $estimate map tiles (limit ${OfflineCorridor.MAX_TILES}). " +
+                                "Exact size is shown while downloading.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Button(
+                            onClick = { onDownload(selected) },
+                            enabled = estimate <= OfflineCorridor.MAX_TILES,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) { Text("Download offline corridor") }
+                        if (estimate > OfflineCorridor.MAX_TILES) {
+                            Text("Too large at this detail level — choose a lower one.",
+                                color = MaterialTheme.colorScheme.error)
+                        }
+                    }
+                }
+                is CorridorState.Preparing -> {
+                    LinearProgressIndicator(Modifier.fillMaxWidth())
+                    Text("Preparing corridor download…")
+                    TextButton(onClick = onCancel, modifier = Modifier.fillMaxWidth()) { Text("Cancel") }
+                }
+                is CorridorState.Downloading -> {
+                    if (corridorState.requiredCountIsPrecise && corridorState.requiredResources > 0) {
+                        LinearProgressIndicator(
+                            progress = {
+                                (corridorState.completedResources.toFloat() /
+                                    corridorState.requiredResources).coerceIn(0f, 1f)
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        Text("Downloading ${corridorState.completedResources} of " +
+                            "${corridorState.requiredResources} resources · " +
+                            corridorState.completedBytes.toMegabytesText())
+                    } else {
+                        LinearProgressIndicator(Modifier.fillMaxWidth())
+                        Text("Downloading… ${corridorState.completedBytes.toMegabytesText()} so far")
+                    }
+                    TextButton(onClick = onCancel, modifier = Modifier.fillMaxWidth()) {
+                        Text("Cancel and delete download")
+                    }
+                }
+                is CorridorState.Ready -> {
+                    val expired = OfflineCorridor.isExpired(
+                        corridorState.metadata, System.currentTimeMillis(),
+                    )
+                    Text(
+                        "Corridor saved · ${corridorState.completedBytes.toMegabytesText()} · " +
+                            "${corridorState.completedTiles} tiles",
+                        color = MaterialTheme.colorScheme.tertiary,
+                    )
+                    Text("Downloaded ${corridorState.metadata.createdAtEpochMillis.toDateText()} · " +
+                        "expires ${corridorState.metadata.expiresAtEpochMillis.toDateText()}")
+                    if (expired) {
+                        Text(
+                            "CORRIDOR EXPIRED — map and restriction data may be outdated. " +
+                                "Delete it and download again while connected.",
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
+                    TextButton(onClick = onDelete, modifier = Modifier.fillMaxWidth()) {
+                        Text("Delete offline corridor")
+                    }
+                }
             }
         }
     }
@@ -235,6 +426,7 @@ private fun RoutePlanner(
     profile: VehicleProfile,
     routingProvider: RoutingProvider,
     routeRepository: RouteRepository,
+    online: Boolean,
     onBack: () -> Unit,
     onRouteSaved: () -> Unit,
     modifier: Modifier = Modifier,
@@ -257,6 +449,12 @@ private fun RoutePlanner(
             Text(
                 "Phase 3 accepts coordinates only. Results are unreviewed decision support based on available data—not proof of legality, clearance, or safety.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        if (!online) item {
+            Text(
+                "OFFLINE — new routes cannot be calculated and this app never reroutes offline. Reconnect to plan a route.",
+                color = MaterialTheme.colorScheme.error,
             )
         }
         item { DecimalField(originLatitude, { originLatitude = it }, "Origin latitude") }
@@ -284,7 +482,7 @@ private fun RoutePlanner(
         }
         item {
             Button(
-                enabled = !calculating,
+                enabled = !calculating && online,
                 onClick = {
                     val origin = GeoPoint(originLatitude.toDoubleOrNull() ?: Double.NaN,
                         originLongitude.toDoubleOrNull() ?: Double.NaN)
@@ -511,6 +709,8 @@ private val CommercialVehicleType.displayName get() = when (this) {
     CommercialVehicleType.OTHER -> "Other commercial vehicle"
 }
 
+private fun Long.toMegabytesText() = String.format(Locale.US, "%.1f MB", this / (1024.0 * 1024.0))
+private fun Long.toDateText(): String = DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(this))
 private fun Double.toFeetText() = String.format(Locale.US, "%.2f", VehicleUnitConversions.metersToFeet(this))
 private fun Double.toPoundsText() = String.format(Locale.US, "%.0f", VehicleUnitConversions.metricTonnesToPounds(this))
 private fun Double.toMilesText() = String.format(Locale.US, "%.1f", this / 1609.344)

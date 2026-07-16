@@ -39,15 +39,22 @@ import org.maplibre.android.style.sources.GeoJsonSource
 import org.maplibre.geojson.LineString
 import org.maplibre.geojson.Point
 import com.lastwagon.core.model.CalculatedRoute
+import com.lastwagon.core.model.GeoPoint
 import com.lastwagon.core.model.hasCurrentDriverReview
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 private enum class MapLoadState { LOADING, READY }
+
+private const val OFF_CORRIDOR_POLL_MILLIS = 15_000L
 
 @Composable
 fun RoutingMapScreen(
     modifier: Modifier = Modifier,
     styleProvider: MapStyleProvider = MapLibreDemoStyleProvider,
     route: CalculatedRoute? = null,
+    online: Boolean = true,
+    corridorState: CorridorState = CorridorState.None,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -63,6 +70,7 @@ fun RoutingMapScreen(
         mutableStateOf(context.hasCoarseLocationPermission())
     }
     var locationDenied by remember { mutableStateOf(false) }
+    var offCorridor by remember { mutableStateOf(false) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -144,6 +152,34 @@ fun RoutingMapScreen(
         }
     }
 
+    // Passive off-corridor check: compare the approximate position against the reviewed
+    // route line. This is a stop-and-reassess warning, never navigation or rerouting.
+    LaunchedEffect(map, locationGranted, route?.provenance?.requestId) {
+        val readyMap = map
+        val geometry = route?.geometry.orEmpty()
+        if (readyMap == null || !locationGranted || geometry.size < 2) {
+            offCorridor = false
+            return@LaunchedEffect
+        }
+        while (isActive) {
+            val location = runCatching {
+                if (readyMap.locationComponent.isLocationComponentActivated) {
+                    readyMap.locationComponent.lastKnownLocation
+                } else null
+            }.getOrNull()
+            offCorridor = if (location == null) false else {
+                val distance = GeoMath.distanceToPolylineMeters(
+                    GeoPoint(location.latitude, location.longitude), geometry,
+                )
+                OfflineCorridor.isOffCorridor(
+                    distance,
+                    if (location.hasAccuracy()) location.accuracy.toDouble() else null,
+                )
+            }
+            delay(OFF_CORRIDOR_POLL_MILLIS)
+        }
+    }
+
     Box(modifier.fillMaxSize()) {
         AndroidView(factory = { mapView }, modifier = Modifier.fillMaxSize())
 
@@ -168,15 +204,59 @@ fun RoutingMapScreen(
                     if (calculated.warnings.isNotEmpty()) Text("Route: DATA WARNING",
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.error)
-                    if (System.currentTimeMillis() - calculated.provenance.receivedAtEpochMillis >
+                    val corridorExpired = (corridorState as? CorridorState.Ready)?.let {
+                        OfflineCorridor.isExpired(it.metadata, System.currentTimeMillis())
+                    } == true
+                    if (!online || corridorExpired ||
+                        System.currentTimeMillis() - calculated.provenance.receivedAtEpochMillis >
                         24 * 60 * 60 * 1000L
                     ) Text("Route: OFFLINE / STALE", style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.error)
                 }
+                when (corridorState) {
+                    is CorridorState.Ready -> Text(
+                        "Offline corridor saved — live updates and rerouting unavailable offline",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    is CorridorState.Downloading -> Text(
+                        "Offline corridor still downloading",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    else -> if (!online) Text(
+                        "No offline corridor — map areas may be missing while offline",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+                if (!online) Text(
+                    "OFFLINE — showing locally saved data only",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.error,
+                )
                 Text(
-                    if (loadState == MapLoadState.READY) "Map loaded" else "Loading evaluation map…",
+                    if (loadState == MapLoadState.READY) "Map loaded" else "Loading map…",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+
+        if (offCorridor) {
+            Surface(
+                modifier = Modifier.align(Alignment.BottomCenter)
+                    .padding(start = 12.dp, end = 12.dp, bottom = 44.dp),
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.errorContainer,
+                tonalElevation = 6.dp,
+            ) {
+                Text(
+                    "Approximate location is OUTSIDE the saved route corridor. Stop and " +
+                        "reassess using official information. This app never reroutes offline.",
+                    modifier = Modifier.padding(16.dp),
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
         }

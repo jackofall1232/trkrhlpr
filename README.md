@@ -22,14 +22,19 @@ The production foundation is native Kotlin and Jetpack Compose, targeting Androi
 - Room-backed versioned content/progress storage
 - DataStore-backed theme and accessibility preferences
 - offline core tools with no account or analytics
-- an online, read-only MapLibre evaluation map with optional approximate location
+- an online, read-only MapLibre map with optional approximate location
 - a locally stored, validated, driver-confirmed commercial-vehicle profile
 - an unreviewed ORS HGV route preview using coordinate entry and local route provenance
 - a mandatory route-overview and driver-review gate before route-map access
+- an offline route corridor download along a reviewed route (bounded size, live progress,
+  cancellation, expiry, and deletion), with recorded provider-terms research
+- explicit offline/stale route states, no offline rerouting, and an approximate-location
+  off-corridor stop-and-reassess warning
 
-Truck-stop discovery and commercial-truck routing/GPS remain future research items and
-remain outside the production milestone. Phase 3 can calculate and display an explicitly
-unreviewed route preview; it is not navigation or a truck-safe-route guarantee.
+Truck-stop discovery and full commercial-truck routing/GPS remain future research items
+and remain outside the production milestone. Routing Phases 0–5 provide reviewed,
+vehicle-aware route planning with offline corridor viewing; this is decision support,
+never navigation, rerouting, or a truck-safe-route guarantee.
 
 ## Project structure
 

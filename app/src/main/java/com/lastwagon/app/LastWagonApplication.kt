@@ -4,8 +4,12 @@ import android.app.Application
 import com.lastwagon.core.data.*
 import com.lastwagon.core.model.*
 import kotlinx.coroutines.*
-import com.lastwagon.feature.routing.OrsRoutingProvider
 import com.lastwagon.feature.routing.FileRouteRepository
+import com.lastwagon.feature.routing.MapStyleProvider
+import com.lastwagon.feature.routing.NetworkMonitor
+import com.lastwagon.feature.routing.OfflineCorridorManager
+import com.lastwagon.feature.routing.OpenFreeMapLibertyStyleProvider
+import com.lastwagon.feature.routing.OrsRoutingProvider
 
 class LastWagonApplication : Application() {
     lateinit var container: AppContainer
@@ -28,4 +32,7 @@ class AppContainer(application: Application) {
     val vehicleProfileRepository: VehicleProfileRepository = DataStoreVehicleProfileRepository(application)
     val routingProvider: RoutingProvider = OrsRoutingProvider(BuildConfig.ORS_API_KEY)
     val routeRepository: RouteRepository = FileRouteRepository(application)
+    val mapStyleProvider: MapStyleProvider = OpenFreeMapLibertyStyleProvider
+    val networkMonitor = NetworkMonitor(application)
+    val corridorManager = OfflineCorridorManager(application)
 }

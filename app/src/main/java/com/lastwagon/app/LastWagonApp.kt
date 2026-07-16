@@ -135,6 +135,9 @@ fun LastWagonApp(container: AppContainer) {
                                     container.vehicleProfileRepository,
                                     container.routingProvider,
                                     container.routeRepository,
+                                    styleProvider = container.mapStyleProvider,
+                                    corridorManager = container.corridorManager,
+                                    networkMonitor = container.networkMonitor,
                                 )
                             }
                         }
