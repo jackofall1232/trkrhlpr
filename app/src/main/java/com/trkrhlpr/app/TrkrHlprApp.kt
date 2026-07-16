@@ -16,6 +16,7 @@ import com.trkrhlpr.core.designsystem.*
 import com.trkrhlpr.core.model.*
 import com.trkrhlpr.feature.dashboard.*
 import com.trkrhlpr.feature.learning.*
+import com.trkrhlpr.feature.routing.*
 import kotlinx.coroutines.launch
 
 private object Routes {
@@ -25,6 +26,7 @@ private object Routes {
     const val Inspection = "inspection"
     const val Practice = "practice"
     const val Daily = "daily"
+    const val Routing = "routing"
 }
 
 private data class Destination(val route: String, val label: String, val icon: ImageVector)
@@ -101,6 +103,7 @@ fun TrkrHlprApp(container: AppContainer) {
                                 onPractice = { navController.navigate(Routes.Practice) },
                                 onDaily = { navController.navigate(Routes.Daily) },
                                 onProgress = { navController.navigateTop(Routes.Progress) },
+                                onRouting = { navController.navigate(Routes.Routing) },
                             )
                         }
                         composable(Routes.Progress) {
@@ -124,6 +127,11 @@ fun TrkrHlprApp(container: AppContainer) {
                         composable(Routes.Daily) {
                             ScreenWithBack("Daily safety", { navController.popBackStack() }) {
                                 DailyQuestionScreen(container.contentRepository, container.progressRepository)
+                            }
+                        }
+                        composable(Routes.Routing) {
+                            ScreenWithBack("Route map", { navController.popBackStack() }) {
+                                RoutingMapScreen()
                             }
                         }
                     }

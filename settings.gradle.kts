@@ -24,5 +24,5 @@ include(
     ":core:testing",
     ":feature:dashboard",
     ":feature:learning",
+    ":feature:routing",
 )
-

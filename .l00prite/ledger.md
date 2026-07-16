@@ -215,3 +215,43 @@ Append one entry per agent run. Do not overwrite prior runs.
   `docs/phased-truck-routing-plan`. `gh pr create` could not create the PR because GitHub
   CLI has no API authentication; SSH authentication alone does not authenticate the CLI.
   The branch is available at GitHub's PR creation URL.
+
+### Run 2026-07-16T16:43:23Z — Codex — Phase 1 read-only MapLibre map
+- **Goal:** Implement the approved Phase 1 map foundation on `0.0.2-alpha` without adding
+  route calculation or offline prefetching.
+- **Triggering event:** User explicitly requested Phase 1 implementation on `0.0.2-alpha`.
+- **Completed work:** Added the `feature:routing` module with MapLibre Native Android
+  13.0.2, a Compose-hosted lifecycle-aware `MapView`, replaceable `MapStyleProvider`, zoom
+  controls, visible evaluation limitations and attribution, and opt-in approximate location
+  with denial handling. Added dashboard/navigation entry, Internet and coarse-location
+  permissions, a provider evaluation record, unit/navigation tests, and accurate README
+  privacy/module documentation. Explicitly removed MapLibre's transitive fine-location
+  permission from the packaged manifest.
+- **Provider decision:** The token-free MapLibre demo world style is approved only for
+  development/evaluation because it is MapLibre's documented quickstart/example source.
+  It is not a production truck-map or offline-prefetch provider. Phase 5 still requires a
+  separate licensing, attribution, availability, privacy, caching, and offline-terms review.
+- **Tests run / Verification:**
+  - command: `env ANDROID_HOME=/opt/android-sdk ./gradlew :feature:routing:testDebugUnitTest
+    :app:assembleDebug :app:assembleDebugAndroidTest lintDebug`; exit_code: 0; summary:
+    routing unit test, debug APK, instrumentation-test APK, and full lint suite passed;
+    timestamp: 2026-07-16T16:43:23Z.
+  - command: `aapt dump permissions app/build/outputs/apk/debug/app-debug.apk`; exit_code: 0;
+    summary: Internet and coarse location present; fine location absent;
+    timestamp: 2026-07-16T16:43:23Z.
+  - command: `git diff --check`; exit_code: 0; summary: no whitespace errors;
+    timestamp: 2026-07-16T16:43:23Z.
+  - artifact: `app/build/outputs/apk/debug/app-debug.apk`; SHA-256:
+    `94aacfbb801553cb058a4cb15dd51a25d9313530e821cba8add195c8ce0972ad`.
+- **Failures:** The first Gradle invocation lacked `ANDROID_HOME`; the SDK was found at
+  `/opt/android-sdk` and subsequent verification succeeded. The initial packaged manifest
+  exposed MapLibre's transitive fine-location declaration; it was removed and the package
+  was rebuilt and re-audited.
+- **Decision:** No routing, route claims, background location, telemetry, tile prefetching,
+  or offline-region download was implemented. Core learning/inspection behavior remains
+  offline. Device execution was not available in this environment.
+- **Confidence:** High for build/lint/package integrity; medium-high for runtime rendering
+  until representative phone/tablet checks exercise lifecycle, network loss, and location
+  grant/denial.
+- **Next action:** Complete the Phase 1 physical-device exit check before beginning Phase 2.
+- **Lock:** e47059cc-d5cf-48c9-b60a-759978ed8131 acquired for this implementation run.
