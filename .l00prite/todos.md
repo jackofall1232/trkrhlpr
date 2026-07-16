@@ -15,11 +15,17 @@
   off-corridor warning with approximate location.
 - [ ] Obtain written confirmation of OpenFreeMap public-instance offline-prefetch terms
   (or move to self-hosting/a keyed commercial provider) before any production release.
-- [ ] Research authoritative FMCSA and official CDL-manual sources for the 131-point checklist.
-- [ ] Define the exact checklist scope, sequence, vehicle configurations, and defect criteria.
+- [ ] Human review and approval of `docs/content-sourcing.md` and
+  `docs/pretrip-131-checklist.md` (content basis, licensing boundaries, and the honest
+  "131 is a product enumeration" framing) before any content authoring or import.
+- [ ] Resolve the 10 PARTIAL and 3 UNVERIFIED checklist items and the flagged UNVERIFIED
+  facts in `docs/content-sourcing.md` by line-by-line verification against the FMCSA model
+  manual PDF and eCFR full text — needs a session/machine whose network can fetch them
+  (this remote environment's policy blocks those hosts).
 - [ ] Define objective acceptance criteria for Study Mode and Real Inspection Mode.
-- [ ] Research lawful authoritative sources and provenance rules for each CDL category.
-- [ ] Define daily safety-question sourcing, review, and update rules.
+- [ ] Design the content-schema additions (per-item source citation, verification
+  date/status, applicability flags COMBO/AIR/IF-EQUIPPED) as a reviewed Room migration
+  before authoritative content import.
 - [ ] Run visual, accessibility, and connected Compose tests on representative phone and tablet hardware.
 - [ ] Review and approve the production foundation before importing authoritative content.
 - [ ] Implement CDL mock exams feature with randomized tests and readiness scoring.
@@ -43,6 +49,20 @@
 
 ## Done
 - Move completed items here with dates when helpful.
+- [x] 2026-07-16: Researched authoritative FMCSA/CDL-manual sources for the 131-point
+  checklist and defined its exact scope, sequence, vehicle applicability, and per-item
+  check criteria with citations and verification statuses (`docs/pretrip-131-checklist.md`).
+  Key finding: "131-point" is not an official term — it is Last Wagon's enumeration of
+  Section 11 + 49 CFR content and must be presented as such.
+- [x] 2026-07-16: Researched lawful, publicly available sources and provenance rules for
+  every first-milestone CDL category and the daily safety question
+  (`docs/content-sourcing.md`). Key finding: the AAMVA model CDL manual (even on
+  fmcsa.dot.gov) is AAMVA-copyrighted, SDLA-only — reference-only; CFR text and
+  FMCSA-authored materials are public domain; AAMVA secure test items and CVSA OOSC are
+  excluded.
+- [x] 2026-07-16: Defined daily safety-question sourcing, review, and update rules
+  (public-domain-first citation rule, currency re-verification, safety framing) in
+  `docs/content-sourcing.md`.
 - [x] 2026-07-16: Built the marketing website v1 scaffold under `website/` (Next.js +
   Tailwind, locked palette/type system, ported hero rig animation, features,
   how-it-works mockups, download CTA), verified via production build and Chromium

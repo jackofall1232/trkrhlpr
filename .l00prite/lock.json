@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "lock_id": "5c1a7c8e-9d24-4b6f-a7e3-131e2f6a0c44",
-  "owner_agent": "claude",
-  "owner_session": "claude/131-pretrip-accuracy-review-7p7u9g",
+  "owner_agent": null,
+  "owner_session": null,
   "acquired_at": "2026-07-16T20:45:00Z",
   "expires_at": "2026-07-16T22:45:00Z",
   "ttl_seconds": 7200,
-  "purpose": "authoritative-source research and content-provenance documentation for the 131-point pre-trip checklist and CDL/endorsement study content; todo phase scan",
+  "purpose": null,
   "protected_paths": [
     "ledger.md",
     "memory.md",
@@ -18,5 +18,5 @@
     "reviews/",
     "sessions/"
   ],
-  "status": "active"
+  "status": "released"
 }

@@ -594,3 +594,48 @@ Append one entry per agent run. Do not overwrite prior runs.
   armed (trig_01AUgifGrKFyFiutPPMnyqqJ).
 - **Push authorization:** Same designated-branch instruction as prior runs.
 - **Lock:** 09ceea1d-6f25-4f23-91b2-8033f43b8955 acquired and released.
+
+### Run 2026-07-16T20:58:52Z — Claude — Content-source research: 131-point checklist and CDL/endorsement material
+- **Goal:** Verify that the planned 131-point pre-trip and all CDL class/endorsement study
+  content can be based on real, publicly available authoritative sources; define the
+  checklist; scan todos for phases implementable now (direct user request).
+- **Triggering event:** Direct user message in a Claude Code remote session on designated
+  branch `claude/131-pretrip-accuracy-review-7p7u9g`.
+- **Completed work:** (1) `docs/content-sourcing.md` — authoritative source registry,
+  licensing boundaries, authoring/provenance rules, and verification gaps for the pre-trip
+  checklist, CDL classes (49 CFR 383 subparts F/G/H), endorsements H/N/P (383.121/.119/
+  .117 + HMR/Part 397/TSA 1572), and daily safety questions (FMCSA public-domain
+  materials, Part 392/395). (2) `docs/pretrip-131-checklist.md` — full 131-item
+  enumeration with sequence, applicability flags, per-item check criteria, citations
+  (Section 11 reference + 49 CFR 392.7/393/396 App A), and per-item verification status
+  (118 corroborated / 10 partial / 3 unverified figures). (3) Todos updated; research
+  items closed, verification/approval follow-ups added.
+- **Key findings:** "131-point" is NOT an official FMCSA/AAMVA/state term — recorded as a
+  product enumeration that must never be presented as an official standard. The AAMVA
+  model CDL manual (including the FMCSA-hosted PDF) is AAMVA-copyrighted with SDLA-only
+  reproduction rights — reference-only for Last Wagon; do not commit the PDF or copy its
+  prose. CFR text and FMCSA-authored materials are public domain (17 U.S.C. § 105).
+  AAMVA's secure test item pool and CVSA's paid Out-of-Service Criteria are excluded;
+  Appendix A to Part 396 is the free defect-criteria source. Since 2022, classic and
+  "modernized" skills-test versions coexist; the checklist follows the classic full
+  walk-around.
+- **Tests run / Verification:** No code changed; no build run. Research evidence: 4
+  parallel research agents, ~87 targeted web searches total against official sources
+  (eCFR, LII, fmcsa.dot.gov, PHMSA, TSA, AAMVA, 15+ state DMV manuals); every claim in
+  both docs carries a source URL and a verification status; uncorroborated facts are
+  explicitly marked UNVERIFIED rather than asserted. Environment evidence: gateway 403 on
+  CONNECT to dl.google.com, fmcsa.dot.gov, ecfr.gov (curl exit 56, proxy status log,
+  2026-07-16T20:42Z) — full-document fetches and Gradle builds remain impossible here.
+- **Failures:** None. Network-policy limits recorded (fetch blocked; search worked).
+- **Decisions:** Public-domain-first citation rule; original-prose-only authoring; the
+  checklist's P/U items block shipping, not just review; brake checks ordered last;
+  content import stays gated behind foundation review and content-doc approval.
+- **Confidence:** High on source identification and licensing boundaries; medium-high on
+  item-level wording pending the line-by-line full-text pass (13 items flagged).
+- **Next action:** Human review/approval of both docs, then full-text verification of the
+  13 flagged items in a network-capable session; acceptance-criteria definition and the
+  provenance schema design are the next implementable units.
+- **Push authorization:** This remote session's task instructions explicitly designate
+  branch `claude/131-pretrip-accuracy-review-7p7u9g` and instruct commit + push there;
+  no merge, deploy, or PR was performed.
+- **Lock:** 5c1a7c8e-9d24-4b6f-a7e3-131e2f6a0c44 acquired and released.

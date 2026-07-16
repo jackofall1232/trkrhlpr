@@ -1,12 +1,12 @@
 {
   "schema_version": 2,
   "project_name": "trkrhlpr (product: Last Wagon)",
-  "current_goal": "verify Phase 5 with a full Gradle build, then device-test Phases 1-5 including airplane-mode corridor behavior",
-  "current_phase": "routing_phase_5_implemented",
+  "current_goal": "get docs/content-sourcing.md and docs/pretrip-131-checklist.md human-approved, then close the 13 flagged verification items with full-text sources",
+  "current_phase": "content_source_research_complete",
   "active_agent": null,
   "last_agent": "claude",
-  "last_updated": "2026-07-16T19:59:53Z",
-  "status": "routing_phase_5_implemented_build_verification_pending",
+  "last_updated": "2026-07-16T20:58:52Z",
+  "status": "content_sourcing_and_131_checklist_documented_pending_human_review",
   "blocked": false,
   "blocker_reason": null,
   "active_event_id": null,
@@ -16,5 +16,5 @@
   "ci_status": "unknown",
   "execution_active": false,
   "execution_stop_reason": "human_review_gate",
-  "next_recommended_action": "run the full Gradle test/assemble/lint suite in an environment with Google Maven access (this session's network policy blocked dl.google.com), then review Phases 4-5 on hardware and confirm OpenFreeMap terms before production; separately, review marketing website v1 under website/ (see ledger run 2026-07-16T19:59:53Z)"
+  "next_recommended_action": "human review of docs/content-sourcing.md and docs/pretrip-131-checklist.md; resolve the 10 PARTIAL + 3 UNVERIFIED checklist items against full-text sources in a network-capable session; then define Study/Real Inspection Mode acceptance criteria and the provenance schema migration; Gradle verification of Phases 1-5 and device reviews still pending outside this environment (dl.google.com blocked again this session)"
 }
