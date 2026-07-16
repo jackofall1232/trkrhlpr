@@ -23,5 +23,5 @@ class AppContainer(application: Application) {
     val contentRepository: ContentRepository = OfflineContentRepository(database)
     val progressRepository: ProgressRepository = OfflineProgressRepository(database.dao())
     val preferencesRepository: PreferencesRepository = DataStorePreferencesRepository(application)
-    val vehicleProfileRepository: VehicleProfileRepository = DataStoreVehicleProfileRepository(application)
 }
+

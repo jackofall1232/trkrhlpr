@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 
 @Composable fun HomeScreen(
     onInspection: () -> Unit, onPractice: () -> Unit, onDaily: () -> Unit,
-    onProgress: () -> Unit, onRouting: () -> Unit, modifier: Modifier = Modifier,
+    onProgress: () -> Unit, modifier: Modifier = Modifier,
 ) {
     IndustrialBackdrop(modifier.fillMaxSize()) {
         LazyVerticalGrid(
@@ -60,9 +60,9 @@ import kotlinx.coroutines.launch
             item { FeatureTile("Truck stops", "National directory — future roadmap.",
                 Icons.Rounded.LocalGasStation, TrkrColors.Steel500, enabled = false,
                 badge = "Later", onClick = {}) }
-            item { FeatureTile("Route map", "Read-only map preview — no routing yet.",
-                Icons.AutoMirrored.Rounded.AltRoute, TrkrColors.DashboardBlue,
-                badge = "Preview", onClick = onRouting) }
+            item { FeatureTile("Truck routing", "Commercial routing — research required.",
+                Icons.AutoMirrored.Rounded.AltRoute, TrkrColors.Steel500, enabled = false,
+                badge = "Later", onClick = {}) }
         }
     }
 }

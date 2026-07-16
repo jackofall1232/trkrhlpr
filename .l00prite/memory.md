@@ -6,24 +6,6 @@ Durable project facts and decisions that future agents should preserve.
 
 - trkrhlpr is Android-only and will initially be distributed as a sideloaded APK; Google
   Play support is not required for the first production milestone.
-- **Architecture Decision:** Map routing will use the "Route Corridor" strategy.
-  - **Visuals:** MapLibre GL Native for Android (offline-capable vector tiles).
-  - **Routing:** OpenRouteService (ORS) is the initial online routing provider, using its
-    `driving-hgv` profile and the driver-confirmed vehicle profile. The provider remains
-    replaceable. Results are routing assistance based on available data, not a guarantee
-    of safety, clearance, legality, or STAA compliance.
-  - **Offline Capability:** The app will save selected route geometry and pre-fetch map
-    resources along a bounded route corridor only from a provider whose terms permit it.
-    The saved route remains visible through cell dead zones. Offline rerouting is not
-    supported; leaving the corridor requires the driver to stop and reassess.
-  - **Safety Contract:** The app must expose unverified, driver-reviewed, data-warning,
-    and offline/stale route states. The driver must verify routes against signs, official
-    restrictions, permits, dispatch instructions, and current conditions. Missing data is
-    unknown, never proof of clearance. Release wording requires legal review and must not
-    assume that a disclaimer transfers liability.
-  - **Delivery Plan:** Implement the approved phases in
-    `docs/truck-routing-plan.md`; the Offline Route Corridor at Phase 5 is the MVP boundary,
-    with guided navigation and restriction assurance gated separately.
 - The confirmed technology direction is native Kotlin, Jetpack Compose, Android SDK 36
   (Android 16), and an offline-first architecture.
 - The first production milestone covers the 131-point pre-trip inspection, Study Mode,
@@ -34,8 +16,8 @@ Durable project facts and decisions that future agents should preserve.
   lawful authoritative sources. Proprietary commercial study materials must not be copied.
 - The 2026-07-13 protocol-initialization run did not authorize application implementation;
   the Android foundation was separately approved on 2026-07-13.
-- Android architecture uses eight modules: app, core model/data/design/testing, and
-  dashboard/learning/routing features.
+- Android foundation architecture uses seven modules: app, core model/data/design/testing,
+  and dashboard/learning features.
 - Minimum Android version is API 26; compile/target SDK is 36; Java target is 17.
 - Manual constructor injection is sufficient for the current dependency graph.
 - Room stores versioned content/progress; DataStore stores theme/accessibility preferences.
@@ -52,17 +34,7 @@ Durable project facts and decisions that future agents should preserve.
 - Exact inspection content, CDL questions, official sources, and unresolved product choices
   require research and explicit decisions before implementation.
 - The foundation builds an installable debug APK at app/build/outputs/apk/debug/app-debug.apk.
-- Phase 1 adds Internet and approximate-location permissions for an online read-only map.
-  Approximate location is requested only from the location control; fine location is
-  explicitly removed from the merged manifest. Accounts and analytics remain absent.
-- Phase 1 uses MapLibre Native Android 13.0.2 behind a replaceable `MapStyleProvider`.
-  MapLibre demo world data is evaluation-only, visibly attributed, and not approved as a
-  production truck-map or offline-prefetch provider.
-- Phase 2 stores one schema-versioned, confirmed commercial-vehicle profile in DataStore.
-  US customary inputs are converted to canonical metric values. The profile includes type,
-  dimensions, gross and axle weight, axle count, hazmat state, and supported avoidances.
-  Broad plausibility validation is not a legal-limit or route-safety determination, and
-  editing always requires the driver to reconfirm the current equipment and load.
+- The app manifest requests no Internet, location, account, analytics, or mapping permission.
 
 ## Avoid
 - Do not store random temporary notes, speculative ideas, or stale debugging output here.

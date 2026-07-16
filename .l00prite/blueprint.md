@@ -94,11 +94,6 @@ subsystems and must not be represented as part of the initial milestone.
 - Truck routing is safety-critical and is not passenger-car navigation. Before any later
   implementation, research map and restriction coverage, routing engines, offline maps,
   updates, validation, legal exposure, warning language, and safe failure behavior.
-- Truck routes are decision support based on the supplied vehicle profile and available
-  data. Never claim that a route is "truck-safe," "guaranteed clear," or "STAA-compliant."
-  Missing restrictions are unknown rather than evidence of clearance. Require driver
-  review against signs, official restrictions, permits, dispatch instructions, and current
-  conditions, and obtain legal review before release.
 - The application must not be presented as a replacement for official regulations,
   required training, employer procedures, driver judgment, or legally required inspections.
 
