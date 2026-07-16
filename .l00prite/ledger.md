@@ -506,3 +506,38 @@ Append one entry per agent run. Do not overwrite prior runs.
 - **Confidence:** High for the changed logic; device review remains the exit gate.
 - **Next action:** Keep watching PR #12 until merged or closed.
 - **Lock:** ddaf54d0-aad0-4924-9e06-928b67510399 acquired and released.
+
+### Run 2026-07-16T19:59:53Z — Claude — Marketing website v1 scaffold
+- **Goal:** Build the Last Wagon marketing/landing site (lastwagon.app) per the
+  user-approved prompt and visual direction board.
+- **Triggering event:** Direct user request in a Claude Code remote session on branch
+  `claude/last-wagon-marketing-site-jytti2`, with the direction-board HTML supplied.
+- **Completed work:** New `website/` Next.js 15 + TypeScript + Tailwind 3 app (App
+  Router), isolated from the Gradle project. Locked palette as Tailwind theme tokens;
+  Archivo (variable, wdth axis) + Space Mono via next/font; hero scene (gradient sky,
+  sun, 3 parallax ridgelines, dashed road, traveling rig SVG) ported verbatim from the
+  direction board; features cards with the three illustration motifs; how-it-works with
+  a static route-preview mockup (scroll-drawn route line) and the pre-trip checklist UI
+  mock; download CTA (placeholder APK link); mono footer. Direction board committed at
+  `website/design/direction-board.html` as the canonical reference.
+- **Tests run / Verification:** `npm run build` clean (all routes static). Served
+  production build and verified in Chromium via Playwright: desktop 1440px and mobile
+  390px full-page screenshots, `prefers-reduced-motion` (rig parks at left 20%, route
+  line pre-drawn), computed h1 style (Archivo, font-stretch 125%, weight 800), and the
+  scroll-triggered route-line draw completing.
+- **Failures:** None in the product. Notable finding: "Archivo Expanded" is not a real
+  Google Fonts family (CSS API returns 400) — the direction board's <link> silently
+  fell back; implemented as Archivo variable wdth=125 via font-stretch instead.
+- **Decisions:** Site lives in `website/` to keep the Android app tree clean; Tailwind 3
+  with theme-extend tokens (no colors outside the locked palette); no API routes/ISR so
+  a static-export fallback stays open; dark-mode only per the locked design; APK link
+  and final CTA copy left as explicit placeholders pending distribution approval.
+- **Confidence:** High for build/render correctness; Vercel deployment intentionally not
+  performed (user asked to be consulted before deploying).
+- **Next action:** User review of the site; then real CTA copy, signed-APK link, and an
+  explicitly approved Vercel deploy.
+- **Push authorization:** This remote session's task instructions explicitly designate
+  branch `claude/last-wagon-marketing-site-jytti2` and instruct commit + push there;
+  that per-branch instruction is the recorded authorization for this push. No merge,
+  deploy, or PR was performed.
+- **Lock:** 48f940f2-67fd-4d6a-90f6-1cdfa0d7a49d acquired and released.

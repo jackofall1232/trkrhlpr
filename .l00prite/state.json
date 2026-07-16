@@ -5,7 +5,7 @@
   "current_phase": "routing_phase_5_implemented",
   "active_agent": null,
   "last_agent": "claude",
-  "last_updated": "2026-07-16T18:58:16Z",
+  "last_updated": "2026-07-16T19:59:53Z",
   "status": "routing_phase_5_implemented_build_verification_pending",
   "blocked": false,
   "blocker_reason": null,
@@ -16,5 +16,5 @@
   "ci_status": "unknown",
   "execution_active": false,
   "execution_stop_reason": "human_review_gate",
-  "next_recommended_action": "run the full Gradle test/assemble/lint suite in an environment with Google Maven access (this session's network policy blocked dl.google.com), then review Phases 4-5 on hardware and confirm OpenFreeMap terms before production"
+  "next_recommended_action": "run the full Gradle test/assemble/lint suite in an environment with Google Maven access (this session's network policy blocked dl.google.com), then review Phases 4-5 on hardware and confirm OpenFreeMap terms before production; separately, review marketing website v1 under website/ (see ledger run 2026-07-16T19:59:53Z)"
 }

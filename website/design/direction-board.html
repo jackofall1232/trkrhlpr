@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Last Wagon — Visual Direction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --near-black: #1A1410;
+    --charcoal: #241C16;
+    --amber: #F4A15C;
+    --amber-bright: #FFB870;
+    --rust: #C4502A;
+    --plum: #3D2F5C;
+    --plum-deep: #2A2140;
+    --dusty-rose: #B8677A;
+    --steel: #8A8378;
+    --steel-light: #C7C0B4;
+    --cream: #F0E9DC;
+
+    --font-display: 'Archivo Expanded', sans-serif;
+    --font-body: 'Archivo', sans-serif;
+    --font-mono: 'Space Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--near-black);
+    color: var(--cream);
+    font-family: var(--font-body);
+    line-height: 1.5;
+  }
+
+  section {
+    padding: 80px 8vw;
+    border-bottom: 1px solid rgba(240,233,220,0.08);
+  }
+
+  .label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  /* ============ HERO / SIGNATURE ============ */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+    background: linear-gradient(180deg, #1A1410 0%, #2A2140 35%, #3D2F5C 55%, #C4502A 78%, #F4A15C 100%);
+    padding: 8vw;
+    border-bottom: none;
+  }
+
+  .hero-sky-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .sun {
+    position: absolute;
+    left: 50%;
+    top: 58%;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #FFDFA8 0%, #FFB870 40%, #F4A15C 70%, transparent 100%);
+    transform: translate(-50%, -50%);
+    opacity: 0.9;
+    filter: blur(1px);
+  }
+
+  .ridge {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+  }
+
+  .ridge-back { bottom: 90px; opacity: 0.55; }
+  .ridge-mid { bottom: 60px; opacity: 0.75; }
+  .ridge-front { bottom: 0; }
+
+  .road-line {
+    position: absolute;
+    bottom: 58px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+  }
+
+  .rig-track {
+    position: absolute;
+    bottom: 40px;
+    left: -260px;
+    width: 210px;
+    animation: travel 13s linear infinite;
+  }
+
+  @keyframes travel {
+    0% { left: -260px; }
+    100% { left: 108%; }
+  }
+
+  .hero-copy {
+    position: relative;
+    z-index: 5;
+    max-width: 640px;
+    margin-bottom: 64px;
+  }
+
+  .hero-copy .label { color: var(--near-black); background: var(--amber-bright); display: inline-block; padding: 4px 10px; border-radius: 2px; }
+
+  .hero h1 {
+    font-size: clamp(48px, 8vw, 96px);
+    color: var(--near-black);
+    line-height: 0.95;
+    margin: 20px 0 24px;
+    text-shadow: 0 2px 0 rgba(255,255,255,0.08);
+  }
+
+  .hero p {
+    font-size: 19px;
+    color: rgba(26,20,16,0.75);
+    max-width: 460px;
+    font-weight: 500;
+  }
+
+  /* ============ PALETTE ============ */
+  .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 20px;
+    margin-top: 40px;
+  }
+
+  .swatch {
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(240,233,220,0.12);
+  }
+
+  .swatch-color { height: 110px; }
+
+  .swatch-info {
+    padding: 14px 16px;
+    background: var(--charcoal);
+  }
+
+  .swatch-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .swatch-hex {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--steel-light);
+  }
+
+  .swatch-use {
+    font-size: 12px;
+    color: var(--steel);
+    margin-top: 6px;
+  }
+
+  /* ============ TYPE ============ */
+  .type-sample {
+    margin: 32px 0;
+    padding: 32px;
+    background: var(--charcoal);
+    border-radius: 4px;
+    border-left: 3px solid var(--amber);
+  }
+
+  .type-sample .display-big {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(32px, 5vw, 56px);
+    color: var(--amber-bright);
+    line-height: 1;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+
+  .type-sample .body-sample {
+    font-family: var(--font-body);
+    font-size: 17px;
+    color: var(--steel-light);
+    max-width: 560px;
+    margin-bottom: 12px;
+  }
+
+  .type-sample .mono-sample {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--steel);
+    letter-spacing: 0.05em;
+  }
+
+  .type-role {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 8px;
+  }
+
+  /* ============ ILLUSTRATION LANGUAGE ============ */
+  .illo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+    margin-top: 40px;
+  }
+
+  .illo-card {
+    background: linear-gradient(160deg, var(--plum-deep), var(--charcoal));
+    border-radius: 6px;
+    padding: 32px 24px;
+    text-align: center;
+    border: 1px solid rgba(240,233,220,0.08);
+  }
+
+  .illo-card svg { width: 100%; height: 90px; }
+
+  .illo-caption {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--steel-light);
+    margin-top: 16px;
+    letter-spacing: 0.03em;
+  }
+
+  /* ============ UI PREVIEW ============ */
+  .ui-mock {
+    background: var(--charcoal);
+    border-radius: 8px;
+    border: 1px solid rgba(240,233,220,0.1);
+    padding: 28px;
+    max-width: 380px;
+    margin-top: 40px;
+  }
+
+  .ui-mock-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .ui-mock-dot {
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, var(--amber), var(--rust));
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .ui-mock-title { font-family: var(--font-display); font-weight: 700; font-size: 15px; }
+  .ui-mock-sub { font-family: var(--font-mono); font-size: 11px; color: var(--steel); }
+
+  .ui-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0;
+    border-top: 1px solid rgba(240,233,220,0.07);
+  }
+
+  .ui-row-icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(244,161,92,0.12);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .ui-row-text { flex: 1; }
+  .ui-row-title { font-size: 14px; font-weight: 600; }
+  .ui-row-meta { font-family: var(--font-mono); font-size: 11px; color: var(--steel); }
+
+  .badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    background: rgba(196,80,42,0.2);
+    color: var(--amber-bright);
+    letter-spacing: 0.05em;
+  }
+
+  footer {
+    padding: 40px 8vw;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--steel);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rig-track { animation: none; left: 20%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-sky-layer">
+    <div class="sun"></div>
+    <svg class="ridge ridge-back" viewBox="0 0 1440 200" preserveAspectRatio="none"><path d="M0,140 L120,110 L260,150 L420,90 L600,130 L780,80 L960,140 L1140,100 L1320,150 L1440,120 L1440,200 L0,200 Z" fill="#2A2140"/></svg>
+    <svg class="ridge ridge-mid" viewBox="0 0 1440 160" preserveAspectRatio="none"><path d="M0,100 L180,60 L360,110 L540,50 L720,90 L900,40 L1080,100 L1260,70 L1440,100 L1440,160 L0,160 Z" fill="#3D2F5C"/></svg>
+    <svg class="ridge ridge-front" viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,60 L200,30 L400,55 L640,20 L880,50 L1120,15 L1440,45 L1440,100 L0,100 Z" fill="#1A1410"/></svg>
+    <svg class="road-line" viewBox="0 0 1440 4" preserveAspectRatio="none"><line x1="0" y1="2" x2="1440" y2="2" stroke="#1A1410" stroke-width="4" stroke-dasharray="24 18"/></svg>
+    <svg class="rig-track" viewBox="0 0 210 60" fill="none">
+      <g class="smoke">
+        <circle cx="27" cy="10" r="4" fill="#8A8378" opacity="0.35"/>
+        <circle cx="24" cy="4" r="5.5" fill="#8A8378" opacity="0.25"/>
+        <circle cx="30" cy="-2" r="6.5" fill="#8A8378" opacity="0.15"/>
+        <circle cx="16" cy="9" r="3.5" fill="#8A8378" opacity="0.3"/>
+        <circle cx="13" cy="3" r="5" fill="#8A8378" opacity="0.2"/>
+        <circle cx="18" cy="-3" r="6" fill="#8A8378" opacity="0.12"/>
+      </g>
+      <rect x="14" y="10" width="4" height="18" rx="1.5" fill="#1A1410"/>
+      <rect x="25" y="10" width="4" height="18" rx="1.5" fill="#1A1410"/>
+      <path d="M4,46 L4,30 Q4,24 10,24 L34,24 L34,20 Q34,17 37,17 L40,17 Q43,17 43,20 L43,28 L48,28 Q54,28 54,34 L54,46 Z" fill="#1A1410" stroke="#1A1410" stroke-width="1"/>
+      <path d="M11,30 L11,25 Q11,23 13,23 L32,23 L32,30 Z" fill="rgba(244,161,92,0.35)"/>
+      <rect x="54" y="40" width="10" height="6" fill="#1A1410"/>
+      <path d="M64,46 L64,26 Q64,20 72,20 L182,20 Q190,20 190,26 L190,46 Z" fill="rgba(26,20,16,0.85)" stroke="#1A1410" stroke-width="1"/>
+      <line x1="80" y1="20" x2="80" y2="46" stroke="#1A1410" stroke-width="1.5" opacity="0.5"/>
+      <line x1="96" y1="20" x2="96" y2="46" stroke="#1A1410" stroke-width="1.5" opacity="0.5"/>
+      <line x1="112" y1="20" x2="112" y2="46" stroke="#1A1410" stroke-width="1.5" opacity="0.5"/>
+      <line x1="128" y1="20" x2="128" y2="46" stroke="#1A1410" stroke-width="1.5" opacity="0.5"/>
+      <line x1="144" y1="20" x2="144" y2="46" stroke="#1A1410" stroke-width="1.5" opacity="0.5"/>
+      <line x1="160" y1="20" x2="160" y2="46" stroke="#1A1410" stroke-width="1.5" opacity="0.5"/>
+      <line x1="176" y1="20" x2="176" y2="46" stroke="#1A1410" stroke-width="1.5" opacity="0.5"/>
+      <circle cx="18" cy="48" r="6" fill="#1A1410"/>
+      <circle cx="46" cy="48" r="6" fill="#1A1410"/>
+      <circle cx="150" cy="48" r="6" fill="#1A1410"/>
+      <circle cx="164" cy="48" r="6" fill="#1A1410"/>
+      <circle cx="178" cy="48" r="6" fill="#1A1410"/>
+    </svg>
+  </div>
+  <div class="hero-copy">
+    <span class="label">Route planning for the long haul</span>
+    <h1>Last Wagon</h1>
+    <p>Truck stops, pre-trip checks, and CDL prep — built for the cab, not the office.</p>
+  </div>
+</section>
+
+<!-- PALETTE -->
+<section>
+  <span class="label">01 — Palette</span>
+  <h2 style="font-size: 32px;">Sunset, steel, and dusk</h2>
+  <div class="palette-grid">
+    <div class="swatch">
+      <div class="swatch-color" style="background:#1A1410;"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Near Black</div>
+        <div class="swatch-hex">#1A1410</div>
+        <div class="swatch-use">Base / dark UI ground</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#F4A15C;"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Amber</div>
+        <div class="swatch-hex">#F4A15C</div>
+        <div class="swatch-use">Primary accent, CTAs</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#C4502A;"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Rust</div>
+        <div class="swatch-hex">#C4502A</div>
+        <div class="swatch-use">Secondary accent, warnings</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#3D2F5C;"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Dusk Plum</div>
+        <div class="swatch-hex">#3D2F5C</div>
+        <div class="swatch-use">Shadow, depth, contrast fields</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#B8677A;"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Dusty Rose</div>
+        <div class="swatch-hex">#B8677A</div>
+        <div class="swatch-use">Sparing accent only</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#8A8378;"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Steel</div>
+        <div class="swatch-hex">#8A8378</div>
+        <div class="swatch-use">UI chrome, borders, meta text</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TYPE -->
+<section>
+  <span class="label">02 — Typography</span>
+  <h2 style="font-size: 32px;">Road-sign weight, cab-legible body</h2>
+  <div class="type-sample">
+    <div class="type-role">Display — Archivo Expanded, 800</div>
+    <div class="display-big">Pre-Trip Ready</div>
+    <div class="type-role" style="margin-top:20px;">Body — Archivo, 400/500</div>
+    <p class="body-sample">Built for drivers checking a phone mounted on a dash, in bad light, with gloves on. Every weight has to hold up at a glance — no thin type, no low-contrast gray-on-gray.</p>
+    <div class="type-role" style="margin-top:20px;">Mono — Space Mono (data, labels, coordinates)</div>
+    <div class="mono-sample">ETA 04:12 · MILE 1,204 · DIESEL $3.89/GAL</div>
+  </div>
+</section>
+
+<!-- ILLUSTRATION LANGUAGE -->
+<section>
+  <span class="label">03 — Illustration Language</span>
+  <h2 style="font-size: 32px;">Abstracted, not cartoonish</h2>
+  <p style="color: var(--steel-light); max-width: 560px; margin-top: 12px;">The ribbed hopper trailer silhouette doubles as the "canopy" — rounded top, structural ridge lines, riding low and wide. No wheels-and-bonnet wagon clichés.</p>
+  <div class="illo-grid">
+    <div class="illo-card">
+      <svg viewBox="0 0 200 90" fill="none">
+        <path d="M20,70 L20,45 Q20,30 40,30 L160,30 Q180,30 180,45 L180,70" stroke="#F4A15C" stroke-width="3" fill="rgba(244,161,92,0.08)"/>
+        <line x1="45" y1="30" x2="45" y2="70" stroke="#F4A15C" stroke-width="1.5" opacity="0.5"/>
+        <line x1="70" y1="30" x2="70" y2="70" stroke="#F4A15C" stroke-width="1.5" opacity="0.5"/>
+        <line x1="95" y1="30" x2="95" y2="70" stroke="#F4A15C" stroke-width="1.5" opacity="0.5"/>
+        <line x1="120" y1="30" x2="120" y2="70" stroke="#F4A15C" stroke-width="1.5" opacity="0.5"/>
+        <line x1="145" y1="30" x2="145" y2="70" stroke="#F4A15C" stroke-width="1.5" opacity="0.5"/>
+        <circle cx="45" cy="75" r="7" fill="#C4502A"/>
+        <circle cx="95" cy="75" r="7" fill="#C4502A"/>
+        <circle cx="145" cy="75" r="7" fill="#C4502A"/>
+      </svg>
+      <div class="illo-caption">HOPPER-AS-CANOPY MOTIF</div>
+    </div>
+    <div class="illo-card">
+      <svg viewBox="0 0 200 90" fill="none">
+        <path d="M30,80 Q60,20 100,20 Q140,20 170,80" stroke="#B8677A" stroke-width="3" fill="none"/>
+        <circle cx="100" cy="20" r="6" fill="#F4A15C"/>
+        <line x1="20" y1="80" x2="180" y2="80" stroke="#8A8378" stroke-width="2" stroke-dasharray="6 6"/>
+      </svg>
+      <div class="illo-caption">ROUTE ARC / HORIZON</div>
+    </div>
+    <div class="illo-card">
+      <svg viewBox="0 0 200 90" fill="none">
+        <path d="M0,70 L60,50 L110,65 L160,35 L200,55" stroke="#3D2F5C" stroke-width="4" fill="none" opacity="0.8"/>
+        <path d="M0,80 L50,68 L100,75 L150,58 L200,72" stroke="#F4A15C" stroke-width="3" fill="none"/>
+      </svg>
+      <div class="illo-caption">LAYERED RIDGELINE</div>
+    </div>
+  </div>
+</section>
+
+<!-- UI APPLICATION -->
+<section>
+  <span class="label">04 — In the UI</span>
+  <h2 style="font-size: 32px;">Same language, functional context</h2>
+  <div class="ui-mock">
+    <div class="ui-mock-header">
+      <div class="ui-mock-dot">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none"><path d="M3,17 L3,11 Q3,8 8,8 L18,8 Q21,8 21,11 L21,17" stroke="#1A1410" stroke-width="2"/></svg>
+      </div>
+      <div>
+        <div class="ui-mock-title">Pre-Trip Checklist</div>
+        <div class="ui-mock-sub">131-POINT · CLASS A</div>
+      </div>
+    </div>
+    <div class="ui-row">
+      <div class="ui-row-icon">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#F4A15C" stroke-width="2"/></svg>
+      </div>
+      <div class="ui-row-text">
+        <div class="ui-row-title">Brake lines & air hoses</div>
+        <div class="ui-row-meta">SECTION 3 OF 12</div>
+      </div>
+      <span class="badge">PENDING</span>
+    </div>
+    <div class="ui-row">
+      <div class="ui-row-icon">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3,8 L6,11 L13,4" stroke="#F4A15C" stroke-width="2" fill="none"/></svg>
+      </div>
+      <div class="ui-row-text">
+        <div class="ui-row-title">Tires & wheel fasteners</div>
+        <div class="ui-row-meta">SECTION 2 OF 12</div>
+      </div>
+      <span class="badge" style="background:rgba(244,161,92,0.2); color:#F4A15C;">DONE</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  LAST WAGON — VISUAL DIRECTION V1 — LASTWAGON.APP
+</footer>
+
+</body>
+</html>
