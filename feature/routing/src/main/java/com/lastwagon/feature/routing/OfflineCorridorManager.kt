@@ -99,14 +99,18 @@ class OfflineCorridorManager(
             appContext.resources.displayMetrics.density,
         )
         // Clear any previous corridor first so only one download ever exists. Creation
-        // waits until every deletion has called back to avoid overlapping database work.
+        // waits until every deletion has called back to avoid overlapping database work,
+        // and a listing failure aborts the download rather than risking a second corridor.
         manager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
             override fun onList(offlineRegions: Array<OfflineRegion>?) {
                 discardAllThen(offlineRegions.orEmpty()) { create(definition, metadata) }
             }
 
             override fun onError(error: String) {
-                create(definition, metadata)
+                _state.value = CorridorState.Failed(
+                    "Existing offline corridors could not be checked: $error. " +
+                        "Try the download again.",
+                )
             }
         })
     }

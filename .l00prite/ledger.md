@@ -461,3 +461,26 @@ Append one entry per agent run. Do not overwrite prior runs.
   full-suite and device checks remain the recorded exit gates.
 - **Next action:** Reply to the review threads, keep watching PR #12 until merged/closed.
 - **Lock:** 8156521d-70d3-479a-bb49-582cdeddeb2a acquired and released.
+
+### Run 2026-07-16T19:22:34Z — Claude — PR #12 second review round
+- **Goal:** Address Codex findings on commit 0c6f99d.
+- **Triggering event:** Codex re-review webhooks on PR #12.
+- **Completed work:** Corridor downloads now fail closed when existing offline regions
+  cannot be listed: the download aborts with a visible failure and asks for a retry
+  instead of creating a region that could coexist with an unaccounted-for prior corridor
+  (accepted P2). For the AGENTS.md P1: the flagged edit is the one-line product-name
+  mission statement, changed on the user's explicit instruction that the final name
+  "Last Wagon" be reflected everywhere; that direct human instruction is the
+  authorization the protocol's human review gate requires, and it is recorded here and
+  in the 2026-07-16T18:58:16Z run entry. No operating rule, gate, boundary, or prompt
+  text was changed. Recorded explicitly: **the AGENTS.md mission-line rename was
+  human-authorized; no protocol rule was modified.**
+- **Tests run / Verification:** OfflineCorridorManager recompiled standalone against
+  MapLibre 13.0.2 and android-all API 36; exit 0. Pure-logic tests unchanged (16 passing
+  as of the prior run). Full Gradle suite still pending outside this environment.
+- **Failures:** None.
+- **Decisions:** Listing failures block downloads (fail closed) rather than best-effort
+  creating; the one-corridor invariant outranks download convenience.
+- **Confidence:** High for the changed branch; unchanged elsewhere.
+- **Next action:** Keep watching PR #12 until merged or closed.
+- **Lock:** 4db86b82-3631-4b4c-937c-86a6ea8ea208 acquired and released.
