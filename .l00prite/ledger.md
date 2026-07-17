@@ -1331,3 +1331,10 @@ Append one entry per agent run. Do not overwrite prior runs.
   in-app Settings remedy first ("Paste an API key under Settings, or set ORS_API_KEY at
   build time") in both routing and geocoding providers; exact-match test updated.
 - **Verification:** CI on the pushed commit.
+
+### Status 2026-07-17T04:04Z — Claude — PR #19 green after Codex round 2
+- Runs 29553758427 + 29553761089 (5362b0e): SUCCESS. All bot findings across both rounds
+  addressed; PR #19 awaits owner merge. Device-review items outstanding: Settings card
+  visuals (masked field + reveal toggle) and backup/restore behavior of the excluded
+  local_secrets DataStore file.
+- **Lock:** b8dfc203-0c13-4a54-b608-4f931ce1e3ce acquired and released.
