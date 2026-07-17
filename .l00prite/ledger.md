@@ -1531,3 +1531,24 @@ Append one entry per agent run. Do not overwrite prior runs.
   fully addressed: 4 findings applied, 1 refuted with sourced reply (393.51 "whichever is
   less").
 - **Lock:** 9f1c2a70-ci-record-fab320d acquired and released.
+
+### Supervised action 2026-07-17T12:58Z — Claude — PR #20 Codex round 2 (1 P1 + 3 P2) all judged valid and applied
+- **Applied — P2 "rejected dataset still marked installed" (REAL flaw in my round-1 fix):**
+  the SAMPLE_VERSION row is now written only after a complete directory install, so a
+  rejected document retries on a later launch instead of freezing the failure; the
+  non-directory inserts are REPLACE-idempotent, so the retry loop is safe.
+- **Applied — P2 "duplicate ids silently collapsed by REPLACE":** the parser now counts a
+  duplicate-id record as skipped (first occurrence wins), which the existing
+  skipped-records install gate then rejects. New parser test (39 model tests total).
+- **Applied — P2 "sample messaging hardcoded":** the truck-stops screen framing and the
+  Home tile badge now derive from the installed records' isSample — when the verified
+  dataset ships (sample:false), the UI reframes itself with no separate change to
+  remember. HomeScreen now takes ContentRepository (wired in LastWagonApp).
+- **Applied — P1 "commit schema 5.json":** cannot be generated locally (no Gradle) and
+  the CI artifact host is proxy-blocked, so ci.yml now prints the exported schemas into
+  the job log ("Print exported Room schemas" step); after the next green run the 5.json
+  content gets copied from the log and committed. Until then CI stays green only via the
+  same-run KSP export — the log-copy commit closes the fragility Codex flagged.
+- **Verification:** core/model recompiled + full suite standalone: **39 tests OK, exit 0**
+  (2026-07-17T12:57Z). Compose/HomeScreen changes verify on CI.
+- **Lock:** aef6ab57-94d9-49fa-a134-624f7b6a68a0 acquired and released.

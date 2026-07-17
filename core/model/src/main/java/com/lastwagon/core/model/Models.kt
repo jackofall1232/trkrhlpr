@@ -239,8 +239,9 @@ data class TruckStopDataset(
  * Per record: `id`, `name`, `state`, `lat`, `lon` are required; `highway`,
  * `parking_spaces`, and the amenity booleans (`diesel`, `showers`, `food`, `repair`) are
  * optional — a missing or null amenity stays null (unknown), never false. A structurally
- * broken record is skipped and counted, never fatal; an unparseable envelope or wrong
- * schema version yields an empty dataset.
+ * broken record — or one whose `id` duplicates an earlier record, which Room's REPLACE
+ * insert would otherwise silently collapse — is skipped and counted, never fatal; an
+ * unparseable envelope or wrong schema version yields an empty dataset.
  */
 object TruckStopContent {
     const val SUPPORTED_SCHEMA_VERSION = 1
@@ -259,10 +260,11 @@ object TruckStopContent {
         val sample = (dataset?.get("sample") as? JsonPrimitive)?.booleanOrNull ?: true
         val records = root["stops"] as? JsonArray ?: return TruckStopDataset(emptyList(), 0)
         val stops = mutableListOf<TruckStop>()
+        val seenIds = HashSet<String>()
         var skipped = 0
         for (element in records) {
             val stop = parseStop(element, citation, vintage, verification, sample)
-            if (stop != null) stops += stop else skipped++
+            if (stop != null && seenIds.add(stop.id.value)) stops += stop else skipped++
         }
         return TruckStopDataset(stops, skipped)
     }

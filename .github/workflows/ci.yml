@@ -45,6 +45,17 @@ jobs:
         env:
           ORS_API_KEY: ${{ secrets.ORS_API_KEY }}
 
+      # Exported Room schemas are printed so a network-restricted session can copy a
+      # newly generated version JSON out of the job log and commit it (the exported
+      # schemas are kept in VCS for MigrationTestHelper).
+      - name: Print exported Room schemas
+        run: |
+          for f in core/data/schemas/com.lastwagon.core.data.LastWagonDatabase/*.json; do
+            echo "=== BEGIN $f"
+            cat "$f"
+            echo "=== END $f"
+          done
+
       # Debug-signed APK for sideload/beta distribution; a human still uploads
       # it to a GitHub Release — CI never publishes anything itself. Runs after
       # check so a red run never exposes a plausible release candidate.

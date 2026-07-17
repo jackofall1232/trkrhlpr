@@ -100,6 +100,7 @@ fun LastWagonApp(container: AppContainer) {
                     ) {
                         composable(Routes.Home) {
                             HomeScreen(
+                                contentRepository = container.contentRepository,
                                 onInspection = { navController.navigate(Routes.Inspection) },
                                 onPractice = { navController.navigate(Routes.Practice) },
                                 onDaily = { navController.navigate(Routes.Daily) },

@@ -29,14 +29,18 @@ class OfflineContentRepository(private val database: LastWagonDatabase) : Conten
             dao.insertQuestions(SampleContent.questions)
             // Replace, never merge: clearing first guarantees rows from a prior dataset
             // (different ids) cannot linger beside the new one. No-silent-truncation: a
-            // document that dropped records is a content defect — keep the previous
-            // directory rather than install a partial dataset (the bundled document is
-            // test-guaranteed to parse completely in TruckStopContentTest).
+            // document that dropped or duplicated records is a content defect — keep the
+            // previous directory rather than install a partial dataset (the bundled
+            // document is test-guaranteed to parse completely in TruckStopContentTest).
+            // The version row is only written after a complete install, so a rejected
+            // document is retried on a later launch (with a corrected bundle) instead of
+            // freezing the failure permanently. The non-directory inserts above are
+            // REPLACE-idempotent, so a retry loop never corrupts them.
             if (truckStops.skippedRecords == 0 && truckStops.stops.isNotEmpty()) {
                 dao.clearTruckStops()
                 dao.insertTruckStops(truckStops.stops.map { it.toEntity() })
+                dao.insertContentVersion(ContentVersionEntity(SAMPLE_VERSION, System.currentTimeMillis()))
             }
-            dao.insertContentVersion(ContentVersionEntity(SAMPLE_VERSION, System.currentTimeMillis()))
         }
     }
     override fun observeInspectionCategories() =

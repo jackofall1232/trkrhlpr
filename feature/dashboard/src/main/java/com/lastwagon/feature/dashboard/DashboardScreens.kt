@@ -24,10 +24,19 @@ import com.lastwagon.core.model.*
 import kotlinx.coroutines.launch
 
 @Composable fun HomeScreen(
+    contentRepository: ContentRepository,
     onInspection: () -> Unit, onPractice: () -> Unit, onDaily: () -> Unit,
     onProgress: () -> Unit, onRouting: () -> Unit, onTruckStops: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // The tile's badge follows the installed directory dataset: labeled "Sample" until
+    // every record is verified real content, then no badge — no separate UI change to
+    // remember at the phase-2 dataset swap.
+    val truckStops by contentRepository.observeTruckStops().collectAsStateWithLifecycle(
+        initialValue = emptyList(),
+    )
+    val truckStopsBadge =
+        if (truckStops.isNotEmpty() && truckStops.none { it.isSample }) null else "Sample"
     IndustrialBackdrop(modifier.fillMaxSize()) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(156.dp),
@@ -62,9 +71,9 @@ import kotlinx.coroutines.launch
                 Icons.Rounded.WbSunny, WagonColors.SignalGreen, badge = "Today", onClick = onDaily) }
             item { FeatureTile("Progress", "Inspection, practice, and daily activity.",
                 Icons.Rounded.QueryStats, Color(0xFFB49CFF), onClick = onProgress) }
-            item { FeatureTile("Truck stops", "Sample directory — search offline.",
+            item { FeatureTile("Truck stops", "Truck-stop directory — search offline.",
                 Icons.Rounded.LocalGasStation, WagonColors.Steel500,
-                badge = "Sample", onClick = onTruckStops) }
+                badge = truckStopsBadge, onClick = onTruckStops) }
             item { FeatureTile("Route map", "Read-only map preview — no routing yet.",
                 Icons.AutoMirrored.Rounded.AltRoute, WagonColors.DashboardBlue,
                 badge = "Preview", onClick = onRouting) }

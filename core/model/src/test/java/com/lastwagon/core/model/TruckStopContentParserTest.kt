@@ -65,6 +65,22 @@ class TruckStopContentParserTest {
         assertEquals(4, dataset.skippedRecords)
     }
 
+    @Test fun duplicateIdsAreSkippedAndCountedNotSilentlyCollapsed() {
+        // Room's REPLACE insert would silently keep only the last duplicate; the parser
+        // must surface the defect instead so the installer can reject the document.
+        val dataset = TruckStopContent.parse(
+            document(
+                """
+                $validStop,
+                {"id": "s1", "name": "Same Id Different Stop", "state": "TX", "lat": 30.0, "lon": -95.0}
+                """.trimIndent(),
+            ),
+        )
+        assertEquals(listOf("s1"), dataset.stops.map { it.id.value })
+        assertEquals("Stop One", dataset.stops.single().name)
+        assertEquals(1, dataset.skippedRecords)
+    }
+
     @Test fun negativeParkingCountIsTreatedAsUnknown() {
         val dataset = TruckStopContent.parse(
             document("""{"id": "s1", "name": "N", "state": "IA", "lat": 41.0, "lon": -93.0, "parking_spaces": -5}"""),

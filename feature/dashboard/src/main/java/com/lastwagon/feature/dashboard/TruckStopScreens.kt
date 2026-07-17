@@ -55,11 +55,22 @@ import com.lastwagon.core.model.*
         verticalArrangement = Arrangement.spacedBy(WagonSpacing.md),
     ) {
         item {
+            // Framing follows the installed dataset, not a hardcoded assumption, so the
+            // phase-2 swap to verified records reframes this screen with no UI change.
+            val allVerifiedReal = stops.isNotEmpty() && stops.none { it.isSample }
             SectionHeader(
-                "Directory preview", "Truck stops",
-                "Labeled sample data only — fictional locations demonstrating offline search. " +
-                    "The verified national dataset ships after source review. Amenities and " +
-                    "parking are never guaranteed; unknown means unknown, not absent.",
+                if (allVerifiedReal) "Directory" else "Directory preview",
+                "Truck stops",
+                if (allVerifiedReal) {
+                    "Imported from the cited public sources — each record shows its source " +
+                        "and dataset vintage. Amenities and parking are never guaranteed; " +
+                        "unknown means unknown, not absent."
+                } else {
+                    "Labeled sample data only — fictional locations demonstrating offline " +
+                        "search. The verified national dataset ships after source review. " +
+                        "Amenities and parking are never guaranteed; unknown means unknown, " +
+                        "not absent."
+                },
             )
         }
         item {
