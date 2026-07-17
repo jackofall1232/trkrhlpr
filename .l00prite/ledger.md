@@ -1445,3 +1445,26 @@ Append one entry per agent run. Do not overwrite prior runs.
   gap candidates are explicitly owner decisions queued for the full-text verification
   pass (todos updated).
 - **Lock:** dc16d922-55e7-4294-bc88-8bda19ce0125 acquired and released.
+
+### Supervised action 2026-07-17T12:30Z — Claude — Owner-directed memory persistence: hybrid architecture model + crowdsourced-status roadmap
+- **Event:** the owner handed over memory blocks drafted in another assistant chat and
+  asked for them to be persisted to memory.md / blueprint.md / todos.md. Classified on
+  merit; applied with two factual reconciliations, flagged to the owner rather than
+  silently: (1) "131-point checklist" corrected to the owner-approved 132; (2) the
+  truck-stop static directory added to the offline-first feature set (approved Track C
+  plan; phase 1 shipped) — and the blueprint's national-directory bullet was annotated
+  with its Track C status instead of being deleted by the replacement, since the static
+  directory is now in-progress, not future.
+- **Persisted:** memory.md hybrid-model decision (offline-first = non-map features;
+  map/routing online-first by design; never describe the app as globally offline-first);
+  blueprint.md crowdsourced truck-stop status layer bullet (backend, write auth via
+  future online accounts, moderation, staleness decay, legal review — all prerequisites
+  before implementation); todos.md Later item for the crowdsourced-status design
+  (rating-scale UX decision, sequenced after online accounts).
+- **Scope note:** no implementation authorized — the crowdsourced layer's blocker is
+  accounts + moderation, both future items. Backend schema drafting deliberately deferred
+  (recommendation to owner: the auth model shapes the schema; the local truck_stops table
+  from Track C phase 1 is the stable anchor future status reports would key off).
+- **Verification:** docs/memory-only change; no build. Files re-read after edit via tool
+  confirmations.
+- **Lock:** e673b835-80ca-4bdc-bf5b-ae9d57595f4d acquired and released.

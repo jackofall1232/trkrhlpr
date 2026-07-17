@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
   "project_name": "trkrhlpr (product: Last Wagon)",
-  "current_goal": "Track C phase 1 CI-verified (194afee green); OOSC-2004 item-level cross-check recorded with gap candidates for the verification pass; next owner decisions: device review, schema 5.json commit, V1/V2 dataset verification, gap candidates",
+  "current_goal": "Hybrid-model decision + crowdsourced-status roadmap persisted (owner-directed). Track C phase 1 CI-verified; owner gates pending: device review, schema 5.json commit, V1/V2 dataset verification, OOSC gap candidates",
   "current_phase": "truck_stop_phase1_verified_oosc_crosscheck_done",
   "active_agent": null,
   "last_agent": "claude",
-  "last_updated": "2026-07-17T12:26:30Z",
+  "last_updated": "2026-07-17T12:31:00Z",
   "status": "track_c_phase1_ci_green_oosc_crosscheck_recorded",
   "blocked": false,
   "blocker_reason": null,

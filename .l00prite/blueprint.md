@@ -71,6 +71,18 @@ behavior remain TODOs.
 
 - National directory of truck-accessible stops, fuel, parking, rest areas, weigh stations,
   services, repairs, washes, showers, restaurants, overnight parking, and amenities.
+  Status update 2026-07-17: the *static offline dataset* phase was pulled forward into the
+  owner-approved Track C build-out (phase 1 — labeled sample data + offline search — is
+  built; the verified national dataset import stays gated on source verification, see
+  `docs/truck-stop-data-sources.md`). The rest of this bullet's scope remains future.
+- Crowdsourced truck-stop status layer: driver-submitted new stop entries, parking
+  availability status (open/limited/full), weigh-station open/closed status, and a
+  comment/rating system. Consistent with the online-first map subsystem (hybrid-model
+  decision, `.l00prite/memory.md`). Still requires, before implementation: a backend
+  service, write authentication (depends on the online accounts system, itself a separate
+  future item), spam/abuse moderation, a staleness/decay model for time-sensitive reports,
+  and legal review of liability exposure for inaccurate crowdsourced safety/business-status
+  data.
 - Open-source commercial-truck GPS and routing based on vehicle dimensions, weights,
   axles, hazmat restrictions, prohibited roads, clearances, bridges, tunnels, and other
   commercial-routing constraints.
