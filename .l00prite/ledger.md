@@ -1226,3 +1226,13 @@ Append one entry per agent run. Do not overwrite prior runs.
   No key is hardcoded anywhere.
 - **Verification:** CI on the follow-up push is the check; watching the run.
 - **Lock:** b0d54a0e-eb92-4491-a722-8c61a4dd38ea acquired and released.
+
+### Supervised action 2026-07-17T02:59Z — Claude — CI green on address-search branch
+- **Run 29551144774 (151772d): SUCCESS** — assembleDebug + check (44 unit tests incl. the 16
+  new geocoding/debounce tests, lint) green on GitHub runners. Two prior red runs fixed:
+  (1) provider error-body parsing bug (both providers, both error shapes now tested);
+  (2) Kotlin DSL script-compilation failure — 'java' in a build-script body resolves to the
+  java extension accessor, so java.util.Properties needed a top-of-script import.
+- **Remaining owner steps:** ORS_API_KEY (local.properties / env / repo secret) and the
+  30-second api.heigit.org path check in docs/routing-provider.md; then device review.
+- **Lock:** 218d1876-941d-44b5-acd2-4c841258be10 acquired and released.
