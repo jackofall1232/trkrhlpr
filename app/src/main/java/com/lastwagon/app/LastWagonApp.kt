@@ -134,6 +134,7 @@ fun LastWagonApp(container: AppContainer) {
                                 RoutingWorkspaceScreen(
                                     container.vehicleProfileRepository,
                                     container.routingProvider,
+                                    container.geocodingProvider,
                                     container.routeRepository,
                                     styleProvider = container.mapStyleProvider,
                                     corridorManager = container.corridorManager,

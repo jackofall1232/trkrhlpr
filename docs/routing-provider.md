@@ -19,6 +19,34 @@ provider attribution and engine dates when returned, response SHA-256, local req
 request/response timestamps. Unknown, corrupt, or invalid persisted-route schemas fail closed.
 Changing the vehicle profile deletes the old route because its calculations no longer match.
 
+## Geocoding (address input)
+
+The route planner takes addresses, not raw coordinates. `OrsGeocodingProvider` resolves them
+with the same ORS account and key as routing (no second provider or credential):
+
+- `GET /geocode/autocomplete` — search-as-you-type for the origin and destination fields,
+  bounded to `boundary.country=US` (first-milestone scope) and at most 6 suggestions. The
+  destination search passes the resolved origin as `focus.point.*` to rank nearby results
+  higher. Tapping a suggestion is the resolution step: the suggestion's own coordinates feed
+  the unchanged coordinate-based `RoutingProvider.calculate` call, so free-typed text that
+  was never matched can never route to (0,0) — the calculate action stays disabled until
+  both endpoints are resolved.
+- `GET /geocode/reverse` — after "Use my current location", the approximate device position
+  is reverse-geocoded once so the driver can confirm a human-readable "Near …" label. This
+  is confirmation display only: routing always keeps the exact device coordinates, and a
+  failed reverse lookup falls back to showing the coordinates without blocking routing.
+
+ORS free-tier geocoding allows roughly 100 requests per minute against a shared daily quota
+([plan limits](https://account.heigit.org/info/plans)). Autocomplete therefore fires only
+after a 450 ms typing pause, requires at least 3 characters, and cancels the in-flight
+request on every new keystroke (`AddressAutocompleteController`), keeping a realistic
+address entry to a handful of requests.
+
+Location access reuses the existing opt-in **approximate** (coarse) location boundary — the
+manifest still strips `ACCESS_FINE_LOCATION`. Permission is requested only when the driver
+taps the location button; denial shows an explicit message and manual address entry remains
+available, so the flow never dead-ends.
+
 ## Credential boundary
 
 Development builds read `ORS_API_KEY` from a Gradle property or environment variable. The key

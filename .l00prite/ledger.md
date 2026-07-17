@@ -1169,3 +1169,37 @@ Append one entry per agent run. Do not overwrite prior runs.
 - **Verification:** website `next build` green locally; Android change is compile-verified by
   the branch CI run that follows this push.
 - **Lock:** e4a91c72-6b0f-4d2e-8a3b-1f5c6d7e8f90 acquired and released.
+
+### Supervised action 2026-07-17T02:40Z — Claude — route planner inputs: address search + current location replace raw lat/lon
+- **Task (owner-directed via Claude Code):** replace the four raw latitude/longitude fields
+  on the Phase 3 "Online route preview" with an Origin field (GPS "Use my current location"
+  primary + manual address search) and a Destination field (ORS `/geocode/autocomplete`
+  search-as-you-type). Branch: `claude/address-search-route-inputs-1i6awg` (push explicitly
+  granted by the task). The coordinate-based routing call is unchanged — only the input
+  method changed.
+- **Changes:** new `OrsGeocodingProvider` (autocomplete + reverse, same ORS key and
+  Authorization-header pattern as routing, `boundary.country=US`, max 6 suggestions, explicit
+  MISSING_CREDENTIAL/rate-limit/malformed-response failures); new `AddressInput.kt`
+  (`AddressAutocompleteController` 450 ms debounce + 3-char minimum + in-flight cancellation,
+  `AddressSearchField` composable, `currentApproximateLocation()` one-shot coarse fix via
+  platform `LocationManagerCompat` — no Play Services); `RoutePlanner` rewritten (Calculate
+  disabled until both endpoints resolve, so unresolved text can never route to (0,0));
+  `AppContainer`/`LastWagonApp` wiring; docs/README geocoding sections. Disclaimer sentence
+  "not proof of legality, clearance, or safety" retained verbatim.
+- **Decisions:** GPS origin is reverse-geocoded ONCE for a driver-confirmation label only —
+  routing keeps the exact device coordinates (no accuracy loss, 1 extra request, and the
+  coarse-only permission boundary from Phase 1 is preserved: ACCESS_FINE_LOCATION stays
+  stripped). Permission denial and no-fix cases show explicit messages and fall back to
+  manual entry — no dead end. Debounce sized against ORS free-tier geocoding (~100 req/min,
+  shared daily quota; exact plan pages 403-blocked from this environment, limits taken from
+  HeiGIT plan-page search snippets).
+- **Verification:** 14 new unit tests written (`OrsGeocodingProviderTest` URL building/
+  encoding/parsing/failure mapping; `AddressAutocompleteControllerTest` proves rapid typing
+  fires exactly one request, short queries fire none, clear/shorten cancels in-flight).
+  NOT run locally — this environment cannot build Android (dl.google.com 403, no SDK);
+  verification is the CI run on the pushed branch. No live ORS calls made (no key yet);
+  end-to-end remains owner-gated on ORS_API_KEY.
+- **Owner action needed:** supply ORS_API_KEY (Gradle property or env var,
+  `ORS_API_KEY=key ./gradlew :app:assembleDebug`) — single existing drop-in point powering
+  routing AND geocoding; then device-review GPS grant/denial and autocomplete flows.
+- **Lock:** 27ea7b6b-3df4-404e-bd99-2e03568fa288 acquired and released.
