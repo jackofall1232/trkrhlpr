@@ -1275,3 +1275,9 @@ Append one entry per agent run. Do not overwrite prior runs.
 - **Owner discussion opened (in chat):** key-distribution architecture (BYO key in-app vs
   baked env key vs self-hosted/proxy endpoint) following Codex P1 — no repo change until
   the owner decides; current CI secret wiring stands in the meantime.
+
+### Status 2026-07-17T03:27Z — Claude — PR #18 green after Codex round 2
+- Runs 29552280417 + 29552282117 (d44f1bd): SUCCESS. All 7 actionable bot findings across
+  two review rounds are fixed; PR #18 awaits owner decisions (merge; ORS_API_KEY; key
+  architecture: baked / BYO-override / proxy — options presented in chat).
+- **Lock:** a8d50a52-2316-41e8-8fa3-93ac457ec20f acquired and released.

@@ -5,7 +5,7 @@
   "current_phase": "content_source_research_complete",
   "active_agent": null,
   "last_agent": "claude",
-  "last_updated": "2026-07-17T02:59:10Z",
+  "last_updated": "2026-07-17T03:27:21Z",
   "status": "track_a_complete_website_apk_cta_wired_release_publication_pending",
   "blocked": false,
   "blocker_reason": null,
@@ -13,7 +13,7 @@
   "last_event_processed": "event-20260714-022005-github-pr2-foundation-review-a5f2",
   "pending_event_count": 0,
   "review_response_required": false,
-  "ci_status": "success (151772d on claude/address-search-route-inputs-1i6awg, run 29551144774: assembleDebug + check green \u2014 address-search route inputs verified by CI; ORS_API_KEY still pending from owner for live end-to-end)",
+  "ci_status": "success (d44f1bd on claude/address-search-route-inputs-1i6awg, runs 29552280417+29552282117: assembleDebug + check green; PR #18 green with both bot-review rounds addressed; ORS_API_KEY + key-architecture decision pending from owner)",
   "execution_active": false,
   "execution_stop_reason": "human_review_gate",
   "next_recommended_action": "2026-07-17: route planner now takes address search + current location on claude/address-search-route-inputs-1i6awg (CI on that branch is the build verification; ORS_API_KEY from owner is the only step left for live end-to-end). Standing owner gate unchanged: publish GitHub Release tag 0.1.0-beta with asset lastwagon-0.1.0-beta.apk from the latest green run on claude/apk-download-button-8y2he6. Standing Track B gate unchanged: FOUNDATION APPROVAL (B0) + owner decisions (JSON pipeline, checklist-only vs +CDL, air-figures policy); eCFR/GovInfo reachable here, fmcsa.dot.gov 403."
