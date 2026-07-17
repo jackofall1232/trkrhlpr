@@ -1115,3 +1115,69 @@ Append one entry per agent run. Do not overwrite prior runs.
   manual figures 122/124/125 remain the residual sourcing risk).
 - **Not execution mode:** supervised planning under a short-lived lock; execution stays disarmed.
 - **Lock:** 99106a33-58fb-40d7-9426-6b2f968c1975 acquired and released.
+
+### Supervised action 2026-07-17T00:57Z — Claude — Track B started (B0 conditionally approved); B1 verification
+- **B0 gate:** owner **conditionally approved** Track B. Conditions: fact-check with
+  research/search agents (never memory); Fable 5 as advisor; **NO direct commits by Claude for
+  the whole of Track B — Claude prepares changes, the human commits**; first drop = checklist
+  only; content storage = JSON asset + tested validator; unconfirmable air figures = drop (kept
+  as PARTIAL + note per Fable, so the 132-count forces an explicit decision).
+- **B1 verification (agent, eCFR versioner XML API):** results in `docs/track-b-verification-b1.md`
+  (uncommitted). CONFIRMED: items 13 (§393.209 — term is "column" not "shaft"), 33 (§393.93;
+  use mandate is §392.16), 129 (§393.43 breakaway), Appendix A/Part 396 defect criteria (label
+  "periodic-inspection", not OOS), §383.135 80% pass, §383.91 groups. PARTIAL: 131/132
+  (procedure not codified), 122 (85→100 psi codified in FMVSS 121 §571.121 but "45 s" is not),
+  124 (min cut-in only). UNCONFIRMED: 125 static-leakage 2/3 psi-per-min — not in 49 CFR
+  anywhere → excluded from ship. Wording fix for daily content: §395.3(a)(3)(ii) codified text
+  is "more than 8 hours of driving time" — drop "cumulative".
+- **Advisor (Fable):** JSON content schema (flat items, stable slug ids, structured
+  citations[{type,ref,url}], per-item verifiedOn) + validator invariants (all VERIFIED, counts,
+  unique ids, contiguous sequence, strict decode, no placeholder markers).
+- **Tooling:** eCFR HTML pages 302-redirect (WebFetch fails); the eCFR **versioner XML API**
+  works for verification. Recorded for future passes.
+- **No commits:** per B0 conditions, all Track B changes (this report + memory) are left in the
+  working tree for the human to commit. Execution Mode NOT armed (supervised flow).
+- **Lock:** d578d32b-4f11-4b10-a7a0-d66a95d1df87 acquired and released.
+
+### Supervised action 2026-07-17T01:13Z — Claude — Track B B2: content pipeline (uncommitted)
+- **B2 built** (new `core/data/.../content/`): `ContentModels` (flat items, slug ids, structured
+  `citations:[{type,ref,url}]`, provenance) · `ContentJson` strict DOM parser (unknown field /
+  enum / missing → throws `ContentFormatException`) · `ContentValidator` (structural invariants +
+  `shipBlockers` "no non-VERIFIED ships" + `importCompletenessProblems` for the final 132) ·
+  `ContentLoader` fail-closed asset→Room seeder · `assets/content/inspection.json` starter corpus
+  of the 3 CFR-VERIFIED items from B1 (393.209, 393.93, 393.43) as original prose · build.gradle
+  adds kotlinx-serialization-json (no new Gradle plugin — DOM parsing, mirrors routing).
+- **Verification:** `:core:data:testDebugUnitTest` exit 0, **BUILD SUCCESSFUL**; new
+  `ContentPipelineTest` **11/11** — parses the actual shipped asset, asserts all-VERIFIED, and
+  proves the gate rejects unverified / malformed / unknown-field / dup-id / future-date /
+  placeholder content. All prior core:data tests (incl. Robolectric MigrationTest v1→v4) still green.
+- **Design (Fable-advised):** structured citations enable per-type ref linting; PARTIAL + note is
+  the "known-but-not-shippable" state (no parallel status); items stay in the file so the count
+  gate forces resolution; expectedItemCount change makes any drop explicit in the diff.
+- **No commits (B0 condition):** all Track B changes remain in the working tree for the human to
+  commit. Uncommitted set: docs/track-b-verification-b1.md, docs/track-b-content-plan.md is
+  already pushed (985eb93), core/data content package + asset + test + build.gradle, l00prite
+  ledger/state/todos/lock.
+- **Next:** B3 authoring (the 132 items, content-review-gated) — grow the asset, verifying each
+  against eCFR via the versioner API; the ship-gate test stays red until every item is VERIFIED.
+- **Lock:** c16c5e5a-e412-4b10-a7a0-d66a95d1df87 acquired and released.
+
+### Supervised action 2026-07-17T01:32Z — Claude — Fable review addressed; Track B PR opened
+- **Fable review** of the B1+B2 changeset found 3 real gate holes + should-fixes; all addressed:
+  (B1) `ContentLoader.seedFrom` now delete-then-inserts and writes a REAL_CONTENT_MARKER so it
+  actually evicts labeled sample rows (proven by new Robolectric `ContentLoaderTest`); startup
+  wiring stays the gated B6 step. (B2) strict parser now rejects JSON `null`/wrong-type/quoted-int
+  in required fields (was laundering `null`→"null"). (B3) validator now requires a public-primary
+  citation (CFR/FMVSS/FMCSA_GUIDE) for VERIFIED. Should-fixes: runtime loader skips the
+  future-date check (device-clock safety) on IO dispatcher; placeholder scan widened to all
+  strings + WIP/DRAFT; `contentVersion` format enforced (asset → "2026.07.0"); item-13 citation
+  broadened to §393.209(a),(c),(d); category title/sequence checks; citation ref/url shape checks;
+  verifiedOn floor + ≤ header.
+- **Verification:** `./gradlew testDebugUnitTest compileDebugKotlin` → exit 0, **86 tests, 0
+  failures** (ContentPipelineTest 20, ContentLoaderTest 1, all prior green incl. Robolectric
+  MigrationTest v1→v4). Evidence: scratchpad/gradle-b2fix.log, gradle-b2final.log.
+- **PR:** per owner instruction ("have fable review, then open pr after green"), the Track B
+  changeset is committed to branch `feature/track-b-content-pipeline` (NOT to 0.1.0-beta) and
+  pushed for review; the owner merges (human-commit-only preserved). Content items are stamped
+  VERIFIED against eCFR but the PR flags them for owner spot-check at merge.
+- **Lock:** 122918d8-78ab-4b10-a7a0-d66a95d1df87 acquired and released.

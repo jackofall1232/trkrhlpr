@@ -117,6 +117,8 @@ interface LastWagonDao {
     suspend fun insertQuestions(values: List<QuestionEntity>)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertContentVersion(value: ContentVersionEntity)
+    @Query("DELETE FROM inspection_items") suspend fun deleteAllInspectionItems()
+    @Query("DELETE FROM inspection_categories") suspend fun deleteAllInspectionCategories()
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun setInspectionCompletion(value: InspectionCompletionEntity)
     @Query("DELETE FROM inspection_completions WHERE itemId = :itemId")
