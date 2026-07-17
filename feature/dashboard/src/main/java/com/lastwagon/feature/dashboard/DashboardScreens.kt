@@ -3,6 +3,7 @@ package com.lastwagon.feature.dashboard
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.AltRoute
@@ -13,6 +14,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lastwagon.core.designsystem.*
@@ -173,11 +177,24 @@ import kotlinx.coroutines.launch
             var keyText by rememberSaveable(prefs.orsApiKeyOverride) {
                 mutableStateOf(prefs.orsApiKeyOverride)
             }
+            // The key is a credential: masked by default, explicit reveal.
+            var keyVisible by rememberSaveable { mutableStateOf(false) }
             OutlinedTextField(
                 value = keyText,
                 onValueChange = { keyText = it },
                 label = { Text("Your API key") },
                 singleLine = true,
+                visualTransformation = if (keyVisible) VisualTransformation.None
+                else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                trailingIcon = {
+                    IconButton(onClick = { keyVisible = !keyVisible }) {
+                        Icon(
+                            if (keyVisible) Icons.Rounded.VisibilityOff else Icons.Rounded.Visibility,
+                            contentDescription = if (keyVisible) "Hide key" else "Show key",
+                        )
+                    }
+                },
                 modifier = Modifier.fillMaxWidth(),
             )
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(WagonSpacing.sm)) {

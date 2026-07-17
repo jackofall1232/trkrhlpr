@@ -1323,3 +1323,11 @@ Append one entry per agent run. Do not overwrite prior runs.
   Backup-exclusion behavior is rules-based and compile-verified; actual backup/restore of
   the secrets file remains a device-review item. PR #19 awaits owner merge decision.
 - **Lock:** 48d6edb4-dc97-4f9a-a243-06d6c5d3764f acquired and released.
+
+### Supervised action 2026-07-17T04:20Z — Claude — PR #19 Codex round 2 (2 P2s) applied
+- **Mask stored key (applied):** Settings key field uses PasswordVisualTransformation with
+  an explicit show/hide toggle; keyboard type Password.
+- **Missing-key message (applied):** provider MISSING_CREDENTIAL message now points to the
+  in-app Settings remedy first ("Paste an API key under Settings, or set ORS_API_KEY at
+  build time") in both routing and geocoding providers; exact-match test updated.
+- **Verification:** CI on the pushed commit.

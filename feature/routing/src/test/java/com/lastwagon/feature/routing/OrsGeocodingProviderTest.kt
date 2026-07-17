@@ -66,7 +66,8 @@ class OrsGeocodingProviderTest {
         val reverse = geocoder.reverse(GeoPoint(41.4, -75.66)) as GeocodeLookupResult.Failure
 
         assertEquals(
-            "OpenRouteService is not configured. Set ORS_API_KEY locally and rebuild.",
+            "OpenRouteService is not configured. Paste an API key under Settings, " +
+                "or set ORS_API_KEY at build time.",
             autocomplete.message,
         )
         assertEquals(autocomplete.message, reverse.message)

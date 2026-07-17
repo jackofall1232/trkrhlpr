@@ -57,7 +57,8 @@ class OrsRoutingProvider internal constructor(
     override suspend fun calculate(request: RouteRequest): RouteCalculationResult {
         if (apiKey.isBlank()) return failure(
             RouteFailureKind.MISSING_CREDENTIAL,
-            "OpenRouteService is not configured. Set ORS_API_KEY locally and rebuild.",
+            "OpenRouteService is not configured. Paste an API key under Settings, " +
+                "or set ORS_API_KEY at build time.",
         )
         if (!request.origin.isValid || !request.destination.isValid ||
             request.origin == request.destination ||
