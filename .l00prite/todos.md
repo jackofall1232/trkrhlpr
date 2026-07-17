@@ -51,8 +51,20 @@ waits behind its gate:
   8. Author CDL class + endorsement practice questions and daily questions (original prose).
   9. Import real content, replacing labeled sample content (needs foundation approval).
 - **Track C — behind its own research gate:**
-  10. Research public truck-stop data sources (licensing, freshness, offline storage).
-  11. Truck-stop dataset + search feature.
+  10. [x] 2026-07-17: Researched public truck-stop data sources — licensing, freshness,
+      offline storage — in `docs/truck-stop-data-sources.md` (NTAD Truck Stop Parking as
+      proposed seed; OSM/Overture as enrichment options; TPIMS deferred; proprietary
+      sources excluded). Search-excerpt evidence only: this environment 403-blocks all
+      research hosts, so exact license/field claims carry UNVERIFIED flags with a V1–V5
+      full-text verification worklist.
+  - [ ] **GATE — owner approval of the truck-stop sourcing plan** (§ 8 of
+    `docs/truck-stop-data-sources.md`) before any unit-11 implementation.
+  - [ ] Full-text verification V1–V2 (NTAD dataset license statement + field schema;
+    Jason's Law third-survey refresh status) from a session/browser that can reach
+    geodata.bts.gov and ops.fhwa.dot.gov; V3–V4 (Overture taxonomy/licensing, ODbL
+    attribution guidelines) before adopting either enrichment source.
+  11. Truck-stop dataset + search feature (blocked by the gate above; draft acceptance
+      criteria proposed in `docs/truck-stop-data-sources.md` § 8).
 
 Gates that will pause the loop: content-doc approval (Track B start), full-text verification
 of the 13 flagged checklist items (needs network to eCFR/FMCSA), foundation approval before
@@ -102,7 +114,9 @@ import, and the truck-stop data-source research gate (Track C start).
 - [ ] Implement CDL mock exams feature with randomized tests and readiness scoring.
 - [ ] Define test-history, missed-question review, randomized-test, and readiness-scoring behavior.
 - [ ] Implement CDL mock exams feature based on the defined behavior.
-- [ ] Implement comprehensive truck stop locations dataset and search features.
+- [ ] Implement comprehensive truck stop locations dataset and search features (Track C
+  unit 11 — blocked by the sourcing-plan approval gate; see the Track C block above and
+  `docs/truck-stop-data-sources.md`).
 - [ ] **OWNER ACTION — publish GitHub Release `0.1.0-beta`** with the asset named exactly
   `lastwagon-0.1.0-beta.apk` (download CI artifact `lastwagon-debug-apk` from the **latest
   green CI run on `claude/apk-download-button-8y2he6`** — runs before 2026-07-17T02:15Z

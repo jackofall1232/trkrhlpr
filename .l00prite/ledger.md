@@ -1331,3 +1331,39 @@ Append one entry per agent run. Do not overwrite prior runs.
   in-app Settings remedy first ("Paste an API key under Settings, or set ORS_API_KEY at
   build time") in both routing and geocoding providers; exact-match test updated.
 - **Verification:** CI on the pushed commit.
+
+### Supervised action 2026-07-17T11:24Z — Claude — Track C unit 10: truck-stop data-source research (docs/truck-stop-data-sources.md)
+- **Goal:** open Track C by researching public truck-stop data sources (licensing,
+  freshness, offline storage) — the unit that sits in front of the Track C research gate.
+- **Built:** `docs/truck-stop-data-sources.md` — source registry and evaluation:
+  (1) USDOT/BTS NTAD "Truck Stop Parking" (8,000+ locations, Jason's Law/MAP-21 survey
+  data, compiled 2019-04-09, GeoJSON/CSV/shapefile) as primary seed — public-domain
+  *expected* but per-dataset license statement flagged UNVERIFIED because NTAD licensing
+  varies (Intercity Bus Atlas inside NTAD is CC-BY-NC-4.0); (2) OpenStreetMap (ODbL 1.0)
+  as enrichment with an explicit compliance design (separate collective-database
+  component, attribution, published extract per the technological-measures clause);
+  (3) Overture Places (CDLA-Permissive-2.0, monthly releases) as low-obligation
+  alternative pending category-taxonomy verification; (4) TPIMS eight-state real-time
+  feeds deferred to the Later roadmap (online-only, regional); (5) proprietary sources
+  (Trucker Path, chain locators, commercial POI APIs) explicitly excluded per
+  constraints.md. Five-item full-text verification worklist (V1–V5) + a proposed phased
+  import plan and draft unit-11 acceptance criteria.
+- **Verification/evidence:** this session's network policy blocks ALL direct fetches:
+  `curl` CONNECT via agent proxy → 403 for every candidate host (geodata.bts.gov,
+  bts.gov, catalog.data.gov, ecfr.gov, govinfo.gov, wiki.openstreetmap.org,
+  overpass-api.de, opendatacommons.org, overturemaps.org, ops.fhwa.dot.gov; probed
+  2026-07-17T11:20Z, exit codes recorded in-session); WebFetch 403 on the same hosts.
+  Research therefore ran on web-search excerpts only (9 targeted searches, 2026-07-17
+  ~11:20–11:23Z); every doc claim cites its official URL and exact-wording claims are
+  marked UNVERIFIED. No build/tests: docs-only change (`git status` clean otherwise).
+- **Decisions:** public-domain-first ordering (federal seed before ODbL enrichment)
+  mirrors the approved content-sourcing rule; TPIMS real-time explicitly out of Track C
+  scope; no source adopted yet — adoption is the owner's Track C gate decision.
+- **Confidence:** high on the licensing landscape shape; medium on per-dataset specifics
+  until V1–V4 full-text checks run.
+- **Next action:** owner reviews docs/truck-stop-data-sources.md and approves (or
+  redirects) the § 8 sourcing plan — that approval opens Track C unit 11. V1/V2
+  verification needs a session or browser that can reach the blocked hosts.
+- **Do-not-retry:** direct page fetches (curl/WebFetch) from THIS remote environment —
+  every research host 403s at the proxy; use WebSearch or a different environment.
+- **Lock:** 550cf4c8-dfd2-46af-aef3-d11f2a602acb acquired and released.

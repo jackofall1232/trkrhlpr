@@ -1,20 +1,20 @@
 {
   "schema_version": 2,
   "project_name": "trkrhlpr (product: Last Wagon)",
-  "current_goal": "content docs owner-approved (2026-07-16); next, close the flagged verification items with full-text sources and prepare the milestone+truck-stops build-out for next-week Execution Mode",
-  "current_phase": "content_source_research_complete",
+  "current_goal": "Track C opened: truck-stop data-source research documented (docs/truck-stop-data-sources.md); awaiting owner approval of the sourcing plan (Track C gate) and full-text verification V1-V5; Track B still behind foundation approval + flagged-item verification",
+  "current_phase": "truck_stop_source_research_complete",
   "active_agent": null,
   "last_agent": "claude",
-  "last_updated": "2026-07-17T03:59:10Z",
-  "status": "track_a_complete_website_apk_cta_wired_release_publication_pending",
+  "last_updated": "2026-07-17T11:26:00Z",
+  "status": "track_a_complete_track_c_research_ready_for_owner_review",
   "blocked": false,
   "blocker_reason": null,
   "active_event_id": null,
   "last_event_processed": "event-20260714-022005-github-pr2-foundation-review-a5f2",
   "pending_event_count": 0,
   "review_response_required": false,
-  "ci_status": "success (85fb789 on claude/byo-ors-key-override, runs 29553557584+29553559115: assembleDebug + check green). PR #19 green with review round addressed (backup-safe key storage, cached delegates, save-to-clear). PR #18 merged earlier (ae80a0e).",
+  "ci_status": "success (85fb789 on claude/byo-ors-key-override, runs 29553557584+29553559115: assembleDebug + check green). PR #19 green with review round addressed. PR #18 merged earlier (ae80a0e). This session: docs-only change, no CI needed.",
   "execution_active": false,
   "execution_stop_reason": "human_review_gate",
-  "next_recommended_action": "2026-07-17: owner approved phased key plan (baked key for beta = disposable/rotatable; BYO override next; proxy w/ per-device rate limiting before wide release \u2014 see todos). PR #18 merged. Phase-2 branch claude/byo-ors-key-override carries the Settings key override; owner to review/merge, then supply ORS_API_KEY + run the api.heigit.org path check in docs/routing-provider.md. Standing gates unchanged (0.1.0-beta release publication; Track B foundation approval)."
+  "next_recommended_action": "2026-07-17: owner reviews docs/truck-stop-data-sources.md and approves or redirects the section-8 sourcing plan (federal NTAD seed -> optional OSM/Overture enrichment; TPIMS deferred). Full-text verification V1-V5 needs a network-open session (this environment 403s all research hosts). Standing gates unchanged: 0.1.0-beta release publication (owner), PR #19 merge decision, Track B foundation approval, ORS_API_KEY + api.heigit.org path check."
 }
