@@ -42,6 +42,11 @@ waits behind its gate:
      docs/local-progress-acceptance.md (formal approval still a human gate). The v1→v2/v2→v3
      migrations are now executed-and-validated, not just device-gated.
 - **Track B — behind human gates (docs approval + full-text verification):**
+  **Plan set up 2026-07-17: `docs/track-b-content-plan.md`** (phasing B0–B7, licensing
+  guardrails, JSON-asset content pipeline, verification worklist for the 14 flagged items,
+  acceptance criteria). Immediate gate = **foundation approval (B0)**. Update: eCFR/GovInfo are
+  reachable in this environment (200), so CFR full-text verification can run here; only the
+  AAMVA-manual air-brake figures (items 122/124/125) remain hard to source (fmcsa.dot.gov 403).
   7. Author the 132 checklist items as real content (original prose, per-item provenance).
   8. Author CDL class + endorsement practice questions and daily questions (original prose).
   9. Import real content, replacing labeled sample content (needs foundation approval).
