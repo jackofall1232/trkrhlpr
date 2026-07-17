@@ -59,6 +59,12 @@ of the 13 flagged checklist items (needs network to eCFR/FMCSA), foundation appr
 import, and the truck-stop data-source research gate (Track C start).
 
 ## Next
+- [ ] **Key architecture phase 3 (owner-approved 2026-07-17, before wide release):** thin
+  proxy endpoint holding the ORS key server-side. HARD REQUIREMENT from the owner: ships
+  with per-device/per-install rate limiting from day one — without it the abuse surface
+  just moves from "extract key from APK" to "hammer the proxy directly" (easier, no
+  reverse engineering). Also check HeiGIT ToS on fronting one key for many end users.
+  Not blocking the beta; baked key ships and is treated as disposable/rotatable.
 - [ ] Complete Phase 1 physical phone/tablet review: rendering, lifecycle, controls,
   approximate-location grant/denial, network loss, and accessibility.
 - [ ] Complete Phase 3 keyed ORS integration/device review: valid route, no-route, timeout,

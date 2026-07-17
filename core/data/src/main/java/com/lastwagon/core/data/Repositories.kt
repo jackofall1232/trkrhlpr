@@ -89,14 +89,23 @@ class DataStorePreferencesRepository(private val context: Context) : Preferences
         val theme = stringPreferencesKey("theme")
         val reduceMotion = booleanPreferencesKey("reduce_motion")
         val largeText = booleanPreferencesKey("large_text")
+        val orsApiKeyOverride = stringPreferencesKey("ors_api_key_override")
     }
     override val preferences = context.preferencesDataStore.data.map { p ->
         UserPreferences(parseThemePreference(p[Keys.theme]),
-            p[Keys.reduceMotion] ?: false, p[Keys.largeText] ?: false)
+            p[Keys.reduceMotion] ?: false, p[Keys.largeText] ?: false,
+            p[Keys.orsApiKeyOverride].orEmpty())
     }
     override suspend fun setTheme(theme: ThemePreference) { context.preferencesDataStore.edit { it[Keys.theme] = theme.name } }
     override suspend fun setReduceMotion(enabled: Boolean) { context.preferencesDataStore.edit { it[Keys.reduceMotion] = enabled } }
     override suspend fun setLargeText(enabled: Boolean) { context.preferencesDataStore.edit { it[Keys.largeText] = enabled } }
+    override suspend fun setOrsApiKeyOverride(key: String) {
+        context.preferencesDataStore.edit { preferences ->
+            val trimmed = key.trim()
+            if (trimmed.isEmpty()) preferences.remove(Keys.orsApiKeyOverride)
+            else preferences[Keys.orsApiKeyOverride] = trimmed
+        }
+    }
 }
 
 class DataStoreVehicleProfileRepository(private val context: Context) : VehicleProfileRepository {

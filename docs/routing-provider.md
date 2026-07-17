@@ -78,7 +78,16 @@ variable, or the gitignored `local.properties` at the repository root
 (`ORS_API_KEY=your-key` on its own line). CI reads it from the optional GitHub Actions
 repository secret `ORS_API_KEY`. All of these are uncommitted sources — the key must never
 be hardcoded in any source or committed file. The key is not committed, logged, or included
-in route provenance, but it is embedded in the APK and must be assumed extractable. A production build must not ship a privileged shared secret;
+in route provenance, but it is embedded in the APK and must be assumed extractable.
+
+At runtime a driver may paste their own key under Settings → "OpenRouteService API key
+(optional)"; a non-blank stored override wins over the build-time key per request
+(`KeyOverrideRoutingProvider` / `KeyOverrideGeocodingProvider`), is kept only in the app's
+local DataStore, and can be cleared to return to the built-in key. This keeps routing
+usable when the shared baked key is exhausted or rotated, without redistributing the APK.
+Owner decision 2026-07-17: the baked key ships for the beta and is treated as disposable /
+rotatable; a thin proxy with per-device rate limiting is the reviewed design required
+before wide release. A production build must not ship a privileged shared secret;
 provider restrictions, a narrowly scoped proxy, self-hosting, or another reviewed design is
 required before distribution.
 

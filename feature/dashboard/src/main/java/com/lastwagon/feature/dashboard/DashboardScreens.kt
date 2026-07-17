@@ -158,6 +158,45 @@ import kotlinx.coroutines.launch
             "lastwagon sample content is not official guidance and does not replace regulations, training, employer procedures, required inspections, or driver judgment.",
             Icons.Rounded.HealthAndSafety, WagonColors.MarkerAmber)
         WagonCard(Modifier.fillMaxWidth()) {
+            Text("ROUTING & ADDRESS SEARCH", style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary)
+            Text("OpenRouteService API key (optional)", style = MaterialTheme.typography.titleMedium)
+            Text(
+                "Route preview and address search normally use the app's built-in key. " +
+                    "Paste your own free key from account.heigit.org to use your own request " +
+                    "quota instead — helpful if the built-in key stops working. The key is " +
+                    "stored only on this device.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            // Re-keyed on the stored value so the field follows saves and clears.
+            var keyText by rememberSaveable(prefs.orsApiKeyOverride) {
+                mutableStateOf(prefs.orsApiKeyOverride)
+            }
+            OutlinedTextField(
+                value = keyText,
+                onValueChange = { keyText = it },
+                label = { Text("Your API key") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(WagonSpacing.sm)) {
+                Button(
+                    onClick = { scope.launch { preferencesRepository.setOrsApiKeyOverride(keyText) } },
+                    enabled = keyText.trim() != prefs.orsApiKeyOverride && keyText.isNotBlank(),
+                ) { Text("Save key") }
+                TextButton(
+                    onClick = { scope.launch { preferencesRepository.setOrsApiKeyOverride("") } },
+                    enabled = prefs.orsApiKeyOverride.isNotEmpty(),
+                ) { Text("Use built-in key") }
+            }
+            if (prefs.orsApiKeyOverride.isNotEmpty()) {
+                Text("Using your key for routing and address search.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.tertiary)
+            }
+        }
+        WagonCard(Modifier.fillMaxWidth()) {
             Text("ABOUT", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.secondary)
             Text("lastwagon " + appVersion, style = MaterialTheme.typography.titleLarge)
             Text("Native Kotlin • Jetpack Compose • Offline first", color = MaterialTheme.colorScheme.onSurfaceVariant)

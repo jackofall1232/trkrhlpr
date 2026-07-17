@@ -1281,3 +1281,19 @@ Append one entry per agent run. Do not overwrite prior runs.
   two review rounds are fixed; PR #18 awaits owner decisions (merge; ORS_API_KEY; key
   architecture: baked / BYO-override / proxy — options presented in chat).
 - **Lock:** a8d50a52-2316-41e8-8fa3-93ac457ec20f acquired and released.
+
+### Supervised action 2026-07-17T03:55Z — Claude — PR #18 merged (owner-authorized); phase-2 BYO key override built
+- **Merge (explicit owner permission in chat):** PR #18 merged into 0.1.0-beta as ae80a0e
+  after confirming green CI on d44f1bd (code) and 3adfc50 (head). PR subscription and the
+  hourly check-in trigger removed.
+- **Owner decisions recorded:** phased key plan approved — (1) baked key ships for beta,
+  disposable/rotatable; (2) optional in-app BYO key override next; (3) thin proxy BEFORE
+  wide release with per-device rate limiting as a day-one hard requirement (todos.md).
+- **Phase 2 built on `claude/byo-ors-key-override` (push authorized as the follow-up
+  branch):** UserPreferences.orsApiKeyOverride + DataStore persistence (blank clears the
+  stored key), KeyOverrideRoutingProvider/KeyOverrideGeocodingProvider resolve the
+  effective key per request (non-blank driver key wins over BuildConfig key), AppContainer
+  wiring, Settings card (paste key / "Use built-in key" / active-override indicator,
+  local-only storage note), docs updated. 3 new unit tests (effective-key precedence,
+  per-call delegate key for routing and geocoding).
+- **Verification:** CI on the pushed branch; no live ORS calls (still keyless environment).
