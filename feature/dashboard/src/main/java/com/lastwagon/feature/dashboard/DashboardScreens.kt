@@ -3,6 +3,7 @@ package com.lastwagon.feature.dashboard
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.AltRoute
@@ -13,6 +14,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lastwagon.core.designsystem.*
@@ -157,6 +161,59 @@ import kotlinx.coroutines.launch
         StatePanel("Safety & education disclaimer",
             "lastwagon sample content is not official guidance and does not replace regulations, training, employer procedures, required inspections, or driver judgment.",
             Icons.Rounded.HealthAndSafety, WagonColors.MarkerAmber)
+        WagonCard(Modifier.fillMaxWidth()) {
+            Text("ROUTING & ADDRESS SEARCH", style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary)
+            Text("OpenRouteService API key (optional)", style = MaterialTheme.typography.titleMedium)
+            Text(
+                "Route preview and address search normally use the app's built-in key. " +
+                    "Paste your own free key from account.heigit.org to use your own request " +
+                    "quota instead — helpful if the built-in key stops working. The key stays " +
+                    "on this device only and is excluded from Android backups and transfers.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            // Re-keyed on the stored value so the field follows saves and clears.
+            var keyText by rememberSaveable(prefs.orsApiKeyOverride) {
+                mutableStateOf(prefs.orsApiKeyOverride)
+            }
+            // The key is a credential: masked by default, explicit reveal.
+            var keyVisible by rememberSaveable { mutableStateOf(false) }
+            OutlinedTextField(
+                value = keyText,
+                onValueChange = { keyText = it },
+                label = { Text("Your API key") },
+                singleLine = true,
+                visualTransformation = if (keyVisible) VisualTransformation.None
+                else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                trailingIcon = {
+                    IconButton(onClick = { keyVisible = !keyVisible }) {
+                        Icon(
+                            if (keyVisible) Icons.Rounded.VisibilityOff else Icons.Rounded.Visibility,
+                            contentDescription = if (keyVisible) "Hide key" else "Show key",
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(WagonSpacing.sm)) {
+                Button(
+                    // Saving a cleared field is a valid way to drop the custom key.
+                    onClick = { scope.launch { preferencesRepository.setOrsApiKeyOverride(keyText) } },
+                    enabled = keyText.trim() != prefs.orsApiKeyOverride,
+                ) { Text("Save key") }
+                TextButton(
+                    onClick = { scope.launch { preferencesRepository.setOrsApiKeyOverride("") } },
+                    enabled = prefs.orsApiKeyOverride.isNotEmpty(),
+                ) { Text("Use built-in key") }
+            }
+            if (prefs.orsApiKeyOverride.isNotEmpty()) {
+                Text("Using your key for routing and address search.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.tertiary)
+            }
+        }
         WagonCard(Modifier.fillMaxWidth()) {
             Text("ABOUT", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.secondary)
             Text("lastwagon " + appVersion, style = MaterialTheme.typography.titleLarge)

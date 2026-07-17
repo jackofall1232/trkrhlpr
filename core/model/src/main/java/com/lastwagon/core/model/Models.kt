@@ -124,6 +124,8 @@ data class UserPreferences(
     val theme: ThemePreference = ThemePreference.DARK,
     val reduceMotion: Boolean = false,
     val largeText: Boolean = false,
+    /** Driver-supplied OpenRouteService key; blank means use the build-time key. */
+    val orsApiKeyOverride: String = "",
 )
 data class ProgressSnapshot(
     val inspectionCompleted: Int = 0, val inspectionTotal: Int = 0,
@@ -218,6 +220,7 @@ interface PreferencesRepository {
     suspend fun setTheme(theme: ThemePreference)
     suspend fun setReduceMotion(enabled: Boolean)
     suspend fun setLargeText(enabled: Boolean)
+    suspend fun setOrsApiKeyOverride(key: String)
 }
 interface VehicleProfileRepository {
     val profile: Flow<VehicleProfile?>

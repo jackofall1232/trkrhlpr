@@ -1281,3 +1281,53 @@ Append one entry per agent run. Do not overwrite prior runs.
   two review rounds are fixed; PR #18 awaits owner decisions (merge; ORS_API_KEY; key
   architecture: baked / BYO-override / proxy — options presented in chat).
 - **Lock:** a8d50a52-2316-41e8-8fa3-93ac457ec20f acquired and released.
+
+### Supervised action 2026-07-17T03:55Z — Claude — PR #18 merged (owner-authorized); phase-2 BYO key override built
+- **Merge (explicit owner permission in chat):** PR #18 merged into 0.1.0-beta as ae80a0e
+  after confirming green CI on d44f1bd (code) and 3adfc50 (head). PR subscription and the
+  hourly check-in trigger removed.
+- **Owner decisions recorded:** phased key plan approved — (1) baked key ships for beta,
+  disposable/rotatable; (2) optional in-app BYO key override next; (3) thin proxy BEFORE
+  wide release with per-device rate limiting as a day-one hard requirement (todos.md).
+- **Phase 2 built on `claude/byo-ors-key-override` (push authorized as the follow-up
+  branch):** UserPreferences.orsApiKeyOverride + DataStore persistence (blank clears the
+  stored key), KeyOverrideRoutingProvider/KeyOverrideGeocodingProvider resolve the
+  effective key per request (non-blank driver key wins over BuildConfig key), AppContainer
+  wiring, Settings card (paste key / "Use built-in key" / active-override indicator,
+  local-only storage note), docs updated. 3 new unit tests (effective-key precedence,
+  per-call delegate key for routing and geocoding).
+- **Verification:** CI on the pushed branch; no live ORS calls (still keyless environment).
+
+### Status 2026-07-17T03:38Z — Claude — phase-2 BYO-key branch green
+- Run 29552733658 (b2f1c29 on claude/byo-ors-key-override): SUCCESS first try — 47 unit
+  tests + lint. Awaiting owner review/merge decision (no PR opened; owner to request one
+  if wanted). Settings-card visuals remain a device-review gate.
+- **Lock:** 0e53f157-e1f1-44e2-8c65-fadd211471c7 acquired and released.
+
+### Supervised action 2026-07-17T04:05Z — Claude — PR #19 bot reviews classified and applied
+- **Codex P1 "driver key leaks into backups" (REAL, applied):** allowBackup=true would have
+  copied the DataStore-held driver key into cloud backups/device transfers, contradicting
+  the local-only promise. Fix: key moved to its own DataStore file (local_secrets), which
+  backup_rules.xml and data_extraction_rules.xml now exclude from cloud backup AND device
+  transfer; ordinary preferences/vehicle profile keep backing up. Settings copy + docs now
+  state the exclusion.
+- **Gemini "cache delegates" (applied):** per-key DelegateCache reuses the provider until
+  the effective key changes; 2 new cache-behavior tests (existing per-call key tests still
+  pass since creations only happen on key change).
+- **Gemini "allow blank Save to clear" (applied):** Save enabled whenever trimmed text
+  differs from stored; blank save clears (repository already removes on blank).
+- **Verification:** CI on the pushed commit.
+
+### Status 2026-07-17T03:59Z — Claude — PR #19 green after review fixes
+- Runs 29553557584 + 29553559115 (85fb789): SUCCESS (assembleDebug + 49 unit tests + lint).
+  Backup-exclusion behavior is rules-based and compile-verified; actual backup/restore of
+  the secrets file remains a device-review item. PR #19 awaits owner merge decision.
+- **Lock:** 48d6edb4-dc97-4f9a-a243-06d6c5d3764f acquired and released.
+
+### Supervised action 2026-07-17T04:20Z — Claude — PR #19 Codex round 2 (2 P2s) applied
+- **Mask stored key (applied):** Settings key field uses PasswordVisualTransformation with
+  an explicit show/hide toggle; keyboard type Password.
+- **Missing-key message (applied):** provider MISSING_CREDENTIAL message now points to the
+  in-app Settings remedy first ("Paste an API key under Settings, or set ORS_API_KEY at
+  build time") in both routing and geocoding providers; exact-match test updated.
+- **Verification:** CI on the pushed commit.

@@ -6,12 +6,13 @@ import com.lastwagon.core.model.*
 import kotlinx.coroutines.*
 import com.lastwagon.feature.routing.FileRouteRepository
 import com.lastwagon.feature.routing.GeocodingProvider
+import com.lastwagon.feature.routing.KeyOverrideGeocodingProvider
+import com.lastwagon.feature.routing.KeyOverrideRoutingProvider
 import com.lastwagon.feature.routing.MapStyleProvider
 import com.lastwagon.feature.routing.NetworkMonitor
 import com.lastwagon.feature.routing.OfflineCorridorManager
 import com.lastwagon.feature.routing.OpenFreeMapLibertyStyleProvider
-import com.lastwagon.feature.routing.OrsGeocodingProvider
-import com.lastwagon.feature.routing.OrsRoutingProvider
+import kotlinx.coroutines.flow.first
 
 class LastWagonApplication : Application() {
     lateinit var container: AppContainer
@@ -32,8 +33,15 @@ class AppContainer(application: Application) {
     val progressRepository: ProgressRepository = OfflineProgressRepository(database.dao())
     val preferencesRepository: PreferencesRepository = DataStorePreferencesRepository(application)
     val vehicleProfileRepository: VehicleProfileRepository = DataStoreVehicleProfileRepository(application)
-    val routingProvider: RoutingProvider = OrsRoutingProvider(BuildConfig.ORS_API_KEY)
-    val geocodingProvider: GeocodingProvider = OrsGeocodingProvider(BuildConfig.ORS_API_KEY)
+    // A driver-supplied key from Settings overrides the build-time key per request, so a
+    // rotated or exhausted baked key can be replaced without redistributing the APK.
+    private val orsKeyOverride: suspend () -> String = {
+        preferencesRepository.preferences.first().orsApiKeyOverride
+    }
+    val routingProvider: RoutingProvider =
+        KeyOverrideRoutingProvider(BuildConfig.ORS_API_KEY, orsKeyOverride)
+    val geocodingProvider: GeocodingProvider =
+        KeyOverrideGeocodingProvider(BuildConfig.ORS_API_KEY, orsKeyOverride)
     val routeRepository: RouteRepository = FileRouteRepository(application)
     // Corridor prefetch stays disabled outside debug/testing builds until the provider's
     // offline-storage terms are confirmed in writing (docs/map-provider-evaluation.md).

@@ -22,7 +22,8 @@ internal const val AUTOCOMPLETE_MAX_SUGGESTIONS = 6
 private const val DEFAULT_ORS_GEOCODE_BASE_URL = OrsApi.GEOCODE_BASE_URL
 
 private const val MISSING_KEY_MESSAGE =
-    "OpenRouteService is not configured. Set ORS_API_KEY locally and rebuild."
+    "OpenRouteService is not configured. Paste an API key under Settings, " +
+        "or set ORS_API_KEY at build time."
 
 data class GeocodeSuggestion(val label: String, val point: GeoPoint)
 

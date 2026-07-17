@@ -12,6 +12,11 @@ import kotlinx.coroutines.flow.map
 private const val SAMPLE_VERSION = 2
 private val Context.preferencesDataStore by preferencesDataStore("preferences")
 
+// Driver-supplied credentials get their own store so the app's backup rules can exclude
+// exactly this file (datastore/local_secrets.preferences_pb) from cloud backup and device
+// transfer without dropping ordinary preferences — see app/src/main/res/xml/.
+private val Context.localSecretsDataStore by preferencesDataStore("local_secrets")
+
 class OfflineContentRepository(private val database: LastWagonDatabase) : ContentRepository {
     private val dao = database.dao()
     override suspend fun ensureSampleContent() {
@@ -89,14 +94,24 @@ class DataStorePreferencesRepository(private val context: Context) : Preferences
         val theme = stringPreferencesKey("theme")
         val reduceMotion = booleanPreferencesKey("reduce_motion")
         val largeText = booleanPreferencesKey("large_text")
+        val orsApiKeyOverride = stringPreferencesKey("ors_api_key_override")
     }
-    override val preferences = context.preferencesDataStore.data.map { p ->
-        UserPreferences(parseThemePreference(p[Keys.theme]),
-            p[Keys.reduceMotion] ?: false, p[Keys.largeText] ?: false)
-    }
+    override val preferences = context.preferencesDataStore.data
+        .combine(context.localSecretsDataStore.data) { p, secrets ->
+            UserPreferences(parseThemePreference(p[Keys.theme]),
+                p[Keys.reduceMotion] ?: false, p[Keys.largeText] ?: false,
+                secrets[Keys.orsApiKeyOverride].orEmpty())
+        }
     override suspend fun setTheme(theme: ThemePreference) { context.preferencesDataStore.edit { it[Keys.theme] = theme.name } }
     override suspend fun setReduceMotion(enabled: Boolean) { context.preferencesDataStore.edit { it[Keys.reduceMotion] = enabled } }
     override suspend fun setLargeText(enabled: Boolean) { context.preferencesDataStore.edit { it[Keys.largeText] = enabled } }
+    override suspend fun setOrsApiKeyOverride(key: String) {
+        context.localSecretsDataStore.edit { secrets ->
+            val trimmed = key.trim()
+            if (trimmed.isEmpty()) secrets.remove(Keys.orsApiKeyOverride)
+            else secrets[Keys.orsApiKeyOverride] = trimmed
+        }
+    }
 }
 
 class DataStoreVehicleProfileRepository(private val context: Context) : VehicleProfileRepository {

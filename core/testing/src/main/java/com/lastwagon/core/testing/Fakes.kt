@@ -72,6 +72,9 @@ class FakePreferencesRepository(initial: UserPreferences = UserPreferences()) : 
     override suspend fun setTheme(theme: ThemePreference) { state.update { it.copy(theme = theme) } }
     override suspend fun setReduceMotion(enabled: Boolean) { state.update { it.copy(reduceMotion = enabled) } }
     override suspend fun setLargeText(enabled: Boolean) { state.update { it.copy(largeText = enabled) } }
+    override suspend fun setOrsApiKeyOverride(key: String) {
+        state.update { it.copy(orsApiKeyOverride = key.trim()) }
+    }
 }
 
 class FakeVehicleProfileRepository(initial: VehicleProfile? = null) : VehicleProfileRepository {
