@@ -1297,3 +1297,9 @@ Append one entry per agent run. Do not overwrite prior runs.
   local-only storage note), docs updated. 3 new unit tests (effective-key precedence,
   per-call delegate key for routing and geocoding).
 - **Verification:** CI on the pushed branch; no live ORS calls (still keyless environment).
+
+### Status 2026-07-17T03:38Z — Claude — phase-2 BYO-key branch green
+- Run 29552733658 (b2f1c29 on claude/byo-ors-key-override): SUCCESS first try — 47 unit
+  tests + lint. Awaiting owner review/merge decision (no PR opened; owner to request one
+  if wanted). Settings-card visuals remain a device-review gate.
+- **Lock:** 0e53f157-e1f1-44e2-8c65-fadd211471c7 acquired and released.
