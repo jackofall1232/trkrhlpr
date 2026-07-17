@@ -5,7 +5,7 @@
   "current_phase": "truck_stop_phase2_pipeline_built",
   "active_agent": null,
   "last_agent": "claude",
-  "last_updated": "2026-07-17T12:46:30Z",
+  "last_updated": "2026-07-17T12:51:00Z",
   "status": "pr20_review_round1_addressed_awaiting_ci",
   "blocked": false,
   "blocker_reason": null,
@@ -13,7 +13,7 @@
   "last_event_processed": "event-20260714-022005-github-pr2-foundation-review-a5f2",
   "pending_event_count": 0,
   "review_response_required": false,
-  "ci_status": "pending on review-fix commit (PR #20). Prior: fab320d runs in progress at review time; 194afee green (29579434919). Local: 38 core/model tests green.",
+  "ci_status": "fab320d: SUCCESS both runs (29580824188 + 29580944539). 7d278e3 (review fixes): in progress (29581446938 + 29581450782). PR #20 open, review round 1 addressed.",
   "execution_active": false,
   "execution_stop_reason": "human_review_gate",
   "next_recommended_action": "Watch PR #20 CI on the review-fix commit; owner gates unchanged (device review, 5.json commit, V1/V2 verification, merge decision)."

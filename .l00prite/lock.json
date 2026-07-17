@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "lock_id": "bdea1d34-52ef-4622-8078-30f0b7b1e304",
+  "lock_id": "9f1c2a70-ci-record-fab320d",
   "owner_agent": null,
   "owner_session": null,
-  "acquired_at": "2026-07-17T12:45:31Z",
-  "expires_at": "2026-07-17T13:45:31Z",
-  "ttl_seconds": 3600,
+  "acquired_at": "2026-07-17T12:50:30Z",
+  "expires_at": "2026-07-17T13:20:30Z",
+  "ttl_seconds": 1800,
   "purpose": null,
   "protected_paths": [
     "ledger.md",
