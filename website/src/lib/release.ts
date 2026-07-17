@@ -1,6 +1,8 @@
 // Current sideloaded beta release. Bump APK_VERSION here (and upload the
-// matching GitHub Release asset) on every release — everything else derives
-// from it, so the version never has to be edited in more than one place.
+// matching GitHub Release asset) on every release — everything else on the
+// site derives from it. The Android build has its own copy of this version:
+// bump versionName AND versionCode in app/build.gradle.kts in the same
+// release, or installed apps won't accept the new APK as an update.
 export const APK_VERSION = "0.1.0-beta";
 
 // Must exactly match the asset filename uploaded to the GitHub Release for

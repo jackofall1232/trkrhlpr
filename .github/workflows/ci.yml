@@ -36,8 +36,12 @@ jobs:
       - name: Assemble debug APK
         run: ./gradlew assembleDebug --stacktrace
 
+      - name: Unit tests and lint
+        run: ./gradlew check --stacktrace
+
       # Debug-signed APK for sideload/beta distribution; a human still uploads
-      # it to a GitHub Release — CI never publishes anything itself.
+      # it to a GitHub Release — CI never publishes anything itself. Runs after
+      # check so a red run never exposes a plausible release candidate.
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
@@ -45,9 +49,6 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
-
-      - name: Unit tests and lint
-        run: ./gradlew check --stacktrace
 
       - name: Upload reports
         if: always()

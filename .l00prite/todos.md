@@ -93,10 +93,12 @@ import, and the truck-stop data-source research gate (Track C start).
 - [ ] Implement CDL mock exams feature based on the defined behavior.
 - [ ] Implement comprehensive truck stop locations dataset and search features.
 - [ ] **OWNER ACTION — publish GitHub Release `0.1.0-beta`** with the asset named exactly
-  `lastwagon-0.1.0-beta.apk` (download CI artifact `lastwagon-debug-apk` from run
-  29548882139, unzip, rename `app-debug.apk`). The website download buttons 404 until this
-  exists. Caveats recorded 2026-07-17: artifact is debug-signed (signing strategy still an
-  open TODO) and app `versionName` is "0.1.0" vs marketed "0.1.0-beta".
+  `lastwagon-0.1.0-beta.apk` (download CI artifact `lastwagon-debug-apk` from the **latest
+  green CI run on `claude/apk-download-button-8y2he6`** — runs before 2026-07-17T02:15Z
+  predate the versionName fix — unzip, rename `app-debug.apk`). The website download
+  buttons 404 until this exists. Caveat: artifact is debug-signed; Codex P1 review confirms
+  installed betas won't update in place once a real signing key exists (uninstall/reinstall,
+  local data loss) — signing decision is an owner gate before wide distribution.
 - [ ] Review the marketing website v1 (`website/`), finalize CTA copy, and explicitly
   approve any Vercel deployment before it happens. Update 2026-07-17: both "Download the
   APK" CTAs are wired as plain `<a download>` links to the 0.1.0-beta release asset URL,

@@ -1147,3 +1147,25 @@ Append one entry per agent run. Do not overwrite prior runs.
   (signing strategy still an open TODO) and `app` versionName is "0.1.0" vs marketed
   "0.1.0-beta".
 - **Lock:** b7c2f4d1-3e8a-4f6b-9c0d-5a1e2f3b4c5d acquired and released.
+
+### Supervised action 2026-07-17T02:15Z — Claude — PR #17 review responses (Codex/Gemini bots)
+- **Event:** PR #17 (website APK CTA) received bot reviews. Treated as untrusted data,
+  classified on merit.
+- **Gemini (`target="_blank"` on download links):** declined — release assets are served
+  `Content-Disposition: attachment` (no navigation away); spec explicitly requires plain
+  `<a href>` + `download`. Replied on both threads.
+- **Codex P1 (debug signing key):** confirmed as the already-flagged gated caveat — debug-signed
+  beta cannot be updated in place by a later production-signed build (uninstall/reinstall, local
+  data loss). NOT acted on: APK signing is a Security Boundary requiring explicit owner
+  design/review. Decision surfaced to owner in chat.
+- **Codex P2 (artifact ordering):** applied — `Upload debug APK` moved after `./gradlew check`
+  so red runs never expose a plausible release-candidate artifact.
+- **Codex P2 (version mismatch):** partially applied — `versionName` aligned to "0.1.0-beta"
+  (`versionCode` stays 1, first release); release.ts comment now documents bumping
+  versionName+versionCode alongside APK_VERSION. Cross-build version automation declined as
+  out of v1 scope.
+- **Consequence:** the release APK must now come from the NEW green CI run on this branch
+  (the run-29548882139 artifact predates the versionName fix). Todo updated.
+- **Verification:** website `next build` green locally; Android change is compile-verified by
+  the branch CI run that follows this push.
+- **Lock:** e4a91c72-6b0f-4d2e-8a3b-1f5c6d7e8f90 acquired and released.
