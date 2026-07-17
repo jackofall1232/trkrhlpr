@@ -164,8 +164,8 @@ import kotlinx.coroutines.launch
             Text(
                 "Route preview and address search normally use the app's built-in key. " +
                     "Paste your own free key from account.heigit.org to use your own request " +
-                    "quota instead — helpful if the built-in key stops working. The key is " +
-                    "stored only on this device.",
+                    "quota instead — helpful if the built-in key stops working. The key stays " +
+                    "on this device only and is excluded from Android backups and transfers.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -182,8 +182,9 @@ import kotlinx.coroutines.launch
             )
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(WagonSpacing.sm)) {
                 Button(
+                    // Saving a cleared field is a valid way to drop the custom key.
                     onClick = { scope.launch { preferencesRepository.setOrsApiKeyOverride(keyText) } },
-                    enabled = keyText.trim() != prefs.orsApiKeyOverride && keyText.isNotBlank(),
+                    enabled = keyText.trim() != prefs.orsApiKeyOverride,
                 ) { Text("Save key") }
                 TextButton(
                     onClick = { scope.launch { preferencesRepository.setOrsApiKeyOverride("") } },

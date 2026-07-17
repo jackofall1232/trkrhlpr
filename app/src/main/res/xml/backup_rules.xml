@@ -2,5 +2,7 @@
 <full-backup-content>
     <exclude domain="database" path="lastwagon.db-shm" />
     <exclude domain="database" path="lastwagon.db-wal" />
+    <!-- Driver-supplied API credentials never leave the device. -->
+    <exclude domain="file" path="datastore/local_secrets.preferences_pb" />
 </full-backup-content>
 

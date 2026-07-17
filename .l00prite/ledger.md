@@ -1303,3 +1303,17 @@ Append one entry per agent run. Do not overwrite prior runs.
   tests + lint. Awaiting owner review/merge decision (no PR opened; owner to request one
   if wanted). Settings-card visuals remain a device-review gate.
 - **Lock:** 0e53f157-e1f1-44e2-8c65-fadd211471c7 acquired and released.
+
+### Supervised action 2026-07-17T04:05Z — Claude — PR #19 bot reviews classified and applied
+- **Codex P1 "driver key leaks into backups" (REAL, applied):** allowBackup=true would have
+  copied the DataStore-held driver key into cloud backups/device transfers, contradicting
+  the local-only promise. Fix: key moved to its own DataStore file (local_secrets), which
+  backup_rules.xml and data_extraction_rules.xml now exclude from cloud backup AND device
+  transfer; ordinary preferences/vehicle profile keep backing up. Settings copy + docs now
+  state the exclusion.
+- **Gemini "cache delegates" (applied):** per-key DelegateCache reuses the provider until
+  the effective key changes; 2 new cache-behavior tests (existing per-call key tests still
+  pass since creations only happen on key change).
+- **Gemini "allow blank Save to clear" (applied):** Save enabled whenever trimmed text
+  differs from stored; blank save clears (repository already removes on blank).
+- **Verification:** CI on the pushed commit.

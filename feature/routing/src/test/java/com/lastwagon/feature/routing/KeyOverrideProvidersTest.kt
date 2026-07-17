@@ -40,6 +40,52 @@ class KeyOverrideProvidersTest {
         assertEquals(listOf("baked", "driver-key"), keysUsed)
     }
 
+    @Test fun routingDelegateIsReusedWhileTheKeyIsUnchanged() = runTest {
+        var creations = 0
+        var stored = ""
+        val provider = KeyOverrideRoutingProvider(
+            buildTimeKey = "baked",
+            overrideKey = { stored },
+            createDelegate = {
+                creations++
+                object : RoutingProvider {
+                    override val id = "fake"
+                    override suspend fun calculate(request: RouteRequest) =
+                        RouteCalculationResult.Failure(RouteFailure(RouteFailureKind.NETWORK, "n/a"))
+                }
+            },
+        )
+        provider.calculate(request)
+        provider.calculate(request)
+        assertEquals(1, creations)
+        stored = "driver-key"
+        provider.calculate(request)
+        provider.calculate(request)
+        assertEquals(2, creations)
+    }
+
+    @Test fun geocodingDelegateIsReusedWhileTheKeyIsUnchanged() = runTest {
+        var creations = 0
+        val provider = KeyOverrideGeocodingProvider(
+            buildTimeKey = "baked",
+            overrideKey = { "" },
+            createDelegate = {
+                creations++
+                object : GeocodingProvider {
+                    override val id = "fake"
+                    override suspend fun autocomplete(text: String, focus: GeoPoint?) =
+                        GeocodeLookupResult.Success(emptyList<GeocodeSuggestion>())
+                    override suspend fun reverse(point: GeoPoint) =
+                        GeocodeLookupResult.Success(emptyList<GeocodeSuggestion>())
+                }
+            },
+        )
+        provider.autocomplete("Scr")
+        provider.autocomplete("Scranton")
+        provider.reverse(GeoPoint(41.4, -75.66))
+        assertEquals(1, creations)
+    }
+
     @Test fun geocodingDelegateReceivesTheEffectiveKeyPerCall() = runTest {
         val keysUsed = mutableListOf<String>()
         var stored = "driver-key"

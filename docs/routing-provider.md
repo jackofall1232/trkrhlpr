@@ -82,8 +82,10 @@ in route provenance, but it is embedded in the APK and must be assumed extractab
 
 At runtime a driver may paste their own key under Settings → "OpenRouteService API key
 (optional)"; a non-blank stored override wins over the build-time key per request
-(`KeyOverrideRoutingProvider` / `KeyOverrideGeocodingProvider`), is kept only in the app's
-local DataStore, and can be cleared to return to the built-in key. This keeps routing
+(`KeyOverrideRoutingProvider` / `KeyOverrideGeocodingProvider`), is kept in a dedicated
+local DataStore file that the app's backup rules exclude from Android cloud backup and
+device transfer (`datastore/local_secrets.preferences_pb`), and can be cleared to return
+to the built-in key. This keeps routing
 usable when the shared baked key is exhausted or rotated, without redistributing the APK.
 Owner decision 2026-07-17: the baked key ships for the beta and is treated as disposable /
 rotatable; a thin proxy with per-device rate limiting is the reviewed design required

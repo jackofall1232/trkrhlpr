@@ -13,24 +13,41 @@ import com.lastwagon.core.model.RoutingProvider
 internal fun effectiveOrsKey(override: String, buildTimeKey: String): String =
     override.trim().ifEmpty { buildTimeKey }
 
+/** Caches a delegate per effective key so steady-state requests reuse one instance. */
+private class DelegateCache<T>(private val create: (String) -> T) {
+    private var key: String? = null
+    private var delegate: T? = null
+
+    fun forKey(effectiveKey: String): T = synchronized(this) {
+        val current = delegate
+        if (current != null && key == effectiveKey) return current
+        create(effectiveKey).also { created ->
+            key = effectiveKey
+            delegate = created
+        }
+    }
+}
+
 class KeyOverrideRoutingProvider(
     private val buildTimeKey: String,
     private val overrideKey: suspend () -> String,
-    private val createDelegate: (String) -> RoutingProvider = { key -> OrsRoutingProvider(key) },
+    createDelegate: (String) -> RoutingProvider = { key -> OrsRoutingProvider(key) },
 ) : RoutingProvider {
+    private val cache = DelegateCache(createDelegate)
     override val id = "openrouteservice"
     override suspend fun calculate(request: RouteRequest): RouteCalculationResult =
-        createDelegate(effectiveOrsKey(overrideKey(), buildTimeKey)).calculate(request)
+        cache.forKey(effectiveOrsKey(overrideKey(), buildTimeKey)).calculate(request)
 }
 
 class KeyOverrideGeocodingProvider(
     private val buildTimeKey: String,
     private val overrideKey: suspend () -> String,
-    private val createDelegate: (String) -> GeocodingProvider = { key -> OrsGeocodingProvider(key) },
+    createDelegate: (String) -> GeocodingProvider = { key -> OrsGeocodingProvider(key) },
 ) : GeocodingProvider {
+    private val cache = DelegateCache(createDelegate)
     override val id = "openrouteservice-geocode"
     override suspend fun autocomplete(text: String, focus: GeoPoint?): GeocodeLookupResult =
-        createDelegate(effectiveOrsKey(overrideKey(), buildTimeKey)).autocomplete(text, focus)
+        cache.forKey(effectiveOrsKey(overrideKey(), buildTimeKey)).autocomplete(text, focus)
     override suspend fun reverse(point: GeoPoint): GeocodeLookupResult =
-        createDelegate(effectiveOrsKey(overrideKey(), buildTimeKey)).reverse(point)
+        cache.forKey(effectiveOrsKey(overrideKey(), buildTimeKey)).reverse(point)
 }
