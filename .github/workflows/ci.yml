@@ -36,6 +36,16 @@ jobs:
       - name: Assemble debug APK
         run: ./gradlew assembleDebug --stacktrace
 
+      # Debug-signed APK for sideload/beta distribution; a human still uploads
+      # it to a GitHub Release — CI never publishes anything itself.
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: lastwagon-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Unit tests and lint
         run: ./gradlew check --stacktrace
 

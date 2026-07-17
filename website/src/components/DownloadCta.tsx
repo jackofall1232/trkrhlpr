@@ -1,4 +1,5 @@
 import RigIllustration from "./RigIllustration";
+import { APK_DOWNLOAD_URL, APK_VERSION } from "@/lib/release";
 
 export default function DownloadCta() {
   return (
@@ -18,15 +19,16 @@ export default function DownloadCta() {
         toward the Play Store. Offline-first — it keeps working where coverage
         doesn&apos;t.
       </p>
-      {/* TODO: point at the real signed APK once release distribution is approved */}
+      {/* Sideload caveats + the no-platform-gating decision: see lib/release.ts */}
       <a
-        href="#download"
+        href={APK_DOWNLOAD_URL}
+        download
         className="mt-9 inline-block rounded bg-amber px-8 py-4 font-display text-sm font-bold uppercase tracking-wide text-near-black transition-colors hover:bg-amber-bright"
       >
         Download the APK
       </a>
       <div className="mt-6 font-mono text-[11px] uppercase tracking-[0.1em] text-steel">
-        DIRECT APK · ANDROID · GOOGLE PLAY COMING SOON
+        DIRECT APK v{APK_VERSION} · ANDROID · GOOGLE PLAY COMING SOON
       </div>
       {/* Ghost rig rolling along the section's bottom border. */}
       <div aria-hidden="true">

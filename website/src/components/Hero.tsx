@@ -1,4 +1,5 @@
 import RigScene from "./RigScene";
+import { APK_DOWNLOAD_URL } from "@/lib/release";
 
 export default function Hero() {
   return (
@@ -16,9 +17,10 @@ export default function Hero() {
           the office.
         </p>
         <div className="mt-8 flex flex-wrap gap-4">
-          {/* TODO: real CTA copy + APK link once distribution is settled */}
+          {/* Sideload caveats + the no-platform-gating decision: see lib/release.ts */}
           <a
-            href="#download"
+            href={APK_DOWNLOAD_URL}
+            download
             className="rounded bg-near-black px-6 py-3.5 font-display text-sm font-bold uppercase tracking-wide text-cream transition-colors hover:text-amber-bright"
           >
             Download the APK
