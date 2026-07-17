@@ -1,7 +1,11 @@
 package com.lastwagon.feature.routing
 
 import com.lastwagon.core.model.GeoPoint
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.*
 import java.net.HttpURLConnection
@@ -46,19 +50,34 @@ internal fun interface GeocodingHttpTransport {
 }
 
 internal class UrlConnectionGeocodingTransport : GeocodingHttpTransport {
-    override suspend fun get(url: String, authorization: String) = withContext(Dispatchers.IO) {
-        val connection = URL(url).openConnection() as HttpURLConnection
+    override suspend fun get(url: String, authorization: String): RoutingHttpResponse = coroutineScope {
+        val connection = withContext(Dispatchers.IO) { URL(url).openConnection() as HttpURLConnection }
+        // A cancelled lookup (the user kept typing) must abort the blocking exchange right
+        // away instead of holding the socket until its timeout; disconnect() from another
+        // coroutine is the only interruption HttpURLConnection supports.
+        var exchangeDone = false
+        val cancellationWatcher = launch {
+            try {
+                awaitCancellation()
+            } finally {
+                if (!exchangeDone) runCatching { connection.disconnect() }
+            }
+        }
         try {
-            connection.requestMethod = "GET"
-            connection.connectTimeout = 10_000
-            connection.readTimeout = 10_000
-            connection.setRequestProperty("Authorization", authorization)
-            connection.setRequestProperty("Accept", "application/geo+json, application/json")
-            val status = connection.responseCode
-            val stream = if (status in 200..299) connection.inputStream else connection.errorStream
-            RoutingHttpResponse(status, stream?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }.orEmpty())
+            withContext(Dispatchers.IO) {
+                connection.requestMethod = "GET"
+                connection.connectTimeout = 10_000
+                connection.readTimeout = 10_000
+                connection.setRequestProperty("Authorization", authorization)
+                connection.setRequestProperty("Accept", "application/geo+json, application/json")
+                val status = connection.responseCode
+                val stream = if (status in 200..299) connection.inputStream else connection.errorStream
+                RoutingHttpResponse(status, stream?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }.orEmpty())
+            }
         } finally {
-            connection.disconnect()
+            exchangeDone = true
+            cancellationWatcher.cancel()
+            runCatching { connection.disconnect() }
         }
     }
 }
@@ -103,6 +122,8 @@ class OrsGeocodingProvider internal constructor(
             transport.get(url, apiKey)
         } catch (_: SocketTimeoutException) {
             return GeocodeLookupResult.Failure("The address service timed out.", retryable = true)
+        } catch (cancellation: CancellationException) {
+            throw cancellation
         } catch (_: Exception) {
             return GeocodeLookupResult.Failure("The address service could not be reached.", retryable = true)
         }
@@ -110,17 +131,22 @@ class OrsGeocodingProvider internal constructor(
         return parse(response.body)
     }
 
+    // Individual malformed features are skipped so one bad entry cannot discard the
+    // remaining valid suggestions; only an unparseable body fails the whole lookup.
     private fun parse(body: String): GeocodeLookupResult = try {
-        val features = Json.parseToJsonElement(body).jsonObject["features"]?.jsonArray.orEmpty()
+        val features = (Json.parseToJsonElement(body) as? JsonObject)
+            ?.get("features") as? JsonArray ?: JsonArray(emptyList())
         val suggestions = features.mapNotNull { feature ->
-            val obj = feature.jsonObject
-            val coordinates = obj["geometry"]?.jsonObject?.get("coordinates")?.jsonArray
+            val obj = feature as? JsonObject ?: return@mapNotNull null
+            val geometry = obj["geometry"] as? JsonObject ?: return@mapNotNull null
+            val coordinates = geometry["coordinates"] as? JsonArray ?: return@mapNotNull null
+            val latitude = (coordinates.getOrNull(1) as? JsonPrimitive)?.doubleOrNull
                 ?: return@mapNotNull null
-            val point = GeoPoint(
-                coordinates[1].jsonPrimitive.double,
-                coordinates[0].jsonPrimitive.double,
-            )
-            val label = obj["properties"]?.jsonObject?.get("label")?.jsonPrimitive?.contentOrNull
+            val longitude = (coordinates.getOrNull(0) as? JsonPrimitive)?.doubleOrNull
+                ?: return@mapNotNull null
+            val point = GeoPoint(latitude, longitude)
+            val properties = obj["properties"] as? JsonObject
+            val label = (properties?.get("label") as? JsonPrimitive)?.contentOrNull
             if (label.isNullOrBlank() || !point.isValid) null else GeocodeSuggestion(label, point)
         }
         GeocodeLookupResult.Success(suggestions)

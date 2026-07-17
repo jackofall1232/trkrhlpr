@@ -450,6 +450,7 @@ private fun RoutePlanner(
     }
     var originFromGps by rememberSaveable { mutableStateOf(false) }
     var locating by remember { mutableStateOf(false) }
+    var locationJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
     var locationMessage by remember { mutableStateOf<String?>(null) }
     var calculating by remember { mutableStateOf(false) }
     var failure by remember { mutableStateOf<RouteFailure?>(null) }
@@ -464,10 +465,21 @@ private fun RoutePlanner(
     val originSearchState by originSearch.state.collectAsStateWithLifecycle()
     val destinationSearchState by destinationSearch.state.collectAsStateWithLifecycle()
 
+    // Address lookups need the network; going offline drops pending and shown suggestions.
+    LaunchedEffect(online) {
+        if (!online) {
+            originSearch.clear()
+            destinationSearch.clear()
+        }
+    }
+
     fun useCurrentLocation() {
         locating = true
         locationMessage = null
-        scope.launch {
+        // Manual origin input cancels this job, so a slow fix or reverse lookup can never
+        // overwrite an origin the driver has since typed or selected.
+        locationJob?.cancel()
+        locationJob = scope.launch {
             try {
                 val located = context.currentApproximateLocation()
                 if (located == null) {
@@ -542,14 +554,18 @@ private fun RoutePlanner(
                 },
                 searchState = originSearchState,
                 onTextChange = { value ->
+                    locationJob?.cancel()
                     originText = value
                     if (origin?.label != value) {
                         origin = null
                         originFromGps = false
                     }
-                    originSearch.onQueryChanged(value)
+                    if (online) originSearch.onQueryChanged(value) else originSearch.clear()
+                    // Only one suggestion card at a time — drop the other field's list.
+                    destinationSearch.clear()
                 },
                 onSuggestionSelected = { suggestion ->
+                    locationJob?.cancel()
                     origin = AddressSelection(suggestion.label, suggestion.point)
                     originFromGps = false
                     originText = suggestion.label
@@ -589,7 +605,10 @@ private fun RoutePlanner(
                 onTextChange = { value ->
                     destinationText = value
                     if (destination?.label != value) destination = null
-                    destinationSearch.onQueryChanged(value, focus = origin?.point)
+                    if (online) destinationSearch.onQueryChanged(value, focus = origin?.point)
+                    else destinationSearch.clear()
+                    // Only one suggestion card at a time — drop the other field's list.
+                    originSearch.clear()
                 },
                 onSuggestionSelected = { suggestion ->
                     destination = AddressSelection(suggestion.label, suggestion.point)

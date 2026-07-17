@@ -116,7 +116,9 @@ class OrsGeocodingProviderTest {
         assertTrue(transport.urls.isEmpty())
     }
 
-    // One valid feature, one with out-of-range coordinates, one with no label.
+    // One valid feature among malformed ones: out-of-range coordinates, missing label,
+    // too-few coordinates, geometry of the wrong type, and a non-object feature. Only the
+    // valid feature may survive, and none of the others may fail the whole lookup.
     private val featureCollection = """
         {
           "geocoding":{"version":"0.2"},
@@ -130,7 +132,14 @@ class OrsGeocodingProviderTest {
              "properties":{"id":"2","label":"Broken coordinates"}},
             {"type":"Feature",
              "geometry":{"type":"Point","coordinates":[-75.0,41.0]},
-             "properties":{"id":"3"}}
+             "properties":{"id":"3"}},
+            {"type":"Feature",
+             "geometry":{"type":"Point","coordinates":[-75.0]},
+             "properties":{"id":"4","label":"Too few coordinates"}},
+            {"type":"Feature",
+             "geometry":"not-an-object",
+             "properties":{"id":"5","label":"Broken geometry"}},
+            "not-a-feature-object"
           ]
         }
     """.trimIndent()

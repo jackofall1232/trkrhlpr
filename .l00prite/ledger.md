@@ -1236,3 +1236,32 @@ Append one entry per agent run. Do not overwrite prior runs.
 - **Remaining owner steps:** ORS_API_KEY (local.properties / env / repo secret) and the
   30-second api.heigit.org path check in docs/routing-provider.md; then device review.
 - **Lock:** 218d1876-941d-44b5-acd2-4c841258be10 acquired and released.
+
+### Supervised action 2026-07-17T03:20Z — Claude — PR #18 bot reviews (Gemini/Codex) classified and applied
+- **Event:** PR #18 (address-search route inputs) received Gemini (3 comments) + Codex
+  (1 P1, 4 P2) bot reviews. Treated as untrusted data, classified on merit.
+- **Applied — Codex P2 "pending GPS overwrites manual origin" (REAL bug):** the GPS
+  coroutine is now a tracked Job; typing or selecting a manual origin cancels it, so a slow
+  fix/reverse lookup can never silently replace a newer manual origin (wrong-origin routing
+  risk). Main-dispatcher execution makes the cancel race-free.
+- **Applied — Gemini+Codex "skip malformed geocode features":** per-feature safe parsing
+  (safe casts + getOrNull + doubleOrNull); one structurally-broken feature no longer
+  discards the valid suggestions. Went beyond the bots' suggestion (their version kept an
+  unsafe .jsonPrimitive on label). Test fixture extended with 3 structurally-malformed
+  features.
+- **Applied — Codex P2 "offline autocomplete":** queries gated on `online`; going offline
+  clears pending/shown suggestions.
+- **Applied — Codex P2 "transport cancellation":** geocoding transport now aborts the
+  blocking HttpURLConnection via a cancellation-watcher disconnect; fetch rethrows
+  CancellationException instead of converting it to a failure. Noted: quota is spent
+  server-side once a request is sent — this saves sockets, not quota. Routing transport
+  left unchanged (no typing-storm exposure).
+- **Applied — Gemini "single suggestion card":** typing in one field clears the other
+  field's suggestion list.
+- **NOT applied silently — Codex P1 "ORS key extractable from CI artifacts":** legitimate
+  consequence of the owner-directed CI secret wiring on a PUBLIC repo (keyed CI APK =
+  extractable key; quota is the blast radius). Credential/security boundary → surfaced to
+  owner in chat with options instead of acting unilaterally. Prior debug-signing/beta
+  caveats already on record.
+- **Verification:** CI on the pushed commit (branch run + PR run). Both prior runs on
+  8ac5c84 were green.
