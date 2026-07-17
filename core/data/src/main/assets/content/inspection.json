@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026.07.0",
+  "verifiedOn": "2026-07-17",
+  "expectedItemCount": 3,
+  "categories": [
+    { "id": "steer-axle", "title": "Steer axle — suspension, brakes, wheel", "sequence": 2 },
+    { "id": "cab-check", "title": "Cab check and engine start", "sequence": 3 },
+    { "id": "brake-checks", "title": "Brake checks", "sequence": 10 }
+  ],
+  "items": [
+    {
+      "id": "steer.steering-column",
+      "categoryId": "steer-axle",
+      "sequence": 13,
+      "name": "Steering column",
+      "inspectFor": "Confirm the steering column is securely fastened and the steering wheel is secured and turns freely through its full travel; check the gear box, joints, and pitman arm for looseness.",
+      "defects": [
+        "Loose or missing steering column mounting hardware",
+        "Steering wheel not secured, or a spoke cracked through or missing",
+        "Worn or weld-repaired steering joints, or a loose pitman arm",
+        "Free play beyond the Appendix A limit for the wheel diameter"
+      ],
+      "applicability": [],
+      "citations": [
+        { "type": "CFR", "ref": "49 CFR 393.209(a),(c),(d)", "url": "https://www.ecfr.gov/current/title-49/section-393.209" },
+        { "type": "CFR", "ref": "49 CFR Part 396, App. A, sec. 7 (steering)", "url": "https://www.ecfr.gov/current/title-49/part-396/appendix-Appendix%20A%20to%20Part%20396" }
+      ],
+      "verificationStatus": "VERIFIED",
+      "verifiedOn": "2026-07-17",
+      "notes": "Original prose from the codified requirement. Term is 'steering column' (not 'shaft') per the CFR."
+    },
+    {
+      "id": "cab.seat-belt",
+      "categoryId": "cab-check",
+      "sequence": 33,
+      "name": "Driver seat belt",
+      "inspectFor": "Confirm a seat belt assembly is installed at the driver's seat, securely mounted, and that it latches and adjusts. The belt must be worn whenever the vehicle is in motion.",
+      "defects": [
+        "Seat belt assembly missing, cut, frayed, or not securely mounted",
+        "Latch or retractor does not hold or adjust"
+      ],
+      "applicability": [],
+      "citations": [
+        { "type": "CFR", "ref": "49 CFR 393.93 (assembly required)", "url": "https://www.ecfr.gov/current/title-49/section-393.93" },
+        { "type": "CFR", "ref": "49 CFR 392.16 (belt must be worn)", "url": "https://www.ecfr.gov/current/title-49/section-392.16" }
+      ],
+      "verificationStatus": "VERIFIED",
+      "verifiedOn": "2026-07-17",
+      "notes": "393.93 requires the assembly; the wear mandate is the separate 392.16."
+    },
+    {
+      "id": "brakes.trailer-air-supply-breakaway",
+      "categoryId": "brake-checks",
+      "sequence": 129,
+      "name": "Trailer air-supply / breakaway test",
+      "inspectFor": "With the system fully charged, pull the trailer air-supply (red) knob: the tractor-protection valve must close and the trailer's emergency (breakaway) brakes must apply and hold.",
+      "defects": [
+        "Tractor-protection / trailer-air-supply valve does not close as supply pressure drops into the 20-45 psi range",
+        "Trailer emergency brakes fail to apply automatically on loss of air supply"
+      ],
+      "applicability": ["AIR", "COMBO"],
+      "citations": [
+        { "type": "CFR", "ref": "49 CFR 393.43(a),(b),(d)", "url": "https://www.ecfr.gov/current/title-49/section-393.43" }
+      ],
+      "verificationStatus": "VERIFIED",
+      "verifiedOn": "2026-07-17",
+      "notes": "The 20-45 psi automatic tractor-protection window and the automatic trailer breakaway application (hold >= 15 min) are codified."
+    }
+  ]
+}
