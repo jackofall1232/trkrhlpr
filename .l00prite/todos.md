@@ -155,7 +155,8 @@ import, and the truck-stop data-source research gate (Track C start).
 - [ ] Define APK signing, sideload distribution, and update strategy.
 - [ ] Define inspection timestamps, notes, and optional defect-reporting behavior.
 - [ ] Consider School Bus, Doubles/Triples, and other CDL categories after the initial scope.
-- [ ] Design crowdsourced parking/weigh-station status feature: data model for status
+- [ ] Design crowdsourced parking/weigh-station status feature (**V2** — not part of the
+  current Track C static-directory work): data model for status
   reports with timestamp decay, submission auth (depends on online accounts), moderation/
   abuse handling, rate limiting, and legal review (false status reports affecting a
   business, defamation risk in free-text comments). Decide rating scale: dual 🚦⭐

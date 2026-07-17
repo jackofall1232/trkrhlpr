@@ -75,7 +75,9 @@ behavior remain TODOs.
   owner-approved Track C build-out (phase 1 — labeled sample data + offline search — is
   built; the verified national dataset import stays gated on source verification, see
   `docs/truck-stop-data-sources.md`). The rest of this bullet's scope remains future.
-- Crowdsourced truck-stop status layer: driver-submitted new stop entries, parking
+- Crowdsourced truck-stop status layer (**V2** — owner clarified 2026-07-17: this layer is
+  V2; the static truck-stop placement itself is Track C work that proceeds now):
+  driver-submitted new stop entries, parking
   availability status (open/limited/full), weigh-station open/closed status, and a
   comment/rating system. Consistent with the online-first map subsystem (hybrid-model
   decision, `.l00prite/memory.md`). Still requires, before implementation: a backend

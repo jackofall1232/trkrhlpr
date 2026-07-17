@@ -26,7 +26,9 @@ class OfflineContentRepository(private val database: LastWagonDatabase) : Conten
             dao.insertItems(SampleContent.inspectionItems)
             dao.insertTestCategories(SampleContent.testCategories)
             dao.insertQuestions(SampleContent.questions)
-            dao.insertTruckStops(SampleContent.truckStops)
+            dao.insertTruckStops(
+                TruckStopContent.parse(SampleContent.truckStopsJson).stops.map { it.toEntity() },
+            )
             dao.insertContentVersion(ContentVersionEntity(SAMPLE_VERSION, System.currentTimeMillis()))
         }
     }
@@ -243,3 +245,7 @@ private fun TruckStopEntity.toModel() = TruckStop(
     ContentId(id), name, state, highway, latitude, longitude, truckParkingSpaces,
     hasDiesel, hasShowers, hasFood, hasRepair, isSample,
     sourceCitation, parseVerificationStatus(verificationStatus), datasetVintage)
+private fun TruckStop.toEntity() = TruckStopEntity(
+    id.value, name, state, highway, latitude, longitude, truckParkingSpaces,
+    hasDiesel, hasShowers, hasFood, hasRepair, isSample,
+    sourceCitation, verificationStatus.name, datasetVintage)

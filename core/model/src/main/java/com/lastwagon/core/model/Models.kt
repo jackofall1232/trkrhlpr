@@ -1,6 +1,15 @@
 package com.lastwagon.core.model
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.intOrNull
 
 @JvmInline value class ContentId(val value: String)
 
@@ -197,6 +206,91 @@ object TruckStopSearch {
             matches.sortedWith(compareBy({ it.state }, { it.name })), hiddenUnknown,
         )
     }
+}
+
+/** Result of parsing a truck-stop content file: the usable records plus a count of
+ *  structurally-broken records that were skipped (surfaced so imports can be audited —
+ *  a silent drop would misreport dataset coverage). */
+data class TruckStopDataset(
+    val stops: List<TruckStop>,
+    val skippedRecords: Int,
+)
+
+/**
+ * Parser for Last Wagon's own truck-stop content JSON — the app-side format of the
+ * versioned content pipeline. External datasets (e.g. the NTAD Truck Stop Parking layer)
+ * are converted to this schema at content-preparation time, after their license and field
+ * schema pass verification; the app never parses provider formats directly.
+ *
+ * Envelope: `schema_version` (must equal [SUPPORTED_SCHEMA_VERSION]), `dataset`
+ * (`citation`, `vintage`, `verification`, `sample`) applied to every record, and `stops`.
+ * Per record: `id`, `name`, `state`, `lat`, `lon` are required; `highway`,
+ * `parking_spaces`, and the amenity booleans (`diesel`, `showers`, `food`, `repair`) are
+ * optional — a missing or null amenity stays null (unknown), never false. A structurally
+ * broken record is skipped and counted, never fatal; an unparseable envelope or wrong
+ * schema version yields an empty dataset.
+ */
+object TruckStopContent {
+    const val SUPPORTED_SCHEMA_VERSION = 1
+
+    fun parse(json: String): TruckStopDataset {
+        val root = runCatching { Json.parseToJsonElement(json) }.getOrNull() as? JsonObject
+            ?: return TruckStopDataset(emptyList(), 0)
+        val version = (root["schema_version"] as? JsonPrimitive)?.intOrNull
+        if (version != SUPPORTED_SCHEMA_VERSION) return TruckStopDataset(emptyList(), 0)
+        val dataset = root["dataset"] as? JsonObject
+        val citation = dataset.string("citation").orEmpty()
+        val vintage = dataset.string("vintage").orEmpty()
+        val verification = VerificationStatus.entries
+            .firstOrNull { it.name == dataset.string("verification") }
+            ?: VerificationStatus.UNVERIFIED
+        val sample = (dataset?.get("sample") as? JsonPrimitive)?.booleanOrNull ?: true
+        val records = root["stops"] as? JsonArray ?: return TruckStopDataset(emptyList(), 0)
+        val stops = mutableListOf<TruckStop>()
+        var skipped = 0
+        for (element in records) {
+            val stop = parseStop(element, citation, vintage, verification, sample)
+            if (stop != null) stops += stop else skipped++
+        }
+        return TruckStopDataset(stops, skipped)
+    }
+
+    private fun parseStop(
+        element: JsonElement, citation: String, vintage: String,
+        verification: VerificationStatus, sample: Boolean,
+    ): TruckStop? {
+        val record = element as? JsonObject ?: return null
+        val id = record.string("id")?.takeIf { it.isNotBlank() } ?: return null
+        val name = record.string("name")?.takeIf { it.isNotBlank() } ?: return null
+        val state = record.string("state")?.takeIf { it.isNotBlank() } ?: return null
+        val latitude = (record["lat"] as? JsonPrimitive)?.doubleOrNull ?: return null
+        val longitude = (record["lon"] as? JsonPrimitive)?.doubleOrNull ?: return null
+        if (!GeoPoint(latitude, longitude).isValid) return null
+        return TruckStop(
+            id = ContentId(id),
+            name = name,
+            state = state,
+            highway = record.string("highway").orEmpty(),
+            latitude = latitude,
+            longitude = longitude,
+            truckParkingSpaces = (record["parking_spaces"] as? JsonPrimitive)?.intOrNull
+                ?.takeIf { it >= 0 },
+            hasDiesel = record.optionalBoolean("diesel"),
+            hasShowers = record.optionalBoolean("showers"),
+            hasFood = record.optionalBoolean("food"),
+            hasRepair = record.optionalBoolean("repair"),
+            isSample = sample,
+            sourceCitation = citation,
+            verificationStatus = verification,
+            datasetVintage = vintage,
+        )
+    }
+
+    private fun JsonObject?.string(key: String): String? =
+        (this?.get(key) as? JsonPrimitive)?.takeIf { it.isString }?.contentOrNull
+
+    private fun JsonObject.optionalBoolean(key: String): Boolean? =
+        (this[key] as? JsonPrimitive)?.booleanOrNull
 }
 
 enum class ThemePreference { DARK, LIGHT, SYSTEM }

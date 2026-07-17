@@ -1468,3 +1468,28 @@ Append one entry per agent run. Do not overwrite prior runs.
 - **Verification:** docs/memory-only change; no build. Files re-read after edit via tool
   confirmations.
 - **Lock:** e673b835-80ca-4bdc-bf5b-ae9d57595f4d acquired and released.
+
+### Supervised action 2026-07-17T12:42Z — Claude — Track C phase 2 pipeline: versioned truck-stop content JSON (owner: "still moving forward with the truck stop placement"; crowdsourcing relabeled V2)
+- **Owner correction applied:** the crowdsourced status layer is V2 (blueprint/todos/memory
+  blocks relabeled); the static truck-stop placement continues now under Track C.
+- **Built:** `TruckStopContent` parser in core/model — Last Wagon's own versioned
+  content-JSON schema (envelope: schema_version, dataset citation/vintage/verification/
+  sample-flag; per-record required id/name/state/lat/lon, optional highway/parking/
+  amenities with absent = unknown, never false; broken records skipped AND counted;
+  sample defaults true so content is never silently real). SampleContent's hardcoded
+  entity list replaced by a JSON document (`truckStopsJson`) parsed through the same
+  production path the real dataset will use — after V1/V2, the verified document swaps in
+  with no app-schema change. kotlinx-serialization-json (already project-standard via
+  routing, 1.9.0) added to core/model — tree parsing only, no codegen plugin.
+  App-side schema documented in docs/truck-stop-data-sources.md §9. NTAD field mapping
+  deliberately NOT guessed in code — the attribute list stays V1 worklist material
+  (search excerpts could not surface it; API page proxy-blocked).
+- **Tests:** TruckStopContentParserTest (7: provenance application, absent-amenity
+  unknown, broken-record skip counting, negative parking, unknown verification status,
+  wrong schema version, garbage input); TruckStopContentTest rewritten against the parsed
+  sample document (+ parse-completeness check).
+- **Verification:** local standalone kotlinc (embeddable 2.2.10 + serialization jars
+  1.9.0 from Maven Central): core/model compiled, **38 tests OK, exit 0**
+  (2026-07-17T12:41Z; 31 prior + 7 new). core/data changes (repository seeding through
+  the parser, entity mapper) verify on CI for the pushed commit.
+- **Lock:** e673b835-80ca-4bdc-bf5b-ae9d57595f4d re-acquired this step and released.

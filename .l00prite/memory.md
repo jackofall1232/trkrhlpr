@@ -47,7 +47,9 @@ Durable project facts and decisions that future agents should preserve.
   (online routing/planning, bounded offline corridor for connectivity loss mid-route)
   remains the model for the routing map itself. (Reconciliations applied when persisting
   the owner's block: the owner-approved count is 132, not 131, and the truck-stop static
-  directory is offline-first per the approved Track C sourcing plan.)
+  directory is offline-first per the approved Track C sourcing plan.) Owner clarification
+  2026-07-17: the crowdsourced status layer is **V2**; the static truck-stop placement
+  (Track C — real stop locations in the offline directory) continues now.
 - The first production milestone covers the 132-point pre-trip inspection, Study Mode,
   Real Inspection Mode, CDL practice tests, a daily safety question, and local progress.
 - The national truck-stop directory, truck GPS/routing, online accounts, and cloud

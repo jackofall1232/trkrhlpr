@@ -171,3 +171,25 @@ offline search over the imported dataset; per-record provenance + vintage visibl
 attribute filters only over verified fields; explicit unknown-state display; attribution
 screen lists every source whose license requires it; dataset replaceable via the
 versioned content pipeline without schema migration for a same-shape refresh.
+
+## 9. App-side content schema (phase-2 pipeline, built 2026-07-17)
+
+The app parses **Last Wagon's own truck-stop content JSON** (`TruckStopContent` in
+core/model), never a provider format. External datasets are converted to this schema at
+content-preparation time, after V1/V2 clear; the app-side pipeline is already live and
+carries the labeled sample document (`SampleContent.truckStopsJson`).
+
+Envelope: `schema_version` (currently 1), `dataset` (`citation`, `vintage`,
+`verification` = VERIFIED/PARTIAL/UNVERIFIED, `sample` — defaults to `true` so content is
+never silently treated as real), `stops`. Per record: `id`, `name`, `state`, `lat`,
+`lon` required; `highway`, `parking_spaces`, and amenity booleans (`diesel`, `showers`,
+`food`, `repair`) optional — an absent amenity stays unknown (null), never false.
+Structurally-broken records are skipped and counted (`skippedRecords`), never fatal, so
+an import's coverage is auditable.
+
+Phase-2 remaining work once V1/V2 clear: map the verified NTAD attribute schema to these
+fields at content-prep time (mapping is deliberately NOT guessed in code — the field
+list is V1 worklist material), produce the real document with
+`citation`/`vintage` = the dataset's actual identity and compilation date,
+`sample: false`, and replace the sample JSON (bundled asset). No app-schema change is
+expected for that swap.

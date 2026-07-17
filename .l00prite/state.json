@@ -1,20 +1,20 @@
 {
   "schema_version": 2,
   "project_name": "trkrhlpr (product: Last Wagon)",
-  "current_goal": "Hybrid-model decision + crowdsourced-status roadmap persisted (owner-directed). Track C phase 1 CI-verified; owner gates pending: device review, schema 5.json commit, V1/V2 dataset verification, OOSC gap candidates",
-  "current_phase": "truck_stop_phase1_verified_oosc_crosscheck_done",
+  "current_goal": "Track C continues (owner): phase-2 content pipeline built (TruckStopContent JSON parser, sample doc through production path); crowdsourced layer relabeled V2. Real dataset swap-in waits only on V1/V2 verification + content prep",
+  "current_phase": "truck_stop_phase2_pipeline_built",
   "active_agent": null,
   "last_agent": "claude",
-  "last_updated": "2026-07-17T12:31:00Z",
-  "status": "track_c_phase1_ci_green_oosc_crosscheck_recorded",
+  "last_updated": "2026-07-17T12:43:00Z",
+  "status": "track_c_pipeline_pushed_awaiting_ci",
   "blocked": false,
   "blocker_reason": null,
   "active_event_id": null,
   "last_event_processed": "event-20260714-022005-github-pr2-foundation-review-a5f2",
   "pending_event_count": 0,
   "review_response_required": false,
-  "ci_status": "success (194afee on claude/continue-track-c-bkd3q7, run 29579434919: assembleDebug + check green, first try). Schema 5.json in build-reports artifact, not yet committed (proxy-blocked here; artifact expires 2026-07-24).",
+  "ci_status": "pending on claude/continue-track-c-bkd3q7 (pipeline commit). Prior green: 194afee run 29579434919. Local: 38 core/model tests green standalone.",
   "execution_active": false,
   "execution_stop_reason": "human_review_gate",
-  "next_recommended_action": "Owner: device-review the truck-stops screen; download run-29579434919 build-reports artifact to commit schemas/5.json (or do it from an SDK session). Track C phase 2 (real NTAD import) waits on V1/V2. OOSC gap candidates (front axle beam, air tank, ABS lamps, disc wording, ASA wording) queued as owner decisions at the full-text verification pass. Standing gates unchanged."
+  "next_recommended_action": "Watch CI on the pipeline commit. Then: owner device review of the truck-stops screen; commit schemas/5.json from the run-29579434919 artifact (expires 2026-07-24); V1/V2 verification (NTAD license + field schema) -> convert real dataset to the documented content JSON -> swap for sample doc. OOSC gap candidates queued at the full-text pass. Standing gates unchanged."
 }
