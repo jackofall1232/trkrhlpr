@@ -111,6 +111,14 @@ import, and the truck-stop data-source research gate (Track C start).
   facts in `docs/content-sourcing.md` by line-by-line verification against the FMCSA model
   manual PDF and eCFR full text — needs a session/machine whose network can fetch them
   (this remote environment's policy blocks those hosts).
+- [ ] **At the same verification pass — decide the OOSC cross-check gap candidates**
+  (item-level pass done 2026-07-17, `docs/pretrip-132-checklist.md`): front axle beam
+  (possible item 133), air reservoir security/drain, ABS malfunction lamps (cab + trailer
+  external, 49 CFR 393.55), disc-rotor wording on items 25/76/109, ASA check-don't-adjust
+  wording on items 24/75/108. Each changes content or count → owner decision.
+- [ ] Commit CI-generated Room schema `core/data/schemas/.../5.json` from an SDK-capable
+  session or the run-29579434919 build-reports artifact (expires 2026-07-24; Azure blob
+  host is proxy-blocked in this session).
 - [ ] Define objective acceptance criteria for Study Mode and Real Inspection Mode.
 - [x] 2026-07-16: Designed and implemented the content-schema additions (per-item source
   citation, verification status, applicability flags COMBO/AIR/IF-EQUIPPED) as a reviewed

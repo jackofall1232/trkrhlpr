@@ -1406,3 +1406,42 @@ Append one entry per agent run. Do not overwrite prior runs.
 - **Next action:** watch CI on claude/continue-track-c-bkd3q7; if green, owner device-review
   of the directory screen + commit 5.json; then V1/V2 verification unlocks the real import.
 - **Lock:** 1db3979e-6329-406a-9d6c-b04065ef141d acquired and released.
+
+### Status 2026-07-17T12:16Z — Claude — Track C phase 1 CI GREEN
+- **Run 29579434919 (194afee): SUCCESS** first try — assembleDebug + check (all unit tests
+  incl. Robolectric MigrationTest v1→v5 and the truck-stop DAO round-trip, Compose
+  compiles, lint) on GitHub runners, completed 12:16:09Z. Track C phase 1 is
+  build-verified; device review of the new screen remains the standing gate.
+- **Schema 5.json:** present in the run's build-reports artifact but NOT committable from
+  this session (Azure blob host proxy-blocked, CONNECT 403). Follow-up stands: commit it
+  from an SDK-capable session or the artifact via the owner's browser (artifact expires
+  2026-07-24). The CI check-in trigger was deleted as done.
+
+### Supervised action 2026-07-17T12:25Z — Claude — OOSC-2004 item-level cross-check of the 132 checklist (owner-directed)
+- **Event:** owner re-supplied the January 1, 2004 CVSA OOSC scan in-session and asked for
+  a comparison, with web search to cover its staleness. Handled strictly inside the
+  recorded boundaries (reference only; no OOSC text/figures ship; scan not committed —
+  processed in the session scratchpad only).
+- **Done:** read the full Part II vehicle criteria (14 sections, OCR text of the
+  public.resource.org IBR copy) and mapped every driver-detectable defect area against the
+  132 items; verified six currency questions via web search (CVSA 2026 edition effective
+  2026-04-01 — the scan is 22 revisions old; current 393.51 = 55 psi/half-cutout floor;
+  393.75 tread depths 4/32 & 2/32 confirmed current; 393.55 ABS-lamp requirements;
+  ASA check-don't-adjust guidance; state S11 front-axle wording). Results written into
+  `docs/pretrip-132-checklist.md` (cross-check section expanded from TOC-level to
+  item-level).
+- **Key findings:** (1) item 129 (breakaway test) directly matches OOSC §1.c(1) — the
+  PR-review addition closed a real gap; (2) full coverage confirmed at item level for all
+  driver-detectable areas; (3) NEW gap candidates for the owner at the verification pass:
+  front axle beam (OOSC §8.c + S11 excerpts — real gap, possible item 133), air
+  reservoir security/drain (§1.j, reaffirmed), ABS malfunction lamps incl. trailer
+  external lamp (post-2004 law, 393.55 — absent from the 132), disc-rotor wording, ASA
+  wording; (4) figure reconciliations: 60 psi (manual, driver-facing) vs 55 psi (393.51
+  floor) — both current, not a conflict.
+- **Verification evidence:** OOSC text extracted via pdftotext (poppler-utils installed
+  from Ubuntu archive); currency claims corroborated by search excerpts citing
+  cvsa.org/eCFR/state-manual sources, quoted URLs in the doc. No build needed (docs-only).
+- **Decisions:** no checklist item text changed — the P/U statuses and count stay 132;
+  gap candidates are explicitly owner decisions queued for the full-text verification
+  pass (todos updated).
+- **Lock:** dc16d922-55e7-4294-bc88-8bda19ce0125 acquired and released.

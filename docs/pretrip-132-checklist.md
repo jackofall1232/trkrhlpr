@@ -298,25 +298,76 @@ the state test (corroborated: GA, ID, FL Section 11 materials).
 
 The owner provided a January 1, 2004 CVSA Out-of-Service Criteria scan (see
 `docs/content-sourcing.md` for its licensing boundaries — reference only, not committed,
-never a source of shipped text or figures). Its Part II vehicle categories were
-cross-checked against this checklist at the table-of-contents level:
+never a source of shipped text or figures). Its Part II vehicle categories were first
+cross-checked at the table-of-contents level; on **2026-07-17** the full Part II text
+(14 vehicle sections, OCR of the public.resource.org incorporated-by-reference copy) was
+read item-by-item against the 132 items, with currency questions checked against 2026
+sources by web search. Results:
 
-- **Covered by the 132 items:** brake systems (drums, linings, hoses, low-pressure warning,
-  air loss, parking brakes, compressor), coupling (fifth wheel, upper/lower coupler),
-  exhaust, frame, fuel system, lamps/turn signals, safe loading/tie-downs, steering
-  (free play, column, gear box, pitman arm, tie rod/drag links, nuts), suspension (spring
-  assemblies, air suspension, torque/tracking components), tires (steer vs other), wheels/
-  rims/hubs, windshield wipers.
-- **OOSC areas out of this checklist's scope:** enforcement-only measures (brake
-  adjustment-limit charts), other configurations (pintle hooks, drawbar/tongue,
-  saddlemounts, electric/vacuum brakes, van body rails as separate items), and buses
-  (emergency exits) — bus items belong to the future Passenger/School Bus content, not the
-  Class A checklist.
-- **Verification-pass candidates raised by the cross-check:** the OOSC lists the
-  *tractor-protection system* and *air reservoir* as distinct brake-system areas. Item 128
-  (reworded above) now covers the tractor-protection/trailer-air-supply valve *pop-out*
-  during pump-down. The full-text pass must confirm Section 11's exact wording for the
-  air-reservoir/air-tank check and fold it into the compressor items if named.
+**Coverage confirmed (item level).** Every driver-detectable OOSC Part II defect area maps
+to one or more of the 132 items: brake components/linings/drums/hoses/tubing (22–26,
+73–76, 86, 106–109), low-air warning (127), applied air-loss (126), tractor-protection
+system (128–129), compressor (10), coupling incl. sliders/latching/kingpin/apron (86–97),
+exhaust (64), frame incl. sliding-tandem locking pins (65, 101–102), fuel (62), lighting
+(50–59), tie-down device condition (98, 119), steering free play/column/gear box/pitman/
+links/nuts (11–17, 39), suspension incl. torque and air components (18–21, 67–72,
+103–105), tires (27–29, 77–81, 110–114), van-body floor/rails at driver level (101),
+wheels/rims/hubs/fasteners/welds (30–32, 82–84, 115–117), wipers (42).
+
+**Direct validations from the item-level pass:**
+
+- **Item 129 confirmed:** OOSC brake §1.c(1) treats an inoperable trailer *breakaway*
+  system as its own condition (no trailer brake application when the supply is actuated) —
+  exactly the check item 129 added in PR review. The addition closed a real gap.
+- **Item 127 figures reconciled:** current 49 CFR 393.51 (verified via eCFR excerpt,
+  2026-07-17) requires the warning at **55 psi or half governor cut-out, whichever is
+  less**; the CDL manual's driver-facing "before 60 psi" is the stricter study figure.
+  Both are current; authoring should present 60 as the manual's check figure and may cite
+  393.51's 55-psi regulatory floor in the explanation.
+- **Tread-depth figures verified current** (eCFR § 393.75 excerpt, 2026-07-17): 4/32 steer
+  (item 27), 2/32 others (77, 110). The OOSC's lower floors (2/32 steer; 1/32 others in
+  two adjacent grooves, 3 locations) are enforcement floors *below* the legal maintenance
+  minimums — useful contrast for defect-example text, cited to § 393.75, not the OOSC.
+- **Enforcement-only areas confirmed out of scope:** the 20 % defective-brake criterion,
+  pushrod-stroke adjustment-limit charts by chamber type, steering free-play degree charts
+  (OOS at 30°/45° vs the manual's ~10° driver standard), fastener-count thresholds, and
+  coupler-movement measurements are roadside-measurement standards, not driver walk-around
+  checks. Other-configuration areas (pintle/drawbar/saddlemount, electric/vacuum brakes,
+  gaseous fuels, C-dollies, bus exits) stay with their future content categories.
+
+**Gap and enhancement candidates raised (owner decisions at the verification pass):**
+
+1. **Front axle beam** — OOSC steering §8.c lists front-axle-beam cracks/welded repairs,
+   and state Section 11 materials confirm "the axle itself should not be cracked" (web
+   excerpts, 2026-07-17). The 132 items cover the steer axle's springs/brakes/wheel but
+   never the axle beam itself. Options: new item (count → 133) or fold into the steer-axle
+   section's inspect-for text.
+2. **Air reservoir/tank security and drain** — OOSC §1.j (reservoir separated from
+   attachment points); reaffirms the earlier TOC-level flag. Confirm Section 11/5 wording
+   at the full-text pass; likely a new item or a compressor-item extension.
+3. **ABS malfunction lamps** — post-dates the walk-around lists this checklist was built
+   from but is current law (49 CFR 393.55, verified 2026-07-17): tractors and trailers
+   since ~1998 carry malfunction lamps, incl. the **external left-rear "ABS" lamp on
+   trailers**; the standard driver check is lamp-on-then-off at key-on. Absent from the
+   132. Candidates: extend item 46 (dash indicators) and item 99/trailer section, or add
+   dedicated items.
+4. **Disc brakes** — items 25/76/109 name drums only; § 393.47 and the OOSC cover rotors
+   (air-disc pad floor 1/8 in.). Authoring should say "drums or rotors" with the matching
+   figures where applicable.
+5. **Automatic slack adjusters** — items 24/75/108 qualify the 1-inch hand check as
+   "manual adjusters." Current guidance (verified 2026-07-17): on ASAs the driver still
+   *checks* travel but must never manually adjust — an out-of-adjustment ASA is a
+   maintenance defect to report. Fold into authoring wording.
+6. **Minor defect-example enrichments:** refrigeration/heater fuel-system leaks under
+   item 62 (OOSC fuel §5.a covers them); tire/body contact under load (OOSC frame §4.b)
+   as a loaded-vehicle caution; projecting-load lamp rules belong to future cargo content.
+
+**Currency caveat.** The 2004 scan is 22 annual revisions old: the OOSC is reissued every
+April 1, and the 2026 edition (effective 2026-04-01, 17 changes incl. brake-measurement,
+cargo-securement, and wheels/rims updates) is current. The scan therefore remains a
+*category-coverage* reference only; every figure or rule that ships must be verified
+against current public-domain sources (eCFR Part 393/396 Appendix A), never against the
+scan. No OOSC text or figures ship in the app.
 
 ### Resolved: trailer air-supply / breakaway test added (item 129)
 

@@ -1,20 +1,20 @@
 {
   "schema_version": 2,
   "project_name": "trkrhlpr (product: Last Wagon)",
-  "current_goal": "Track C unit 11 phase 1 built (truck-stop directory vs labeled sample data, Room v5, offline search UI); verify via CI, then owner device review; real NTAD import stays behind V1/V2 license verification",
-  "current_phase": "truck_stop_directory_sample_phase_built",
+  "current_goal": "Track C phase 1 CI-verified (194afee green); OOSC-2004 item-level cross-check recorded with gap candidates for the verification pass; next owner decisions: device review, schema 5.json commit, V1/V2 dataset verification, gap candidates",
+  "current_phase": "truck_stop_phase1_verified_oosc_crosscheck_done",
   "active_agent": null,
   "last_agent": "claude",
-  "last_updated": "2026-07-17T12:13:00Z",
-  "status": "track_c_phase1_pushed_awaiting_ci",
+  "last_updated": "2026-07-17T12:26:30Z",
+  "status": "track_c_phase1_ci_green_oosc_crosscheck_recorded",
   "blocked": false,
   "blocker_reason": null,
   "active_event_id": null,
   "last_event_processed": "event-20260714-022005-github-pr2-foundation-review-a5f2",
   "pending_event_count": 0,
   "review_response_required": false,
-  "ci_status": "pending on claude/continue-track-c-bkd3q7 (Track C phase 1 commit). Local evidence: 31 core/model tests green via standalone kotlinc (this host cannot run Gradle). Prior green: 85fb789 (PR #19 branch).",
+  "ci_status": "success (194afee on claude/continue-track-c-bkd3q7, run 29579434919: assembleDebug + check green, first try). Schema 5.json in build-reports artifact, not yet committed (proxy-blocked here; artifact expires 2026-07-24).",
   "execution_active": false,
   "execution_stop_reason": "human_review_gate",
-  "next_recommended_action": "Watch CI on claude/continue-track-c-bkd3q7. If green: commit the CI-generated Room schema 5.json (build-reports artifact) and owner device-reviews the truck-stops screen. Track C real-data import waits on V1/V2 (NTAD license + field schema, Jason's Law refresh status). Standing gates unchanged: 0.1.0-beta release publication, PR #19 merge decision, Track B foundation approval."
+  "next_recommended_action": "Owner: device-review the truck-stops screen; download run-29579434919 build-reports artifact to commit schemas/5.json (or do it from an SDK session). Track C phase 2 (real NTAD import) waits on V1/V2. OOSC gap candidates (front axle beam, air tank, ABS lamps, disc wording, ASA wording) queued as owner decisions at the full-text verification pass. Standing gates unchanged."
 }
