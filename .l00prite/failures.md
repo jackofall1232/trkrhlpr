@@ -45,6 +45,18 @@ Record failed approaches and why they should not be retried unless conditions ch
   status came from `tail` while the wrapper download had failed. Check `PIPESTATUS` or run
   without pipes before recording build evidence.
 
+### Remote-session network policy (2026-07-17 session) — all research hosts blocked
+
+- **Every direct HTTPS fetch 403s at the agent proxy** in the 2026-07-17 remote session:
+  curl CONNECT and WebFetch both denied for geodata.bts.gov, bts.gov, catalog.data.gov,
+  ecfr.gov, govinfo.gov, wiki.openstreetmap.org, overpass-api.de, opendatacommons.org,
+  overturemaps.org, and ops.fhwa.dot.gov. This is STRICTER than the 2026-07-16 session
+  (which could reach eCFR/GovInfo). Only WebSearch (search-API excerpts) worked. Do not
+  retry direct fetches in an environment behaving this way — do search-excerpt research
+  with UNVERIFIED flags, and route full-text verification to a network-open session or
+  the owner's browser. Network policy varies per session: probe one URL first, then pick
+  the method.
+
 ### Build-environment setup (this Claude Code host) — 2026-07-16 (Execution run)
 
 - **Masked exit via trailing echo:** `./gradlew … > log 2>&1; echo "EXIT $?"` run in the

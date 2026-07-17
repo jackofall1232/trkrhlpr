@@ -1331,3 +1331,224 @@ Append one entry per agent run. Do not overwrite prior runs.
   in-app Settings remedy first ("Paste an API key under Settings, or set ORS_API_KEY at
   build time") in both routing and geocoding providers; exact-match test updated.
 - **Verification:** CI on the pushed commit.
+
+### Supervised action 2026-07-17T11:24Z — Claude — Track C unit 10: truck-stop data-source research (docs/truck-stop-data-sources.md)
+- **Goal:** open Track C by researching public truck-stop data sources (licensing,
+  freshness, offline storage) — the unit that sits in front of the Track C research gate.
+- **Built:** `docs/truck-stop-data-sources.md` — source registry and evaluation:
+  (1) USDOT/BTS NTAD "Truck Stop Parking" (8,000+ locations, Jason's Law/MAP-21 survey
+  data, compiled 2019-04-09, GeoJSON/CSV/shapefile) as primary seed — public-domain
+  *expected* but per-dataset license statement flagged UNVERIFIED because NTAD licensing
+  varies (Intercity Bus Atlas inside NTAD is CC-BY-NC-4.0); (2) OpenStreetMap (ODbL 1.0)
+  as enrichment with an explicit compliance design (separate collective-database
+  component, attribution, published extract per the technological-measures clause);
+  (3) Overture Places (CDLA-Permissive-2.0, monthly releases) as low-obligation
+  alternative pending category-taxonomy verification; (4) TPIMS eight-state real-time
+  feeds deferred to the Later roadmap (online-only, regional); (5) proprietary sources
+  (Trucker Path, chain locators, commercial POI APIs) explicitly excluded per
+  constraints.md. Five-item full-text verification worklist (V1–V5) + a proposed phased
+  import plan and draft unit-11 acceptance criteria.
+- **Verification/evidence:** this session's network policy blocks ALL direct fetches:
+  `curl` CONNECT via agent proxy → 403 for every candidate host (geodata.bts.gov,
+  bts.gov, catalog.data.gov, ecfr.gov, govinfo.gov, wiki.openstreetmap.org,
+  overpass-api.de, opendatacommons.org, overturemaps.org, ops.fhwa.dot.gov; probed
+  2026-07-17T11:20Z, exit codes recorded in-session); WebFetch 403 on the same hosts.
+  Research therefore ran on web-search excerpts only (9 targeted searches, 2026-07-17
+  ~11:20–11:23Z); every doc claim cites its official URL and exact-wording claims are
+  marked UNVERIFIED. No build/tests: docs-only change (`git status` clean otherwise).
+- **Decisions:** public-domain-first ordering (federal seed before ODbL enrichment)
+  mirrors the approved content-sourcing rule; TPIMS real-time explicitly out of Track C
+  scope; no source adopted yet — adoption is the owner's Track C gate decision.
+- **Confidence:** high on the licensing landscape shape; medium on per-dataset specifics
+  until V1–V4 full-text checks run.
+- **Next action:** owner reviews docs/truck-stop-data-sources.md and approves (or
+  redirects) the § 8 sourcing plan — that approval opens Track C unit 11. V1/V2
+  verification needs a session or browser that can reach the blocked hosts.
+- **Do-not-retry:** direct page fetches (curl/WebFetch) from THIS remote environment —
+  every research host 403s at the proxy; use WebSearch or a different environment.
+- **Lock:** 550cf4c8-dfd2-46af-aef3-d11f2a602acb acquired and released.
+
+### Supervised action 2026-07-17T12:11Z — Claude — Track C unit 11 phase 1: truck-stop directory against labeled sample data (owner-approved)
+- **Gate passed:** the owner approved the truck-stop sourcing plan in-session (2026-07-17,
+  AskUserQuestion: "Track C feature now"), explicitly choosing the Track A pattern — build
+  the feature against clearly-labeled sample data, keep the real NTAD import behind the
+  V1/V2 license verification worklist. This entry records that approval as the Track C
+  research-gate decision.
+- **Built:** (1) `TruckStop` model + `TruckStopSearch` pure filter logic in core/model —
+  three-state amenity semantics (true/false/NULL=unknown), hidden-unknown counting so
+  amenity filters never silently bury unknown data; `ContentRepository.observeTruckStops()`.
+  (2) Room v4→v5 additive migration: `truck_stops` table (nullable amenity/parking columns,
+  provenance columns incl. `datasetVintage`), state index, DAO observe/insert, entity→model
+  mapping, SAMPLE_VERSION 2→3 reseed with 6 fictional labeled sample stops.
+  (3) `TruckStopsScreen` in feature/dashboard: offline search (name/highway/state), state +
+  amenity filter chips, unknown-vs-not-listed display per stop, sample/verification tags,
+  dataset-provenance panel, hidden-unknown StatePanel; home tile enabled ("Sample" badge);
+  route wired in LastWagonApp. (4) Tests: TruckStopSearchTest (8), TruckStopContentTest (5),
+  DAO round-trip w/ null amenities, MigrationTest extended v1→v5 with default+NULL checks.
+  (5) ci.yml build-reports artifact now also captures core/data/schemas so the CI-generated
+  5.json can be committed by a follow-up session (this host cannot run Gradle).
+- **Verification:** this host has no Android SDK and dl.google.com is proxy-blocked, so NO
+  local Gradle run. Local evidence: standalone kotlin-compiler-embeddable 2.2.10 + JUnit
+  4.13.2 from Maven Central — compiled Models.kt + all 6 core/model test files, ran
+  JUnitCore: **31 tests OK, exit 0** (2026-07-17T12:10Z; includes the 8 new search tests).
+  core/data (Robolectric Room), Compose compiles, and lint are pending on CI for the pushed
+  commit — treat CI as the real build verification. On-device UI review remains the standing
+  device gate. NOTE: exported schema 5.json is generated on CI, not committed here — commit
+  it from the CI artifact (or an SDK-capable session) to keep the schemas-in-VCS convention.
+- **Decisions:** no new Gradle module (constraints: module set is owner-approved) — screen
+  lives in feature/dashboard; real-dataset import stays gated on V1/V2; no availability or
+  open-now claims anywhere in the UI; SAMPLE_VERSION bump reseeds existing installs.
+- **Do-not-retry:** plain `kotlin-compiler` Maven jar crashes on value-class codegen when
+  invoked standalone (unsafe-coerce + missing org.jetbrains:annotations); use
+  kotlin-compiler-embeddable WITH kotlin-stdlib, kotlinx-coroutines-core-jvm, AND
+  org.jetbrains:annotations on the java classpath, plus -kotlin-home dir containing
+  lib/kotlin-stdlib.jar.
+- **Next action:** watch CI on claude/continue-track-c-bkd3q7; if green, owner device-review
+  of the directory screen + commit 5.json; then V1/V2 verification unlocks the real import.
+- **Lock:** 1db3979e-6329-406a-9d6c-b04065ef141d acquired and released.
+
+### Status 2026-07-17T12:16Z — Claude — Track C phase 1 CI GREEN
+- **Run 29579434919 (194afee): SUCCESS** first try — assembleDebug + check (all unit tests
+  incl. Robolectric MigrationTest v1→v5 and the truck-stop DAO round-trip, Compose
+  compiles, lint) on GitHub runners, completed 12:16:09Z. Track C phase 1 is
+  build-verified; device review of the new screen remains the standing gate.
+- **Schema 5.json:** present in the run's build-reports artifact but NOT committable from
+  this session (Azure blob host proxy-blocked, CONNECT 403). Follow-up stands: commit it
+  from an SDK-capable session or the artifact via the owner's browser (artifact expires
+  2026-07-24). The CI check-in trigger was deleted as done.
+
+### Supervised action 2026-07-17T12:25Z — Claude — OOSC-2004 item-level cross-check of the 132 checklist (owner-directed)
+- **Event:** owner re-supplied the January 1, 2004 CVSA OOSC scan in-session and asked for
+  a comparison, with web search to cover its staleness. Handled strictly inside the
+  recorded boundaries (reference only; no OOSC text/figures ship; scan not committed —
+  processed in the session scratchpad only).
+- **Done:** read the full Part II vehicle criteria (14 sections, OCR text of the
+  public.resource.org IBR copy) and mapped every driver-detectable defect area against the
+  132 items; verified six currency questions via web search (CVSA 2026 edition effective
+  2026-04-01 — the scan is 22 revisions old; current 393.51 = 55 psi/half-cutout floor;
+  393.75 tread depths 4/32 & 2/32 confirmed current; 393.55 ABS-lamp requirements;
+  ASA check-don't-adjust guidance; state S11 front-axle wording). Results written into
+  `docs/pretrip-132-checklist.md` (cross-check section expanded from TOC-level to
+  item-level).
+- **Key findings:** (1) item 129 (breakaway test) directly matches OOSC §1.c(1) — the
+  PR-review addition closed a real gap; (2) full coverage confirmed at item level for all
+  driver-detectable areas; (3) NEW gap candidates for the owner at the verification pass:
+  front axle beam (OOSC §8.c + S11 excerpts — real gap, possible item 133), air
+  reservoir security/drain (§1.j, reaffirmed), ABS malfunction lamps incl. trailer
+  external lamp (post-2004 law, 393.55 — absent from the 132), disc-rotor wording, ASA
+  wording; (4) figure reconciliations: 60 psi (manual, driver-facing) vs 55 psi (393.51
+  floor) — both current, not a conflict.
+- **Verification evidence:** OOSC text extracted via pdftotext (poppler-utils installed
+  from Ubuntu archive); currency claims corroborated by search excerpts citing
+  cvsa.org/eCFR/state-manual sources, quoted URLs in the doc. No build needed (docs-only).
+- **Decisions:** no checklist item text changed — the P/U statuses and count stay 132;
+  gap candidates are explicitly owner decisions queued for the full-text verification
+  pass (todos updated).
+- **Lock:** dc16d922-55e7-4294-bc88-8bda19ce0125 acquired and released.
+
+### Supervised action 2026-07-17T12:30Z — Claude — Owner-directed memory persistence: hybrid architecture model + crowdsourced-status roadmap
+- **Event:** the owner handed over memory blocks drafted in another assistant chat and
+  asked for them to be persisted to memory.md / blueprint.md / todos.md. Classified on
+  merit; applied with two factual reconciliations, flagged to the owner rather than
+  silently: (1) "131-point checklist" corrected to the owner-approved 132; (2) the
+  truck-stop static directory added to the offline-first feature set (approved Track C
+  plan; phase 1 shipped) — and the blueprint's national-directory bullet was annotated
+  with its Track C status instead of being deleted by the replacement, since the static
+  directory is now in-progress, not future.
+- **Persisted:** memory.md hybrid-model decision (offline-first = non-map features;
+  map/routing online-first by design; never describe the app as globally offline-first);
+  blueprint.md crowdsourced truck-stop status layer bullet (backend, write auth via
+  future online accounts, moderation, staleness decay, legal review — all prerequisites
+  before implementation); todos.md Later item for the crowdsourced-status design
+  (rating-scale UX decision, sequenced after online accounts).
+- **Scope note:** no implementation authorized — the crowdsourced layer's blocker is
+  accounts + moderation, both future items. Backend schema drafting deliberately deferred
+  (recommendation to owner: the auth model shapes the schema; the local truck_stops table
+  from Track C phase 1 is the stable anchor future status reports would key off).
+- **Verification:** docs/memory-only change; no build. Files re-read after edit via tool
+  confirmations.
+- **Lock:** e673b835-80ca-4bdc-bf5b-ae9d57595f4d acquired and released.
+
+### Supervised action 2026-07-17T12:42Z — Claude — Track C phase 2 pipeline: versioned truck-stop content JSON (owner: "still moving forward with the truck stop placement"; crowdsourcing relabeled V2)
+- **Owner correction applied:** the crowdsourced status layer is V2 (blueprint/todos/memory
+  blocks relabeled); the static truck-stop placement continues now under Track C.
+- **Built:** `TruckStopContent` parser in core/model — Last Wagon's own versioned
+  content-JSON schema (envelope: schema_version, dataset citation/vintage/verification/
+  sample-flag; per-record required id/name/state/lat/lon, optional highway/parking/
+  amenities with absent = unknown, never false; broken records skipped AND counted;
+  sample defaults true so content is never silently real). SampleContent's hardcoded
+  entity list replaced by a JSON document (`truckStopsJson`) parsed through the same
+  production path the real dataset will use — after V1/V2, the verified document swaps in
+  with no app-schema change. kotlinx-serialization-json (already project-standard via
+  routing, 1.9.0) added to core/model — tree parsing only, no codegen plugin.
+  App-side schema documented in docs/truck-stop-data-sources.md §9. NTAD field mapping
+  deliberately NOT guessed in code — the attribute list stays V1 worklist material
+  (search excerpts could not surface it; API page proxy-blocked).
+- **Tests:** TruckStopContentParserTest (7: provenance application, absent-amenity
+  unknown, broken-record skip counting, negative parking, unknown verification status,
+  wrong schema version, garbage input); TruckStopContentTest rewritten against the parsed
+  sample document (+ parse-completeness check).
+- **Verification:** local standalone kotlinc (embeddable 2.2.10 + serialization jars
+  1.9.0 from Maven Central): core/model compiled, **38 tests OK, exit 0**
+  (2026-07-17T12:41Z; 31 prior + 7 new). core/data changes (repository seeding through
+  the parser, entity mapper) verify on CI for the pushed commit.
+- **Lock:** e673b835-80ca-4bdc-bf5b-ae9d57595f4d re-acquired this step and released.
+
+### Supervised action 2026-07-17T12:45Z — Claude — PR #20 bot reviews (Gemini 1 + Codex 4) classified and addressed
+- **PR #20 opened by the owner** from the Claude Code UI (head fab320d, base 0.1.1-beta);
+  session subscribed to PR activity; hourly watch trigger armed. Vercel preview comment =
+  informational, no action.
+- **Applied — Codex P1 "sample rows survive dataset replacement" (REAL):** ensureSampleContent
+  now clears truck_stops before inserting (new DAO clearTruckStops; replace-never-merge),
+  so a phase-2 dataset with different ids can never leave fictional stops beside real
+  ones. DAO test added (clear + fresh-ids reinstall).
+- **Applied — Codex P2 "skipped-record count discarded":** the parse result now gates the
+  install — a document that dropped records (or parsed empty) does NOT replace the
+  existing directory (no-silent-truncation; bundled document is test-guaranteed complete).
+- **Applied — Codex P2 "OOSC coverage claim contradicts gap list" (doc):** coverage
+  conclusion qualified — front axle beam + air reservoir are driver-detectable and NOT
+  covered; claim now says so up front.
+- **Applied — Gemini high "per-stop allocations in search":** single-pass rewrite, no
+  per-stop allocations, early exit on recorded-false; behavior identical (all 8 search
+  tests unchanged and green).
+- **NOT applied — Codex P1 "393.51 says whichever is greater" (judged INCORRECT):** the
+  exact regulation sentence captured via eCFR-derived search excerpt says "whichever is
+  less", and OOSC-2004 §1.g uses the same wording — two independent sources vs the bot's
+  plausibility argument. Doc now quotes the exact sentence, records the disagreement, and
+  keeps the phrase on the full-text verification pass. Replying on the PR thread with the
+  rationale.
+- **Verification:** core/model recompiled + full suite standalone: **38 tests OK, exit 0**
+  (2026-07-17T12:45Z). core/data changes (clear-before-insert, gating, DAO test) verify on
+  CI for the pushed commit.
+- **Lock:** bdea1d34-52ef-4622-8078-30f0b7b1e304 acquired and released.
+
+### Status 2026-07-17T12:50Z — Claude — content-pipeline commit CI GREEN; review-fix runs in progress
+- **fab320d (Track C phase-2 content pipeline): SUCCESS on both runs** (29580824188 branch
+  + 29580944539 PR, completed ~12:44Z) — assembleDebug + check green including the new
+  parser-fed seeding path.
+- **7d278e3 (PR #20 review round 1 fixes): two runs in progress** (29581446938 +
+  29581450782, started 12:46Z); result lands via the armed check-ins. PR #20 review round
+  fully addressed: 4 findings applied, 1 refuted with sourced reply (393.51 "whichever is
+  less").
+- **Lock:** 9f1c2a70-ci-record-fab320d acquired and released.
+
+### Supervised action 2026-07-17T12:58Z — Claude — PR #20 Codex round 2 (1 P1 + 3 P2) all judged valid and applied
+- **Applied — P2 "rejected dataset still marked installed" (REAL flaw in my round-1 fix):**
+  the SAMPLE_VERSION row is now written only after a complete directory install, so a
+  rejected document retries on a later launch instead of freezing the failure; the
+  non-directory inserts are REPLACE-idempotent, so the retry loop is safe.
+- **Applied — P2 "duplicate ids silently collapsed by REPLACE":** the parser now counts a
+  duplicate-id record as skipped (first occurrence wins), which the existing
+  skipped-records install gate then rejects. New parser test (39 model tests total).
+- **Applied — P2 "sample messaging hardcoded":** the truck-stops screen framing and the
+  Home tile badge now derive from the installed records' isSample — when the verified
+  dataset ships (sample:false), the UI reframes itself with no separate change to
+  remember. HomeScreen now takes ContentRepository (wired in LastWagonApp).
+- **Applied — P1 "commit schema 5.json":** cannot be generated locally (no Gradle) and
+  the CI artifact host is proxy-blocked, so ci.yml now prints the exported schemas into
+  the job log ("Print exported Room schemas" step); after the next green run the 5.json
+  content gets copied from the log and committed. Until then CI stays green only via the
+  same-run KSP export — the log-copy commit closes the fragility Codex flagged.
+- **Verification:** core/model recompiled + full suite standalone: **39 tests OK, exit 0**
+  (2026-07-17T12:57Z). Compose/HomeScreen changes verify on CI.
+- **Lock:** aef6ab57-94d9-49fa-a134-624f7b6a68a0 acquired and released.

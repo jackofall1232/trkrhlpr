@@ -34,7 +34,22 @@ Durable project facts and decisions that future agents should preserve.
     `docs/truck-routing-plan.md`; the Offline Route Corridor at Phase 5 is the MVP boundary,
     with guided navigation and restriction assurance gated separately.
 - The confirmed technology direction is native Kotlin, Jetpack Compose, Android SDK 36
-  (Android 16), and an offline-first architecture.
+  (Android 16), and an offline-first architecture for the non-map feature set (see the
+  hybrid-model decision below).
+- **Architecture split (hybrid model — owner decision, 2026-07-17):** The application is
+  offline-first for testing, pre-trip inspection, and directory features (132-point
+  checklist, Study Mode, Real Inspection Mode, CDL practice tests, daily safety question,
+  local progress, and the truck-stop directory's static dataset). The map/routing
+  subsystem is online-first by design — this reflects the product's origin as a CDL
+  testing app, with truck routing added later in response to user demand for a free/cheap
+  truck-aware routing option. Do not describe the app as globally offline-first;
+  offline-first applies only to the non-map feature set. The Route Corridor strategy
+  (online routing/planning, bounded offline corridor for connectivity loss mid-route)
+  remains the model for the routing map itself. (Reconciliations applied when persisting
+  the owner's block: the owner-approved count is 132, not 131, and the truck-stop static
+  directory is offline-first per the approved Track C sourcing plan.) Owner clarification
+  2026-07-17: the crowdsourced status layer is **V2**; the static truck-stop placement
+  (Track C — real stop locations in the offline directory) continues now.
 - The first production milestone covers the 132-point pre-trip inspection, Study Mode,
   Real Inspection Mode, CDL practice tests, a daily safety question, and local progress.
 - The national truck-stop directory, truck GPS/routing, online accounts, and cloud

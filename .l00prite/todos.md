@@ -51,8 +51,27 @@ waits behind its gate:
   8. Author CDL class + endorsement practice questions and daily questions (original prose).
   9. Import real content, replacing labeled sample content (needs foundation approval).
 - **Track C — behind its own research gate:**
-  10. Research public truck-stop data sources (licensing, freshness, offline storage).
-  11. Truck-stop dataset + search feature.
+  10. [x] 2026-07-17: Researched public truck-stop data sources — licensing, freshness,
+      offline storage — in `docs/truck-stop-data-sources.md` (NTAD Truck Stop Parking as
+      proposed seed; OSM/Overture as enrichment options; TPIMS deferred; proprietary
+      sources excluded). Search-excerpt evidence only: this environment 403-blocks all
+      research hosts, so exact license/field claims carry UNVERIFIED flags with a V1–V5
+      full-text verification worklist.
+  - [x] 2026-07-17: **GATE PASSED — owner approved the truck-stop sourcing plan**
+    (in-session choice "Track C feature now": build against labeled sample data, real
+    import stays behind verification).
+  - [ ] Full-text verification V1–V2 (NTAD dataset license statement + field schema;
+    Jason's Law third-survey refresh status) from a session/browser that can reach
+    geodata.bts.gov and ops.fhwa.dot.gov; V3–V4 (Overture taxonomy/licensing, ODbL
+    attribution guidelines) before adopting either enrichment source. **Blocks the real
+    dataset import (unit 11 phase 2).**
+  11. [x] 2026-07-17 (phase 1): truck-stop directory against labeled sample data — Room
+      v4→v5 `truck_stops` table (three-state amenities, provenance + vintage columns),
+      `TruckStopSearch` pure logic (8 tests), offline search/filter UI with
+      unknown-vs-absent display, home tile enabled. Local: 31 core/model tests green via
+      standalone kotlinc; Robolectric/Compose/lint verification on CI. Remaining:
+      commit CI-generated schema 5.json; device review; phase 2 = real NTAD import
+      (behind V1/V2).
 
 Gates that will pause the loop: content-doc approval (Track B start), full-text verification
 of the 13 flagged checklist items (needs network to eCFR/FMCSA), foundation approval before
@@ -92,6 +111,14 @@ import, and the truck-stop data-source research gate (Track C start).
   facts in `docs/content-sourcing.md` by line-by-line verification against the FMCSA model
   manual PDF and eCFR full text — needs a session/machine whose network can fetch them
   (this remote environment's policy blocks those hosts).
+- [ ] **At the same verification pass — decide the OOSC cross-check gap candidates**
+  (item-level pass done 2026-07-17, `docs/pretrip-132-checklist.md`): front axle beam
+  (possible item 133), air reservoir security/drain, ABS malfunction lamps (cab + trailer
+  external, 49 CFR 393.55), disc-rotor wording on items 25/76/109, ASA check-don't-adjust
+  wording on items 24/75/108. Each changes content or count → owner decision.
+- [ ] Commit CI-generated Room schema `core/data/schemas/.../5.json` from an SDK-capable
+  session or the run-29579434919 build-reports artifact (expires 2026-07-24; Azure blob
+  host is proxy-blocked in this session).
 - [ ] Define objective acceptance criteria for Study Mode and Real Inspection Mode.
 - [x] 2026-07-16: Designed and implemented the content-schema additions (per-item source
   citation, verification status, applicability flags COMBO/AIR/IF-EQUIPPED) as a reviewed
@@ -102,7 +129,9 @@ import, and the truck-stop data-source research gate (Track C start).
 - [ ] Implement CDL mock exams feature with randomized tests and readiness scoring.
 - [ ] Define test-history, missed-question review, randomized-test, and readiness-scoring behavior.
 - [ ] Implement CDL mock exams feature based on the defined behavior.
-- [ ] Implement comprehensive truck stop locations dataset and search features.
+- [ ] Implement comprehensive truck stop locations dataset and search features (Track C
+  unit 11 — blocked by the sourcing-plan approval gate; see the Track C block above and
+  `docs/truck-stop-data-sources.md`).
 - [ ] **OWNER ACTION — publish GitHub Release `0.1.0-beta`** with the asset named exactly
   `lastwagon-0.1.0-beta.apk` (download CI artifact `lastwagon-debug-apk` from the **latest
   green CI run on `claude/apk-download-button-8y2he6`** — runs before 2026-07-17T02:15Z
@@ -126,6 +155,14 @@ import, and the truck-stop data-source research gate (Track C start).
 - [ ] Define APK signing, sideload distribution, and update strategy.
 - [ ] Define inspection timestamps, notes, and optional defect-reporting behavior.
 - [ ] Consider School Bus, Doubles/Triples, and other CDL categories after the initial scope.
+- [ ] Design crowdsourced parking/weigh-station status feature (**V2** — not part of the
+  current Track C static-directory work): data model for status
+  reports with timestamp decay, submission auth (depends on online accounts), moderation/
+  abuse handling, rate limiting, and legal review (false status reports affecting a
+  business, defamation risk in free-text comments). Decide rating scale: dual 🚦⭐
+  (traffic-light availability/safety + star quality) vs. single scale — needs UX pass
+  before backend design. Sequence after online accounts land, since submissions need
+  attribution.
 - [ ] Revisit online accounts and cloud synchronization only after explicit future approval.
 
 ## Done

@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
-private const val SAMPLE_VERSION = 2
+private const val SAMPLE_VERSION = 3
 private val Context.preferencesDataStore by preferencesDataStore("preferences")
 
 // Driver-supplied credentials get their own store so the app's backup rules can exclude
@@ -21,12 +21,26 @@ class OfflineContentRepository(private val database: LastWagonDatabase) : Conten
     private val dao = database.dao()
     override suspend fun ensureSampleContent() {
         if (dao.contentVersionCount(SAMPLE_VERSION) > 0) return
+        val truckStops = TruckStopContent.parse(SampleContent.truckStopsJson)
         database.withTransaction {
             dao.insertCategories(SampleContent.inspectionCategories)
             dao.insertItems(SampleContent.inspectionItems)
             dao.insertTestCategories(SampleContent.testCategories)
             dao.insertQuestions(SampleContent.questions)
-            dao.insertContentVersion(ContentVersionEntity(SAMPLE_VERSION, System.currentTimeMillis()))
+            // Replace, never merge: clearing first guarantees rows from a prior dataset
+            // (different ids) cannot linger beside the new one. No-silent-truncation: a
+            // document that dropped or duplicated records is a content defect — keep the
+            // previous directory rather than install a partial dataset (the bundled
+            // document is test-guaranteed to parse completely in TruckStopContentTest).
+            // The version row is only written after a complete install, so a rejected
+            // document is retried on a later launch (with a corrected bundle) instead of
+            // freezing the failure permanently. The non-directory inserts above are
+            // REPLACE-idempotent, so a retry loop never corrupts them.
+            if (truckStops.skippedRecords == 0 && truckStops.stops.isNotEmpty()) {
+                dao.clearTruckStops()
+                dao.insertTruckStops(truckStops.stops.map { it.toEntity() })
+                dao.insertContentVersion(ContentVersionEntity(SAMPLE_VERSION, System.currentTimeMillis()))
+            }
         }
     }
     override fun observeInspectionCategories() =
@@ -45,6 +59,8 @@ class OfflineContentRepository(private val database: LastWagonDatabase) : Conten
         dao.getPracticeQuestions(categoryId.value).map { it.toPracticeQuestion() }
     override suspend fun getDailyQuestion() = dao.getDailyQuestion()?.toDailyQuestion()
     override suspend fun getDailyQuestions() = dao.getDailyQuestions().map { it.toDailyQuestion() }
+    override fun observeTruckStops() =
+        dao.observeTruckStops().map { values -> values.map { it.toModel() } }
 }
 
 /** UTC day index used for daily-question selection and streaks. */
@@ -236,3 +252,11 @@ private fun QuestionEntity.toDailyQuestion() = DailyQuestion(
     ContentId(id), prompt, answers(), ContentId(correctAnswerId), explanation, isSample)
 private fun ExamResultEntity.toModel() = ExamResult(
     id.toString(), categoryTitle, ExamScore(correct, total), completedAtEpochMillis)
+private fun TruckStopEntity.toModel() = TruckStop(
+    ContentId(id), name, state, highway, latitude, longitude, truckParkingSpaces,
+    hasDiesel, hasShowers, hasFood, hasRepair, isSample,
+    sourceCitation, parseVerificationStatus(verificationStatus), datasetVintage)
+private fun TruckStop.toEntity() = TruckStopEntity(
+    id.value, name, state, highway, latitude, longitude, truckParkingSpaces,
+    hasDiesel, hasShowers, hasFood, hasRepair, isSample,
+    sourceCitation, verificationStatus.name, datasetVintage)

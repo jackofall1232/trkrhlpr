@@ -7,5 +7,8 @@ android {
 }
 dependencies {
     implementation(libs.kotlinx.coroutines.core)
+    // Tree-walking JSON parsing for the versioned content pipeline (TruckStopContent);
+    // same library and version the routing providers already use. No codegen plugin needed.
+    implementation(libs.kotlinx.serialization.json)
     testImplementation(libs.junit)
 }

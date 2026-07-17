@@ -1,6 +1,15 @@
 package com.lastwagon.core.model
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.intOrNull
 
 @JvmInline value class ContentId(val value: String)
 
@@ -119,6 +128,185 @@ object DailySafety {
         return streak
     }
 }
+/** One truck-stop / rest-area directory record (Track C). Amenity fields are three-state:
+ *  true/false when the source actually recorded the fact, null when unknown. Unknown is never
+ *  displayed or filtered as absent — missing data is unknown, not proof of absence. */
+data class TruckStop(
+    val id: ContentId,
+    val name: String,
+    val state: String,
+    val highway: String,
+    val latitude: Double,
+    val longitude: Double,
+    val truckParkingSpaces: Int? = null,
+    val hasDiesel: Boolean? = null,
+    val hasShowers: Boolean? = null,
+    val hasFood: Boolean? = null,
+    val hasRepair: Boolean? = null,
+    val isSample: Boolean = true,
+    val sourceCitation: String = "",
+    val verificationStatus: VerificationStatus = VerificationStatus.UNVERIFIED,
+    /** Human-readable provenance of the imported dataset (e.g. compilation date), shown in
+     *  the directory so drivers can judge how stale a record may be. */
+    val datasetVintage: String = "",
+)
+
+enum class TruckStopAmenity { DIESEL, SHOWERS, FOOD, REPAIR }
+
+data class TruckStopFilter(
+    val query: String = "",
+    /** Two-letter state filter; null means all states. */
+    val state: String? = null,
+    /** Amenities the driver requires. Only stops with the amenity recorded true match. */
+    val requiredAmenities: Set<TruckStopAmenity> = emptySet(),
+)
+
+data class TruckStopSearchResult(
+    val matches: List<TruckStop>,
+    /** Stops that matched the query/state but were hidden ONLY because at least one required
+     *  amenity is unknown (null, never false). Surfaced in the UI so amenity filters never
+     *  silently bury records whose data is merely missing. */
+    val hiddenUnknownCount: Int,
+)
+
+/** Pure offline search/filter logic for the truck-stop directory. */
+object TruckStopSearch {
+    fun amenityValue(stop: TruckStop, amenity: TruckStopAmenity): Boolean? = when (amenity) {
+        TruckStopAmenity.DIESEL -> stop.hasDiesel
+        TruckStopAmenity.SHOWERS -> stop.hasShowers
+        TruckStopAmenity.FOOD -> stop.hasFood
+        TruckStopAmenity.REPAIR -> stop.hasRepair
+    }
+
+    /**
+     * A stop matches when it satisfies the text query (name, highway, or state,
+     * case-insensitive), the state filter, and has every required amenity recorded true.
+     * A stop whose required amenities are only *unknown* (none false) is excluded from
+     * matches but counted in [TruckStopSearchResult.hiddenUnknownCount]; a stop with a
+     * required amenity recorded false is an ordinary non-match. Results are ordered by
+     * state then name for stable, scannable display.
+     *
+     * Single pass with no per-stop allocations: this re-runs on every query keystroke and
+     * must stay smooth once the directory holds the full national dataset (8,000+ rows).
+     */
+    fun search(stops: List<TruckStop>, filter: TruckStopFilter): TruckStopSearchResult {
+        val query = filter.query.trim()
+        val matches = mutableListOf<TruckStop>()
+        var hiddenUnknown = 0
+        for (stop in stops) {
+            if (filter.state != null && !stop.state.equals(filter.state, ignoreCase = true)) continue
+            if (query.isNotEmpty() &&
+                !stop.name.contains(query, ignoreCase = true) &&
+                !stop.highway.contains(query, ignoreCase = true) &&
+                !stop.state.contains(query, ignoreCase = true)
+            ) continue
+            var allRecordedTrue = true
+            var anyRecordedFalse = false
+            for (amenity in filter.requiredAmenities) {
+                when (amenityValue(stop, amenity)) {
+                    true -> Unit
+                    false -> { anyRecordedFalse = true; allRecordedTrue = false }
+                    null -> allRecordedTrue = false
+                }
+                if (anyRecordedFalse) break
+            }
+            when {
+                allRecordedTrue -> matches += stop
+                !anyRecordedFalse -> hiddenUnknown++
+            }
+        }
+        matches.sortWith(compareBy({ it.state }, { it.name }))
+        return TruckStopSearchResult(matches, hiddenUnknown)
+    }
+}
+
+/** Result of parsing a truck-stop content file: the usable records plus a count of
+ *  structurally-broken records that were skipped (surfaced so imports can be audited —
+ *  a silent drop would misreport dataset coverage). */
+data class TruckStopDataset(
+    val stops: List<TruckStop>,
+    val skippedRecords: Int,
+)
+
+/**
+ * Parser for Last Wagon's own truck-stop content JSON — the app-side format of the
+ * versioned content pipeline. External datasets (e.g. the NTAD Truck Stop Parking layer)
+ * are converted to this schema at content-preparation time, after their license and field
+ * schema pass verification; the app never parses provider formats directly.
+ *
+ * Envelope: `schema_version` (must equal [SUPPORTED_SCHEMA_VERSION]), `dataset`
+ * (`citation`, `vintage`, `verification`, `sample`) applied to every record, and `stops`.
+ * Per record: `id`, `name`, `state`, `lat`, `lon` are required; `highway`,
+ * `parking_spaces`, and the amenity booleans (`diesel`, `showers`, `food`, `repair`) are
+ * optional — a missing or null amenity stays null (unknown), never false. A structurally
+ * broken record — or one whose `id` duplicates an earlier record, which Room's REPLACE
+ * insert would otherwise silently collapse — is skipped and counted, never fatal; an
+ * unparseable envelope or wrong schema version yields an empty dataset.
+ */
+object TruckStopContent {
+    const val SUPPORTED_SCHEMA_VERSION = 1
+
+    fun parse(json: String): TruckStopDataset {
+        val root = runCatching { Json.parseToJsonElement(json) }.getOrNull() as? JsonObject
+            ?: return TruckStopDataset(emptyList(), 0)
+        val version = (root["schema_version"] as? JsonPrimitive)?.intOrNull
+        if (version != SUPPORTED_SCHEMA_VERSION) return TruckStopDataset(emptyList(), 0)
+        val dataset = root["dataset"] as? JsonObject
+        val citation = dataset.string("citation").orEmpty()
+        val vintage = dataset.string("vintage").orEmpty()
+        val verification = VerificationStatus.entries
+            .firstOrNull { it.name == dataset.string("verification") }
+            ?: VerificationStatus.UNVERIFIED
+        val sample = (dataset?.get("sample") as? JsonPrimitive)?.booleanOrNull ?: true
+        val records = root["stops"] as? JsonArray ?: return TruckStopDataset(emptyList(), 0)
+        val stops = mutableListOf<TruckStop>()
+        val seenIds = HashSet<String>()
+        var skipped = 0
+        for (element in records) {
+            val stop = parseStop(element, citation, vintage, verification, sample)
+            if (stop != null && seenIds.add(stop.id.value)) stops += stop else skipped++
+        }
+        return TruckStopDataset(stops, skipped)
+    }
+
+    private fun parseStop(
+        element: JsonElement, citation: String, vintage: String,
+        verification: VerificationStatus, sample: Boolean,
+    ): TruckStop? {
+        val record = element as? JsonObject ?: return null
+        val id = record.string("id")?.takeIf { it.isNotBlank() } ?: return null
+        val name = record.string("name")?.takeIf { it.isNotBlank() } ?: return null
+        val state = record.string("state")?.takeIf { it.isNotBlank() } ?: return null
+        val latitude = (record["lat"] as? JsonPrimitive)?.doubleOrNull ?: return null
+        val longitude = (record["lon"] as? JsonPrimitive)?.doubleOrNull ?: return null
+        if (!GeoPoint(latitude, longitude).isValid) return null
+        return TruckStop(
+            id = ContentId(id),
+            name = name,
+            state = state,
+            highway = record.string("highway").orEmpty(),
+            latitude = latitude,
+            longitude = longitude,
+            truckParkingSpaces = (record["parking_spaces"] as? JsonPrimitive)?.intOrNull
+                ?.takeIf { it >= 0 },
+            hasDiesel = record.optionalBoolean("diesel"),
+            hasShowers = record.optionalBoolean("showers"),
+            hasFood = record.optionalBoolean("food"),
+            hasRepair = record.optionalBoolean("repair"),
+            isSample = sample,
+            sourceCitation = citation,
+            verificationStatus = verification,
+            datasetVintage = vintage,
+        )
+    }
+
+    private fun JsonObject?.string(key: String): String? =
+        (this?.get(key) as? JsonPrimitive)?.takeIf { it.isString }?.contentOrNull
+
+    private fun JsonObject.optionalBoolean(key: String): Boolean? =
+        (this[key] as? JsonPrimitive)?.booleanOrNull
+}
+
 enum class ThemePreference { DARK, LIGHT, SYSTEM }
 data class UserPreferences(
     val theme: ThemePreference = ThemePreference.DARK,
@@ -200,6 +388,8 @@ interface ContentRepository {
     suspend fun getDailyQuestion(): DailyQuestion?
     /** The full pool of daily questions, for deterministic one-per-day selection. */
     suspend fun getDailyQuestions(): List<DailyQuestion>
+    /** Truck-stop directory records, ordered by state then name. */
+    fun observeTruckStops(): Flow<List<TruckStop>>
 }
 interface ProgressRepository {
     fun observeInspectionProgress(): Flow<InspectionProgress>

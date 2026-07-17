@@ -77,6 +77,43 @@ internal object SampleContent {
             "daily", true)
     }
 
+    // Fictional truck-stop directory content (Track C), carried as a document in the
+    // versioned content-pipeline schema parsed by TruckStopContent — the same path the
+    // real dataset will take once its source verification clears
+    // (docs/truck-stop-data-sources.md): the verified dataset replaces this JSON, nothing
+    // else changes. Names and coordinates are invented; records exercise the three-state
+    // amenity model (true / false / absent = unknown).
+    val truckStopsJson = """
+        {
+          "schema_version": 1,
+          "dataset": {
+            "citation": "$SAMPLE_CITATION",
+            "vintage": "Sample data — fictional locations for interface demonstration.",
+            "verification": "UNVERIFIED",
+            "sample": true
+          },
+          "stops": [
+            {"id": "sample-stop-01", "name": "Sample Junction Travel Plaza", "state": "OH",
+             "highway": "I-75 Exit 100", "lat": 40.10, "lon": -84.20,
+             "parking_spaces": 60, "diesel": true, "showers": true, "food": true, "repair": false},
+            {"id": "sample-stop-02", "name": "Sample Ridge Fuel & Parking", "state": "OH",
+             "highway": "I-70 Exit 52", "lat": 39.95, "lon": -83.80,
+             "parking_spaces": 25, "diesel": true, "food": true},
+            {"id": "sample-stop-03", "name": "Sample Prairie Rest Area", "state": "IA",
+             "highway": "I-80 Mile 200", "lat": 41.60, "lon": -93.60,
+             "parking_spaces": 18},
+            {"id": "sample-stop-04", "name": "Sample Summit Truck Stop", "state": "CO",
+             "highway": "I-70 Exit 250", "lat": 39.60, "lon": -106.00,
+             "parking_spaces": 40, "diesel": true, "showers": true, "repair": true},
+            {"id": "sample-stop-05", "name": "Sample Delta Travel Center", "state": "TX",
+             "highway": "I-10 Exit 800", "lat": 29.80, "lon": -95.40,
+             "parking_spaces": 110, "diesel": true, "showers": true, "food": true, "repair": true},
+            {"id": "sample-stop-06", "name": "Sample Basin Rest Stop", "state": "TX",
+             "highway": "I-20 Mile 150", "lat": 32.30, "lon": -101.50}
+          ]
+        }
+    """.trimIndent()
+
     private fun kindFor(id: String) = when (id) {
         "class-a" -> "CLASS_A"; "class-b" -> "CLASS_B"; "general" -> "GENERAL"
         "air-brakes" -> "AIR_BRAKES"; "combination" -> "COMBINATION"
