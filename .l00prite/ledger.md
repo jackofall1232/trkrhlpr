@@ -1493,3 +1493,31 @@ Append one entry per agent run. Do not overwrite prior runs.
   (2026-07-17T12:41Z; 31 prior + 7 new). core/data changes (repository seeding through
   the parser, entity mapper) verify on CI for the pushed commit.
 - **Lock:** e673b835-80ca-4bdc-bf5b-ae9d57595f4d re-acquired this step and released.
+
+### Supervised action 2026-07-17T12:45Z — Claude — PR #20 bot reviews (Gemini 1 + Codex 4) classified and addressed
+- **PR #20 opened by the owner** from the Claude Code UI (head fab320d, base 0.1.1-beta);
+  session subscribed to PR activity; hourly watch trigger armed. Vercel preview comment =
+  informational, no action.
+- **Applied — Codex P1 "sample rows survive dataset replacement" (REAL):** ensureSampleContent
+  now clears truck_stops before inserting (new DAO clearTruckStops; replace-never-merge),
+  so a phase-2 dataset with different ids can never leave fictional stops beside real
+  ones. DAO test added (clear + fresh-ids reinstall).
+- **Applied — Codex P2 "skipped-record count discarded":** the parse result now gates the
+  install — a document that dropped records (or parsed empty) does NOT replace the
+  existing directory (no-silent-truncation; bundled document is test-guaranteed complete).
+- **Applied — Codex P2 "OOSC coverage claim contradicts gap list" (doc):** coverage
+  conclusion qualified — front axle beam + air reservoir are driver-detectable and NOT
+  covered; claim now says so up front.
+- **Applied — Gemini high "per-stop allocations in search":** single-pass rewrite, no
+  per-stop allocations, early exit on recorded-false; behavior identical (all 8 search
+  tests unchanged and green).
+- **NOT applied — Codex P1 "393.51 says whichever is greater" (judged INCORRECT):** the
+  exact regulation sentence captured via eCFR-derived search excerpt says "whichever is
+  less", and OOSC-2004 §1.g uses the same wording — two independent sources vs the bot's
+  plausibility argument. Doc now quotes the exact sentence, records the disagreement, and
+  keeps the phrase on the full-text verification pass. Replying on the PR thread with the
+  rationale.
+- **Verification:** core/model recompiled + full suite standalone: **38 tests OK, exit 0**
+  (2026-07-17T12:45Z). core/data changes (clear-before-insert, gating, DAO test) verify on
+  CI for the pushed commit.
+- **Lock:** bdea1d34-52ef-4622-8078-30f0b7b1e304 acquired and released.

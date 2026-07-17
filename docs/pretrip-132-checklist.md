@@ -304,7 +304,9 @@ cross-checked at the table-of-contents level; on **2026-07-17** the full Part II
 read item-by-item against the 132 items, with currency questions checked against 2026
 sources by web search. Results:
 
-**Coverage confirmed (item level).** Every driver-detectable OOSC Part II defect area maps
+**Coverage at item level.** With the exception of the gap candidates listed below (most
+notably the front axle beam and the air reservoir, which are driver-detectable and NOT
+covered by any current item), every driver-detectable OOSC Part II defect area maps
 to one or more of the 132 items: brake components/linings/drums/hoses/tubing (22–26,
 73–76, 86, 106–109), low-air warning (127), applied air-loss (126), tractor-protection
 system (128–129), compressor (10), coupling incl. sliders/latching/kingpin/apron (86–97),
@@ -319,11 +321,15 @@ wheels/rims/hubs/fasteners/welds (30–32, 82–84, 115–117), wipers (42).
 - **Item 129 confirmed:** OOSC brake §1.c(1) treats an inoperable trailer *breakaway*
   system as its own condition (no trailer brake application when the supply is actuated) —
   exactly the check item 129 added in PR review. The addition closed a real gap.
-- **Item 127 figures reconciled:** current 49 CFR 393.51 (verified via eCFR excerpt,
-  2026-07-17) requires the warning at **55 psi or half governor cut-out, whichever is
-  less**; the CDL manual's driver-facing "before 60 psi" is the stricter study figure.
-  Both are current; authoring should present 60 as the manual's check figure and may cite
-  393.51's 55-psi regulatory floor in the explanation.
+- **Item 127 figures reconciled:** current 49 CFR 393.51 (exact sentence captured via
+  eCFR-derived excerpt, 2026-07-17: "at 379 kPa (55 psi) and below, or one-half of the
+  compressor governor cutout pressure, **whichever is less**") — the 2004 OOSC §1.g uses
+  the same "whichever is less" wording. A PR-review bot suggested the regulation reads
+  "whichever is greater"; two independent sources contradict that, so "less" stands here,
+  but the phrase is explicitly on the full-text verification pass with the other 393.51
+  wording. The CDL manual's driver-facing "before 60 psi" is the stricter study figure;
+  authoring presents 60 as the manual's check figure and may cite 393.51 in the
+  explanation.
 - **Tread-depth figures verified current** (eCFR § 393.75 excerpt, 2026-07-17): 4/32 steer
   (item 27), 2/32 others (77, 110). The OOSC's lower floors (2/32 steer; 1/32 others in
   two adjacent grooves, 3 locations) are enforcement floors *below* the legal maintenance

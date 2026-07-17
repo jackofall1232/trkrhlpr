@@ -121,6 +121,10 @@ interface LastWagonDao {
     fun observeExamResults(): Flow<List<ExamResultEntity>>
     @Query("SELECT * FROM truck_stops ORDER BY state, name")
     fun observeTruckStops(): Flow<List<TruckStopEntity>>
+    /** Content replacement, not progress reset: dataset installs clear the directory so
+     *  rows from a prior dataset (different ids) can never linger beside the new one. */
+    @Query("DELETE FROM truck_stops")
+    suspend fun clearTruckStops()
     @Query("SELECT COUNT(*) FROM content_versions WHERE version = :version")
     suspend fun contentVersionCount(version: Int): Int
     @Insert(onConflict = OnConflictStrategy.REPLACE)

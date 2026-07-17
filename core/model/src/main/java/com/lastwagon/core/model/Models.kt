@@ -185,26 +185,38 @@ object TruckStopSearch {
      * matches but counted in [TruckStopSearchResult.hiddenUnknownCount]; a stop with a
      * required amenity recorded false is an ordinary non-match. Results are ordered by
      * state then name for stable, scannable display.
+     *
+     * Single pass with no per-stop allocations: this re-runs on every query keystroke and
+     * must stay smooth once the directory holds the full national dataset (8,000+ rows).
      */
     fun search(stops: List<TruckStop>, filter: TruckStopFilter): TruckStopSearchResult {
         val query = filter.query.trim()
-        val base = stops.filter { stop ->
-            (filter.state == null || stop.state.equals(filter.state, ignoreCase = true)) &&
-                (query.isEmpty() || listOf(stop.name, stop.highway, stop.state)
-                    .any { it.contains(query, ignoreCase = true) })
-        }
         val matches = mutableListOf<TruckStop>()
         var hiddenUnknown = 0
-        for (stop in base) {
-            val required = filter.requiredAmenities.map { amenityValue(stop, it) }
+        for (stop in stops) {
+            if (filter.state != null && !stop.state.equals(filter.state, ignoreCase = true)) continue
+            if (query.isNotEmpty() &&
+                !stop.name.contains(query, ignoreCase = true) &&
+                !stop.highway.contains(query, ignoreCase = true) &&
+                !stop.state.contains(query, ignoreCase = true)
+            ) continue
+            var allRecordedTrue = true
+            var anyRecordedFalse = false
+            for (amenity in filter.requiredAmenities) {
+                when (amenityValue(stop, amenity)) {
+                    true -> Unit
+                    false -> { anyRecordedFalse = true; allRecordedTrue = false }
+                    null -> allRecordedTrue = false
+                }
+                if (anyRecordedFalse) break
+            }
             when {
-                required.all { it == true } -> matches += stop
-                required.none { it == false } -> hiddenUnknown++
+                allRecordedTrue -> matches += stop
+                !anyRecordedFalse -> hiddenUnknown++
             }
         }
-        return TruckStopSearchResult(
-            matches.sortedWith(compareBy({ it.state }, { it.name })), hiddenUnknown,
-        )
+        matches.sortWith(compareBy({ it.state }, { it.name }))
+        return TruckStopSearchResult(matches, hiddenUnknown)
     }
 }
 

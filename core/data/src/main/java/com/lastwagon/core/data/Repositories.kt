@@ -21,14 +21,21 @@ class OfflineContentRepository(private val database: LastWagonDatabase) : Conten
     private val dao = database.dao()
     override suspend fun ensureSampleContent() {
         if (dao.contentVersionCount(SAMPLE_VERSION) > 0) return
+        val truckStops = TruckStopContent.parse(SampleContent.truckStopsJson)
         database.withTransaction {
             dao.insertCategories(SampleContent.inspectionCategories)
             dao.insertItems(SampleContent.inspectionItems)
             dao.insertTestCategories(SampleContent.testCategories)
             dao.insertQuestions(SampleContent.questions)
-            dao.insertTruckStops(
-                TruckStopContent.parse(SampleContent.truckStopsJson).stops.map { it.toEntity() },
-            )
+            // Replace, never merge: clearing first guarantees rows from a prior dataset
+            // (different ids) cannot linger beside the new one. No-silent-truncation: a
+            // document that dropped records is a content defect — keep the previous
+            // directory rather than install a partial dataset (the bundled document is
+            // test-guaranteed to parse completely in TruckStopContentTest).
+            if (truckStops.skippedRecords == 0 && truckStops.stops.isNotEmpty()) {
+                dao.clearTruckStops()
+                dao.insertTruckStops(truckStops.stops.map { it.toEntity() })
+            }
             dao.insertContentVersion(ContentVersionEntity(SAMPLE_VERSION, System.currentTimeMillis()))
         }
     }

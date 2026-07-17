@@ -82,6 +82,21 @@ class LastWagonDaoTest {
         assertEquals(true, known.hasDiesel)
     }
 
+    @Test fun clearTruckStopsRemovesAllRowsForDatasetReplacement() = runTest {
+        dao.insertTruckStops(listOf(
+            TruckStopEntity("old-1", "Old Stop", "OH", "I-75", 40.0, -84.0,
+                null, null, null, null, null, true, "c", "UNVERIFIED", "v"),
+        ))
+        dao.clearTruckStops()
+        assertEquals(emptyList<TruckStopEntity>(), dao.observeTruckStops().first())
+        // A fresh dataset with different ids starts clean after the clear.
+        dao.insertTruckStops(listOf(
+            TruckStopEntity("new-1", "New Stop", "IA", "I-80", 41.0, -93.0,
+                null, null, null, null, null, false, "c", "VERIFIED", "v2"),
+        ))
+        assertEquals(listOf("new-1"), dao.observeTruckStops().first().map { it.id })
+    }
+
     @Test fun examResultsPersistNewestFirstAndResetClearsThem() = runTest {
         dao.insertExamResult(ExamResultEntity(categoryTitle = "General", correct = 3, total = 5, completedAtEpochMillis = 100))
         dao.insertExamResult(ExamResultEntity(categoryTitle = "Air Brakes", correct = 4, total = 5, completedAtEpochMillis = 200))
