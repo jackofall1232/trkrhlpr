@@ -52,6 +52,11 @@ class OrsRoutingProviderTest {
             .calculate(request) as RouteCalculationResult.Failure
         assertEquals(RouteFailureKind.RATE_LIMITED, limited.error.kind)
         assertTrue(limited.error.retryable)
+        assertEquals("quota", limited.error.message)
+
+        val stringForm = provider(RoutingHttpResponse(429, """{"error":"Rate limit exceeded"}"""))
+            .calculate(request) as RouteCalculationResult.Failure
+        assertEquals("Rate limit exceeded", stringForm.error.message)
     }
 
     private fun provider(response: RoutingHttpResponse) = OrsRoutingProvider(

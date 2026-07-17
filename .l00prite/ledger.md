@@ -1203,3 +1203,26 @@ Append one entry per agent run. Do not overwrite prior runs.
   `ORS_API_KEY=key ./gradlew :app:assembleDebug`) — single existing drop-in point powering
   routing AND geocoding; then device-review GPS grant/denial and autocomplete flows.
 - **Lock:** 27ea7b6b-3df4-404e-bd99-2e03568fa288 acquired and released.
+
+### Supervised action 2026-07-17T02:55Z — Claude — ORS host migrated to api.heigit.org; CI red fixed; key drop-in points finalized
+- **CI on 47ee22d (run 29550565197): FAILURE** — 38 tests ran, 1 failed:
+  `OrsGeocodingProviderTest.rateLimitIsRetryableFailureWithStatus`. Root cause: real parsing
+  bug — for the string error form `{"error":"..."}` the `error.jsonObject` access threw
+  inside the outer `runCatching`, so the primitive fallback branch was unreachable and the
+  provider's own message was lost. Fixed with an explicit JsonObject/JsonPrimitive `when` in
+  BOTH providers (the routing provider had the identical latent bug; its test only covered
+  the object form). Tests extended to cover both error shapes.
+- **Owner-directed host change:** all hosted-ORS URLs now derive from single-source
+  `OrsApi.kt` — `https://api.heigit.org/ors` (HeiGIT deprecated api.openrouteservice.org,
+  announcement 2026-04-28, ask thread 7912). **Verification limit reported, not papered
+  over:** the exact path mapping under the new gateway could NOT be confirmed from this
+  environment (ORS docs/forum/api.heigit.org all egress-blocked; npm/pypi probes of
+  2026-era clients still show the old host). Best-evidence `/ors` prefix wired; a 30-second
+  keyed curl check + the one-line fix location are documented in docs/routing-provider.md.
+- **Key handling (owner ask):** uncommitted sources only — Gradle property, env var, or
+  gitignored root `local.properties` (support added; precedence documented); CI reads
+  optional repo secret `ORS_API_KEY` (ci.yml env wiring added; empty fallback keeps
+  keyless builds green). The website makes no ORS calls, so no Vercel secret is needed.
+  No key is hardcoded anywhere.
+- **Verification:** CI on the follow-up push is the check; watching the run.
+- **Lock:** b0d54a0e-eb92-4491-a722-8c61a4dd38ea acquired and released.

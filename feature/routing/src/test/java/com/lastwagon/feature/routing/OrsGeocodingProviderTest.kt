@@ -83,6 +83,15 @@ class OrsGeocodingProviderTest {
         assertEquals("Rate limit exceeded", result.message)
     }
 
+    @Test fun objectFormProviderErrorMessageIsSurfaced() = runTest {
+        val result = provider(
+            RecordingTransport(RoutingHttpResponse(403, """{"error":{"message":"Access to this API has been disallowed"}}""")),
+        ).autocomplete("Scranton") as GeocodeLookupResult.Failure
+
+        assertEquals(403, result.httpStatus)
+        assertEquals("Access to this API has been disallowed", result.message)
+    }
+
     @Test fun malformedBodyIsExplicitFailure() = runTest {
         val result = provider(RecordingTransport(RoutingHttpResponse(200, "not json")))
             .autocomplete("Scranton")

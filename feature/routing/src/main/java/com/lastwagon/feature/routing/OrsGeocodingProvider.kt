@@ -15,7 +15,7 @@ internal const val AUTOCOMPLETE_DEBOUNCE_MILLIS = 450L
 internal const val AUTOCOMPLETE_MIN_CHARS = 3
 internal const val AUTOCOMPLETE_MAX_SUGGESTIONS = 6
 
-private const val DEFAULT_ORS_GEOCODE_BASE_URL = "https://api.openrouteservice.org/geocode"
+private const val DEFAULT_ORS_GEOCODE_BASE_URL = OrsApi.GEOCODE_BASE_URL
 
 private const val MISSING_KEY_MESSAGE =
     "OpenRouteService is not configured. Set ORS_API_KEY locally and rebuild."
@@ -129,10 +129,13 @@ class OrsGeocodingProvider internal constructor(
     }
 
     private fun providerFailure(response: RoutingHttpResponse): GeocodeLookupResult.Failure {
+        // ORS returns errors both as {"error":{"message":...}} and as {"error":"..."}.
         val message = runCatching {
-            val error = Json.parseToJsonElement(response.body).jsonObject["error"]
-            error?.jsonObject?.get("message")?.jsonPrimitive?.contentOrNull
-                ?: error?.jsonPrimitive?.contentOrNull
+            when (val error = Json.parseToJsonElement(response.body).jsonObject["error"]) {
+                is JsonObject -> error["message"]?.jsonPrimitive?.contentOrNull
+                is JsonPrimitive -> error.contentOrNull
+                else -> null
+            }
         }.getOrNull() ?: when (response.status) {
             429 -> "The address service request limit was reached. Wait a moment and try again."
             else -> "The address service rejected the request."

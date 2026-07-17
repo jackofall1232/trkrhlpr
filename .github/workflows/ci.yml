@@ -33,11 +33,17 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      # ORS_API_KEY is an optional repository secret; when unset the build
+      # falls back to an empty key and the app shows its not-configured state.
       - name: Assemble debug APK
         run: ./gradlew assembleDebug --stacktrace
+        env:
+          ORS_API_KEY: ${{ secrets.ORS_API_KEY }}
 
       - name: Unit tests and lint
         run: ./gradlew check --stacktrace
+        env:
+          ORS_API_KEY: ${{ secrets.ORS_API_KEY }}
 
       # Debug-signed APK for sideload/beta distribution; a human still uploads
       # it to a GitHub Release — CI never publishes anything itself. Runs after

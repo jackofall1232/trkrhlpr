@@ -1,12 +1,14 @@
 package com.lastwagon.feature.routing
 
 import com.lastwagon.core.model.GeoPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AddressAutocompleteControllerTest {
     private class RecordingGeocoder(
         private val result: (String) -> GeocodeLookupResult,

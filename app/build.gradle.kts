@@ -3,9 +3,18 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+// Uncommitted key sources only, in precedence order: Gradle property (-P or
+// ~/.gradle/gradle.properties), environment variable, then the gitignored
+// local.properties (ORS_API_KEY=...). Never put the key in a committed file.
+val orsKeyFromLocalProperties = rootProject.file("local.properties")
+    .takeIf { it.exists() }
+    ?.inputStream()
+    ?.use { stream -> java.util.Properties().apply { load(stream) } }
+    ?.getProperty("ORS_API_KEY")
+    .orEmpty()
 val orsApiKey = providers.gradleProperty("ORS_API_KEY")
     .orElse(providers.environmentVariable("ORS_API_KEY"))
-    .orElse("")
+    .orElse(orsKeyFromLocalProperties)
     .get()
     .replace("\\", "\\\\")
     .replace("\"", "\\\"")
