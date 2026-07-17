@@ -5,7 +5,7 @@
   "current_phase": "content_source_research_complete",
   "active_agent": null,
   "last_agent": "claude",
-  "last_updated": "2026-07-17T02:06:30Z",
+  "last_updated": "2026-07-17T03:27:21Z",
   "status": "track_a_complete_website_apk_cta_wired_release_publication_pending",
   "blocked": false,
   "blocker_reason": null,
@@ -13,8 +13,8 @@
   "last_event_processed": "event-20260714-022005-github-pr2-foundation-review-a5f2",
   "pending_event_count": 0,
   "review_response_required": false,
-  "ci_status": "success (0378017 on claude/apk-download-button-8y2he6, run 29548882139: assembleDebug + check green; APK artifact lastwagon-debug-apk uploaded)",
+  "ci_status": "success (d44f1bd on claude/address-search-route-inputs-1i6awg, runs 29552280417+29552282117: assembleDebug + check green; PR #18 green with both bot-review rounds addressed; ORS_API_KEY + key-architecture decision pending from owner)",
   "execution_active": false,
   "execution_stop_reason": "human_review_gate",
-  "next_recommended_action": "Website APK CTA wired on claude/apk-download-button-8y2he6 (2026-07-17 ledger entry). OWNER GATE: publish GitHub Release tag 0.1.0-beta with asset named exactly lastwagon-0.1.0-beta.apk (CI artifact from run 29548882139; debug-signed, versionName mismatch 0.1.0 vs 0.1.0-beta noted) — link 404s until then. Standing Track B gate unchanged: FOUNDATION APPROVAL (B0) + owner decisions (JSON pipeline, checklist-only vs +CDL, air-figures policy); eCFR/GovInfo reachable here, fmcsa.dot.gov 403."
+  "next_recommended_action": "2026-07-17: route planner now takes address search + current location on claude/address-search-route-inputs-1i6awg (CI on that branch is the build verification; ORS_API_KEY from owner is the only step left for live end-to-end). Standing owner gate unchanged: publish GitHub Release tag 0.1.0-beta with asset lastwagon-0.1.0-beta.apk from the latest green run on claude/apk-download-button-8y2he6. Standing Track B gate unchanged: FOUNDATION APPROVAL (B0) + owner decisions (JSON pipeline, checklist-only vs +CDL, air-figures policy); eCFR/GovInfo reachable here, fmcsa.dot.gov 403."
 }

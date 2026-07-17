@@ -10,8 +10,7 @@ import java.net.URL
 import java.security.MessageDigest
 import java.util.UUID
 
-private const val DEFAULT_ORS_ENDPOINT =
-    "https://api.openrouteservice.org/v2/directions/driving-hgv/geojson"
+private const val DEFAULT_ORS_ENDPOINT = OrsApi.DIRECTIONS_HGV_GEOJSON_URL
 
 internal data class RoutingHttpResponse(val status: Int, val body: String)
 
@@ -172,10 +171,13 @@ class OrsRoutingProvider internal constructor(
     }
 
     private fun providerFailure(response: RoutingHttpResponse): RouteCalculationResult.Failure {
+        // ORS returns errors both as {"error":{"message":...}} and as {"error":"..."}.
         val message = runCatching {
-            val error = Json.parseToJsonElement(response.body).jsonObject["error"]
-            error?.jsonObject?.get("message")?.jsonPrimitive?.contentOrNull
-                ?: error?.jsonPrimitive?.contentOrNull
+            when (val error = Json.parseToJsonElement(response.body).jsonObject["error"]) {
+                is JsonObject -> error["message"]?.jsonPrimitive?.contentOrNull
+                is JsonPrimitive -> error.contentOrNull
+                else -> null
+            }
         }.getOrNull() ?: "The routing provider rejected the request."
         val kind = when (response.status) {
             429 -> RouteFailureKind.RATE_LIMITED

@@ -114,8 +114,13 @@ vehicle profile and bundled sample content installed.
 
 ## Route provider configuration
 
-Phase 3 is disabled when no OpenRouteService key is configured. Supply a development key
-through an uncommitted Gradle property or environment variable:
+Phase 3 is disabled when no OpenRouteService key is configured. The same key drives both
+route calculation and the address search / reverse geocoding used by the route planner's
+origin and destination fields; all hosted-ORS URLs derive from `OrsApi.BASE_URL`
+(`api.heigit.org` — see docs/routing-provider.md). Supply a development key through an
+uncommitted source: an environment variable, a Gradle property, or the gitignored
+`local.properties` (`ORS_API_KEY=your-key`). In CI it comes from the optional repository
+secret `ORS_API_KEY`. Never commit the key.
 
 ```bash
 ORS_API_KEY=your-development-key ./gradlew :app:assembleDebug

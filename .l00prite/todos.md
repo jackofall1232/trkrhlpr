@@ -63,6 +63,11 @@ import, and the truck-stop data-source research gate (Track C start).
   approximate-location grant/denial, network loss, and accessibility.
 - [ ] Complete Phase 3 keyed ORS integration/device review: valid route, no-route, timeout,
   quota/authorization error, corrupt response, map fit/overlay, and route deletion.
+- [ ] Device-review the new address-based route inputs (branch
+  `claude/address-search-route-inputs-1i6awg`, 2026-07-17): GPS permission grant/denial/
+  location-off paths, reverse-geocode confirmation label, autocomplete debounce behavior on
+  a real keyboard, no-match/rate-limit messages, and end-to-end routing once ORS_API_KEY
+  exists (owner is creating the key; it is the single remaining step for live testing).
 - [ ] Complete Phase 4 device/accessibility review: long overview scrolling, warning
   visibility, acknowledgment persistence, bypass attempts, stale state, and profile changes.
 - [ ] Verify the Last Wagon rename and Phase 5 with the full Gradle suite (unit tests,

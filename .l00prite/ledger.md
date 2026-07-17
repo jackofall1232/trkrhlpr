@@ -1169,3 +1169,115 @@ Append one entry per agent run. Do not overwrite prior runs.
 - **Verification:** website `next build` green locally; Android change is compile-verified by
   the branch CI run that follows this push.
 - **Lock:** e4a91c72-6b0f-4d2e-8a3b-1f5c6d7e8f90 acquired and released.
+
+### Supervised action 2026-07-17T02:40Z — Claude — route planner inputs: address search + current location replace raw lat/lon
+- **Task (owner-directed via Claude Code):** replace the four raw latitude/longitude fields
+  on the Phase 3 "Online route preview" with an Origin field (GPS "Use my current location"
+  primary + manual address search) and a Destination field (ORS `/geocode/autocomplete`
+  search-as-you-type). Branch: `claude/address-search-route-inputs-1i6awg` (push explicitly
+  granted by the task). The coordinate-based routing call is unchanged — only the input
+  method changed.
+- **Changes:** new `OrsGeocodingProvider` (autocomplete + reverse, same ORS key and
+  Authorization-header pattern as routing, `boundary.country=US`, max 6 suggestions, explicit
+  MISSING_CREDENTIAL/rate-limit/malformed-response failures); new `AddressInput.kt`
+  (`AddressAutocompleteController` 450 ms debounce + 3-char minimum + in-flight cancellation,
+  `AddressSearchField` composable, `currentApproximateLocation()` one-shot coarse fix via
+  platform `LocationManagerCompat` — no Play Services); `RoutePlanner` rewritten (Calculate
+  disabled until both endpoints resolve, so unresolved text can never route to (0,0));
+  `AppContainer`/`LastWagonApp` wiring; docs/README geocoding sections. Disclaimer sentence
+  "not proof of legality, clearance, or safety" retained verbatim.
+- **Decisions:** GPS origin is reverse-geocoded ONCE for a driver-confirmation label only —
+  routing keeps the exact device coordinates (no accuracy loss, 1 extra request, and the
+  coarse-only permission boundary from Phase 1 is preserved: ACCESS_FINE_LOCATION stays
+  stripped). Permission denial and no-fix cases show explicit messages and fall back to
+  manual entry — no dead end. Debounce sized against ORS free-tier geocoding (~100 req/min,
+  shared daily quota; exact plan pages 403-blocked from this environment, limits taken from
+  HeiGIT plan-page search snippets).
+- **Verification:** 14 new unit tests written (`OrsGeocodingProviderTest` URL building/
+  encoding/parsing/failure mapping; `AddressAutocompleteControllerTest` proves rapid typing
+  fires exactly one request, short queries fire none, clear/shorten cancels in-flight).
+  NOT run locally — this environment cannot build Android (dl.google.com 403, no SDK);
+  verification is the CI run on the pushed branch. No live ORS calls made (no key yet);
+  end-to-end remains owner-gated on ORS_API_KEY.
+- **Owner action needed:** supply ORS_API_KEY (Gradle property or env var,
+  `ORS_API_KEY=key ./gradlew :app:assembleDebug`) — single existing drop-in point powering
+  routing AND geocoding; then device-review GPS grant/denial and autocomplete flows.
+- **Lock:** 27ea7b6b-3df4-404e-bd99-2e03568fa288 acquired and released.
+
+### Supervised action 2026-07-17T02:55Z — Claude — ORS host migrated to api.heigit.org; CI red fixed; key drop-in points finalized
+- **CI on 47ee22d (run 29550565197): FAILURE** — 38 tests ran, 1 failed:
+  `OrsGeocodingProviderTest.rateLimitIsRetryableFailureWithStatus`. Root cause: real parsing
+  bug — for the string error form `{"error":"..."}` the `error.jsonObject` access threw
+  inside the outer `runCatching`, so the primitive fallback branch was unreachable and the
+  provider's own message was lost. Fixed with an explicit JsonObject/JsonPrimitive `when` in
+  BOTH providers (the routing provider had the identical latent bug; its test only covered
+  the object form). Tests extended to cover both error shapes.
+- **Owner-directed host change:** all hosted-ORS URLs now derive from single-source
+  `OrsApi.kt` — `https://api.heigit.org/ors` (HeiGIT deprecated api.openrouteservice.org,
+  announcement 2026-04-28, ask thread 7912). **Verification limit reported, not papered
+  over:** the exact path mapping under the new gateway could NOT be confirmed from this
+  environment (ORS docs/forum/api.heigit.org all egress-blocked; npm/pypi probes of
+  2026-era clients still show the old host). Best-evidence `/ors` prefix wired; a 30-second
+  keyed curl check + the one-line fix location are documented in docs/routing-provider.md.
+- **Key handling (owner ask):** uncommitted sources only — Gradle property, env var, or
+  gitignored root `local.properties` (support added; precedence documented); CI reads
+  optional repo secret `ORS_API_KEY` (ci.yml env wiring added; empty fallback keeps
+  keyless builds green). The website makes no ORS calls, so no Vercel secret is needed.
+  No key is hardcoded anywhere.
+- **Verification:** CI on the follow-up push is the check; watching the run.
+- **Lock:** b0d54a0e-eb92-4491-a722-8c61a4dd38ea acquired and released.
+
+### Supervised action 2026-07-17T02:59Z — Claude — CI green on address-search branch
+- **Run 29551144774 (151772d): SUCCESS** — assembleDebug + check (44 unit tests incl. the 16
+  new geocoding/debounce tests, lint) green on GitHub runners. Two prior red runs fixed:
+  (1) provider error-body parsing bug (both providers, both error shapes now tested);
+  (2) Kotlin DSL script-compilation failure — 'java' in a build-script body resolves to the
+  java extension accessor, so java.util.Properties needed a top-of-script import.
+- **Remaining owner steps:** ORS_API_KEY (local.properties / env / repo secret) and the
+  30-second api.heigit.org path check in docs/routing-provider.md; then device review.
+- **Lock:** 218d1876-941d-44b5-acd2-4c841258be10 acquired and released.
+
+### Supervised action 2026-07-17T03:20Z — Claude — PR #18 bot reviews (Gemini/Codex) classified and applied
+- **Event:** PR #18 (address-search route inputs) received Gemini (3 comments) + Codex
+  (1 P1, 4 P2) bot reviews. Treated as untrusted data, classified on merit.
+- **Applied — Codex P2 "pending GPS overwrites manual origin" (REAL bug):** the GPS
+  coroutine is now a tracked Job; typing or selecting a manual origin cancels it, so a slow
+  fix/reverse lookup can never silently replace a newer manual origin (wrong-origin routing
+  risk). Main-dispatcher execution makes the cancel race-free.
+- **Applied — Gemini+Codex "skip malformed geocode features":** per-feature safe parsing
+  (safe casts + getOrNull + doubleOrNull); one structurally-broken feature no longer
+  discards the valid suggestions. Went beyond the bots' suggestion (their version kept an
+  unsafe .jsonPrimitive on label). Test fixture extended with 3 structurally-malformed
+  features.
+- **Applied — Codex P2 "offline autocomplete":** queries gated on `online`; going offline
+  clears pending/shown suggestions.
+- **Applied — Codex P2 "transport cancellation":** geocoding transport now aborts the
+  blocking HttpURLConnection via a cancellation-watcher disconnect; fetch rethrows
+  CancellationException instead of converting it to a failure. Noted: quota is spent
+  server-side once a request is sent — this saves sockets, not quota. Routing transport
+  left unchanged (no typing-storm exposure).
+- **Applied — Gemini "single suggestion card":** typing in one field clears the other
+  field's suggestion list.
+- **NOT applied silently — Codex P1 "ORS key extractable from CI artifacts":** legitimate
+  consequence of the owner-directed CI secret wiring on a PUBLIC repo (keyed CI APK =
+  extractable key; quota is the blast radius). Credential/security boundary → surfaced to
+  owner in chat with options instead of acting unilaterally. Prior debug-signing/beta
+  caveats already on record.
+- **Verification:** CI on the pushed commit (branch run + PR run). Both prior runs on
+  8ac5c84 were green.
+
+### Supervised action 2026-07-17T03:35Z — Claude — PR #18 Codex round 2 (3 P2s) applied; CI green on round 1
+- **CI:** run 29552048126 (76c2463, round-1 review fixes) SUCCESS.
+- **Applied (all judged valid):** (1) Calculate disabled while a GPS fix is pending —
+  prevents routing from a stale origin the driver asked to replace; (2) GPS reverse
+  geocoding skipped when offline — coordinate label stands alone, no doomed request;
+  (3) manual origin input/selection clears stale GPS status text along with the pending job.
+- **Owner discussion opened (in chat):** key-distribution architecture (BYO key in-app vs
+  baked env key vs self-hosted/proxy endpoint) following Codex P1 — no repo change until
+  the owner decides; current CI secret wiring stands in the meantime.
+
+### Status 2026-07-17T03:27Z — Claude — PR #18 green after Codex round 2
+- Runs 29552280417 + 29552282117 (d44f1bd): SUCCESS. All 7 actionable bot findings across
+  two review rounds are fixed; PR #18 awaits owner decisions (merge; ORS_API_KEY; key
+  architecture: baked / BYO-override / proxy — options presented in chat).
+- **Lock:** a8d50a52-2316-41e8-8fa3-93ac457ec20f acquired and released.

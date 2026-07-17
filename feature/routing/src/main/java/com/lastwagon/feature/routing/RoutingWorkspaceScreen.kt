@@ -1,11 +1,15 @@
 package com.lastwagon.feature.routing
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowDropDown
+import androidx.compose.material.icons.rounded.MyLocation
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -26,6 +30,7 @@ import java.util.Locale
 fun RoutingWorkspaceScreen(
     repository: VehicleProfileRepository,
     routingProvider: RoutingProvider,
+    geocodingProvider: GeocodingProvider,
     routeRepository: RouteRepository,
     modifier: Modifier = Modifier,
     styleProvider: MapStyleProvider = OpenFreeMapLibertyStyleProvider(),
@@ -81,6 +86,7 @@ fun RoutingWorkspaceScreen(
         RoutePlanner(
             profile = requireNotNull(profile),
             routingProvider = routingProvider,
+            geocodingProvider = geocodingProvider,
             routeRepository = routeRepository,
             online = online,
             onBack = { planning = false },
@@ -426,20 +432,99 @@ private fun OfflineCorridorCard(
 private fun RoutePlanner(
     profile: VehicleProfile,
     routingProvider: RoutingProvider,
+    geocodingProvider: GeocodingProvider,
     routeRepository: RouteRepository,
     online: Boolean,
     onBack: () -> Unit,
     onRouteSaved: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var originLatitude by rememberSaveable { mutableStateOf("") }
-    var originLongitude by rememberSaveable { mutableStateOf("") }
-    var destinationLatitude by rememberSaveable { mutableStateOf("") }
-    var destinationLongitude by rememberSaveable { mutableStateOf("") }
+    val context = LocalContext.current
+    var originText by rememberSaveable { mutableStateOf("") }
+    var destinationText by rememberSaveable { mutableStateOf("") }
+    var origin by rememberSaveable(stateSaver = AddressSelectionSaver) {
+        mutableStateOf<AddressSelection?>(null)
+    }
+    var destination by rememberSaveable(stateSaver = AddressSelectionSaver) {
+        mutableStateOf<AddressSelection?>(null)
+    }
+    var originFromGps by rememberSaveable { mutableStateOf(false) }
+    var locating by remember { mutableStateOf(false) }
+    var locationJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
+    var locationMessage by remember { mutableStateOf<String?>(null) }
     var calculating by remember { mutableStateOf(false) }
     var failure by remember { mutableStateOf<RouteFailure?>(null) }
     var result by remember { mutableStateOf<CalculatedRoute?>(null) }
     val scope = rememberCoroutineScope()
+    val originSearch = remember(geocodingProvider) {
+        AddressAutocompleteController(geocodingProvider, scope)
+    }
+    val destinationSearch = remember(geocodingProvider) {
+        AddressAutocompleteController(geocodingProvider, scope)
+    }
+    val originSearchState by originSearch.state.collectAsStateWithLifecycle()
+    val destinationSearchState by destinationSearch.state.collectAsStateWithLifecycle()
+
+    // Address lookups need the network; going offline drops pending and shown suggestions.
+    LaunchedEffect(online) {
+        if (!online) {
+            originSearch.clear()
+            destinationSearch.clear()
+        }
+    }
+
+    fun useCurrentLocation() {
+        locating = true
+        locationMessage = null
+        // Manual origin input cancels this job, so a slow fix or reverse lookup can never
+        // overwrite an origin the driver has since typed or selected.
+        locationJob?.cancel()
+        locationJob = scope.launch {
+            try {
+                val located = context.currentApproximateLocation()
+                if (located == null) {
+                    locationMessage = "Your approximate location could not be determined. " +
+                        "Check that device location is turned on, or type the origin address instead."
+                    return@launch
+                }
+                val coordinateLabel = String.format(
+                    Locale.US, "Current location (approx. %.4f, %.4f)",
+                    located.latitude, located.longitude,
+                )
+                origin = AddressSelection(coordinateLabel, located)
+                originText = coordinateLabel
+                originFromGps = true
+                originSearch.clear()
+                // Reverse geocoding is confirmation display only — routing keeps the exact
+                // device coordinates even when a nearby address label is shown. Offline,
+                // the coordinate label stands on its own; no doomed lookup is attempted.
+                if (!online) return@launch
+                when (val reversed = geocodingProvider.reverse(located)) {
+                    is GeocodeLookupResult.Success -> reversed.suggestions.firstOrNull()?.let { nearest ->
+                        val label = "Near ${nearest.label}"
+                        origin = AddressSelection(label, located)
+                        originText = label
+                    }
+                    is GeocodeLookupResult.Failure -> locationMessage =
+                        "Device position captured, but the address lookup failed: " +
+                            "${reversed.message} Routing will use the coordinates shown."
+                }
+            } finally {
+                locating = false
+            }
+        }
+    }
+
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        if (granted) {
+            useCurrentLocation()
+        } else {
+            locationMessage = "Location permission was denied, so GPS stays off. " +
+                "Type the origin address instead — routing works without location access."
+        }
+    }
 
     LazyColumn(
         modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp),
@@ -448,7 +533,7 @@ private fun RoutePlanner(
         item {
             Text("Online route preview", style = MaterialTheme.typography.headlineMedium)
             Text(
-                "Phase 3 accepts coordinates only. Results are unreviewed decision support based on available data—not proof of legality, clearance, or safety.",
+                "Search an address for each end of the trip, or use your current location as the origin. Results are unreviewed decision support based on available data—not proof of legality, clearance, or safety.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
@@ -458,10 +543,85 @@ private fun RoutePlanner(
                 color = MaterialTheme.colorScheme.error,
             )
         }
-        item { DecimalField(originLatitude, { originLatitude = it }, "Origin latitude") }
-        item { DecimalField(originLongitude, { originLongitude = it }, "Origin longitude") }
-        item { DecimalField(destinationLatitude, { destinationLatitude = it }, "Destination latitude") }
-        item { DecimalField(destinationLongitude, { destinationLongitude = it }, "Destination longitude") }
+        item {
+            AddressSearchField(
+                label = "Origin",
+                text = originText,
+                resolved = origin != null,
+                supportingText = when {
+                    origin != null && originFromGps ->
+                        "Approximate GPS position — confirm this matches where the trip starts."
+                    origin != null -> "Location set."
+                    else -> "Type an address and tap a match, or use current location below."
+                },
+                searchState = originSearchState,
+                onTextChange = { value ->
+                    // Manual input supersedes any pending GPS lookup and its status text.
+                    locationJob?.cancel()
+                    locationMessage = null
+                    originText = value
+                    if (origin?.label != value) {
+                        origin = null
+                        originFromGps = false
+                    }
+                    if (online) originSearch.onQueryChanged(value) else originSearch.clear()
+                    // Only one suggestion card at a time — drop the other field's list.
+                    destinationSearch.clear()
+                },
+                onSuggestionSelected = { suggestion ->
+                    locationJob?.cancel()
+                    locationMessage = null
+                    origin = AddressSelection(suggestion.label, suggestion.point)
+                    originFromGps = false
+                    originText = suggestion.label
+                    originSearch.clear()
+                },
+            )
+        }
+        item {
+            Button(
+                onClick = {
+                    if (context.hasCoarseLocationPermission()) useCurrentLocation()
+                    else locationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                },
+                enabled = !locating,
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+            ) {
+                if (locating) {
+                    CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
+                } else {
+                    Icon(Icons.Rounded.MyLocation, null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Use my current location")
+                }
+            }
+        }
+        locationMessage?.let { message ->
+            item { Text(message, color = MaterialTheme.colorScheme.error) }
+        }
+        item {
+            AddressSearchField(
+                label = "Destination",
+                text = destinationText,
+                resolved = destination != null,
+                supportingText = if (destination != null) "Location set."
+                else "Type the destination address, then tap a match.",
+                searchState = destinationSearchState,
+                onTextChange = { value ->
+                    destinationText = value
+                    if (destination?.label != value) destination = null
+                    if (online) destinationSearch.onQueryChanged(value, focus = origin?.point)
+                    else destinationSearch.clear()
+                    // Only one suggestion card at a time — drop the other field's list.
+                    originSearch.clear()
+                },
+                onSuggestionSelected = { suggestion ->
+                    destination = AddressSelection(suggestion.label, suggestion.point)
+                    destinationText = suggestion.label
+                    destinationSearch.clear()
+                },
+            )
+        }
         failure?.let { error -> item {
             Text(error.message, color = MaterialTheme.colorScheme.error)
             error.httpStatus?.let { Text("Provider HTTP status: $it") }
@@ -482,30 +642,35 @@ private fun RoutePlanner(
             }
         }
         item {
+            val originPoint = origin?.point
+            val destinationPoint = destination?.point
             Button(
-                enabled = !calculating && online,
+                // Also disabled while a GPS fix is pending so a route can never be
+                // calculated from a stale origin the driver has asked to replace.
+                enabled = !calculating && !locating && online &&
+                    originPoint != null && destinationPoint != null,
                 onClick = {
-                    val origin = GeoPoint(originLatitude.toDoubleOrNull() ?: Double.NaN,
-                        originLongitude.toDoubleOrNull() ?: Double.NaN)
-                    val destination = GeoPoint(destinationLatitude.toDoubleOrNull() ?: Double.NaN,
-                        destinationLongitude.toDoubleOrNull() ?: Double.NaN)
-                    calculating = true
-                    failure = null
-                    result = null
-                    scope.launch {
-                        try {
-                            when (val calculated = routingProvider.calculate(RouteRequest(origin, destination, profile))) {
-                                is RouteCalculationResult.Failure -> failure = calculated.error
-                                is RouteCalculationResult.Success -> {
-                                    routeRepository.save(calculated.route)
-                                    result = calculated.route
+                    if (originPoint != null && destinationPoint != null) {
+                        calculating = true
+                        failure = null
+                        result = null
+                        scope.launch {
+                            try {
+                                when (val calculated = routingProvider.calculate(
+                                    RouteRequest(originPoint, destinationPoint, profile),
+                                )) {
+                                    is RouteCalculationResult.Failure -> failure = calculated.error
+                                    is RouteCalculationResult.Success -> {
+                                        routeRepository.save(calculated.route)
+                                        result = calculated.route
+                                    }
                                 }
+                            } catch (_: Exception) {
+                                failure = RouteFailure(RouteFailureKind.STORAGE,
+                                    "The calculated route could not be saved locally.")
+                            } finally {
+                                calculating = false
                             }
-                        } catch (_: Exception) {
-                            failure = RouteFailure(RouteFailureKind.STORAGE,
-                                "The calculated route could not be saved locally.")
-                        } finally {
-                            calculating = false
                         }
                     }
                 },
@@ -513,6 +678,13 @@ private fun RoutePlanner(
             ) {
                 if (calculating) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
                 else Text("Calculate with OpenRouteService")
+            }
+            if (originPoint == null || destinationPoint == null) {
+                Text(
+                    "Set both the origin and the destination first — pick a suggestion for each, or use current location for the origin.",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodySmall,
+                )
             }
         }
         item { TextButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) { Text("Back to vehicle profile") } }
