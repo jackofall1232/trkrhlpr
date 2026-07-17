@@ -5,7 +5,7 @@
   "current_phase": "content_source_research_complete",
   "active_agent": null,
   "last_agent": "claude",
-  "last_updated": "2026-07-17T03:38:56Z",
+  "last_updated": "2026-07-17T03:59:10Z",
   "status": "track_a_complete_website_apk_cta_wired_release_publication_pending",
   "blocked": false,
   "blocker_reason": null,
@@ -13,7 +13,7 @@
   "last_event_processed": "event-20260714-022005-github-pr2-foundation-review-a5f2",
   "pending_event_count": 0,
   "review_response_required": false,
-  "ci_status": "success (b2f1c29 on claude/byo-ors-key-override, run 29552733658: assembleDebug + check green). PR #18 previously merged into 0.1.0-beta (ae80a0e).",
+  "ci_status": "success (85fb789 on claude/byo-ors-key-override, runs 29553557584+29553559115: assembleDebug + check green). PR #19 green with review round addressed (backup-safe key storage, cached delegates, save-to-clear). PR #18 merged earlier (ae80a0e).",
   "execution_active": false,
   "execution_stop_reason": "human_review_gate",
   "next_recommended_action": "2026-07-17: owner approved phased key plan (baked key for beta = disposable/rotatable; BYO override next; proxy w/ per-device rate limiting before wide release \u2014 see todos). PR #18 merged. Phase-2 branch claude/byo-ors-key-override carries the Settings key override; owner to review/merge, then supply ORS_API_KEY + run the api.heigit.org path check in docs/routing-provider.md. Standing gates unchanged (0.1.0-beta release publication; Track B foundation approval)."
