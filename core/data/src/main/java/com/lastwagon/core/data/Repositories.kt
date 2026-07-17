@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
-private const val SAMPLE_VERSION = 2
+private const val SAMPLE_VERSION = 3
 private val Context.preferencesDataStore by preferencesDataStore("preferences")
 
 // Driver-supplied credentials get their own store so the app's backup rules can exclude
@@ -26,6 +26,7 @@ class OfflineContentRepository(private val database: LastWagonDatabase) : Conten
             dao.insertItems(SampleContent.inspectionItems)
             dao.insertTestCategories(SampleContent.testCategories)
             dao.insertQuestions(SampleContent.questions)
+            dao.insertTruckStops(SampleContent.truckStops)
             dao.insertContentVersion(ContentVersionEntity(SAMPLE_VERSION, System.currentTimeMillis()))
         }
     }
@@ -45,6 +46,8 @@ class OfflineContentRepository(private val database: LastWagonDatabase) : Conten
         dao.getPracticeQuestions(categoryId.value).map { it.toPracticeQuestion() }
     override suspend fun getDailyQuestion() = dao.getDailyQuestion()?.toDailyQuestion()
     override suspend fun getDailyQuestions() = dao.getDailyQuestions().map { it.toDailyQuestion() }
+    override fun observeTruckStops() =
+        dao.observeTruckStops().map { values -> values.map { it.toModel() } }
 }
 
 /** UTC day index used for daily-question selection and streaks. */
@@ -236,3 +239,7 @@ private fun QuestionEntity.toDailyQuestion() = DailyQuestion(
     ContentId(id), prompt, answers(), ContentId(correctAnswerId), explanation, isSample)
 private fun ExamResultEntity.toModel() = ExamResult(
     id.toString(), categoryTitle, ExamScore(correct, total), completedAtEpochMillis)
+private fun TruckStopEntity.toModel() = TruckStop(
+    ContentId(id), name, state, highway, latitude, longitude, truckParkingSpaces,
+    hasDiesel, hasShowers, hasFood, hasRepair, isSample,
+    sourceCitation, parseVerificationStatus(verificationStatus), datasetVintage)

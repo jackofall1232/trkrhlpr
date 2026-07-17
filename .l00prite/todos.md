@@ -57,14 +57,21 @@ waits behind its gate:
       sources excluded). Search-excerpt evidence only: this environment 403-blocks all
       research hosts, so exact license/field claims carry UNVERIFIED flags with a V1–V5
       full-text verification worklist.
-  - [ ] **GATE — owner approval of the truck-stop sourcing plan** (§ 8 of
-    `docs/truck-stop-data-sources.md`) before any unit-11 implementation.
+  - [x] 2026-07-17: **GATE PASSED — owner approved the truck-stop sourcing plan**
+    (in-session choice "Track C feature now": build against labeled sample data, real
+    import stays behind verification).
   - [ ] Full-text verification V1–V2 (NTAD dataset license statement + field schema;
     Jason's Law third-survey refresh status) from a session/browser that can reach
     geodata.bts.gov and ops.fhwa.dot.gov; V3–V4 (Overture taxonomy/licensing, ODbL
-    attribution guidelines) before adopting either enrichment source.
-  11. Truck-stop dataset + search feature (blocked by the gate above; draft acceptance
-      criteria proposed in `docs/truck-stop-data-sources.md` § 8).
+    attribution guidelines) before adopting either enrichment source. **Blocks the real
+    dataset import (unit 11 phase 2).**
+  11. [x] 2026-07-17 (phase 1): truck-stop directory against labeled sample data — Room
+      v4→v5 `truck_stops` table (three-state amenities, provenance + vintage columns),
+      `TruckStopSearch` pure logic (8 tests), offline search/filter UI with
+      unknown-vs-absent display, home tile enabled. Local: 31 core/model tests green via
+      standalone kotlinc; Robolectric/Compose/lint verification on CI. Remaining:
+      commit CI-generated schema 5.json; device review; phase 2 = real NTAD import
+      (behind V1/V2).
 
 Gates that will pause the loop: content-doc approval (Track B start), full-text verification
 of the 13 flagged checklist items (needs network to eCFR/FMCSA), foundation approval before

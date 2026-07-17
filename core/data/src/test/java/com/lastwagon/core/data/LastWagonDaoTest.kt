@@ -10,11 +10,12 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/** Exercises the actual Room v3 stack (entities, DAO, queries) end-to-end via Robolectric. */
+/** Exercises the actual Room stack (entities, DAO, queries) end-to-end via Robolectric. */
 @RunWith(AndroidJUnit4::class)
 class LastWagonDaoTest {
     private lateinit var db: LastWagonDatabase
@@ -59,6 +60,26 @@ class LastWagonDaoTest {
         dao.insertDailyDayCompletion(DailyDayCompletionEntity(10, "q", true, 100))
         dao.resetProgress()
         assertEquals(emptySet<Long>(), dao.observeCompletedDailyDays().first().toSet())
+    }
+
+    @Test fun truckStopsRoundTripPreservingNullAmenitiesAndOrdering() = runTest {
+        dao.insertTruckStops(listOf(
+            TruckStopEntity("t2", "Zeta Plaza", "TX", "I-10 Exit 800", 29.8, -95.4,
+                110, true, true, true, true, true, "cite", "UNVERIFIED", "vintage"),
+            TruckStopEntity("t1", "Alpha Rest", "IA", "I-80 Mile 200", 41.6, -93.6,
+                null, null, null, null, null, true, "cite", "UNVERIFIED", "vintage"),
+        ))
+        val stops = dao.observeTruckStops().first()
+        // Ordered by state then name.
+        assertEquals(listOf("t1", "t2"), stops.map { it.id })
+        // NULL amenity/parking columns survive the round trip as unknown, not false/zero.
+        val unknown = stops.first()
+        assertNull(unknown.truckParkingSpaces)
+        assertNull(unknown.hasDiesel)
+        assertNull(unknown.hasShowers)
+        val known = stops.last()
+        assertEquals(110, known.truckParkingSpaces)
+        assertEquals(true, known.hasDiesel)
     }
 
     @Test fun examResultsPersistNewestFirstAndResetClearsThem() = runTest {

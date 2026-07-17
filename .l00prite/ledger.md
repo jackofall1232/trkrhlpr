@@ -1367,3 +1367,42 @@ Append one entry per agent run. Do not overwrite prior runs.
 - **Do-not-retry:** direct page fetches (curl/WebFetch) from THIS remote environment —
   every research host 403s at the proxy; use WebSearch or a different environment.
 - **Lock:** 550cf4c8-dfd2-46af-aef3-d11f2a602acb acquired and released.
+
+### Supervised action 2026-07-17T12:11Z — Claude — Track C unit 11 phase 1: truck-stop directory against labeled sample data (owner-approved)
+- **Gate passed:** the owner approved the truck-stop sourcing plan in-session (2026-07-17,
+  AskUserQuestion: "Track C feature now"), explicitly choosing the Track A pattern — build
+  the feature against clearly-labeled sample data, keep the real NTAD import behind the
+  V1/V2 license verification worklist. This entry records that approval as the Track C
+  research-gate decision.
+- **Built:** (1) `TruckStop` model + `TruckStopSearch` pure filter logic in core/model —
+  three-state amenity semantics (true/false/NULL=unknown), hidden-unknown counting so
+  amenity filters never silently bury unknown data; `ContentRepository.observeTruckStops()`.
+  (2) Room v4→v5 additive migration: `truck_stops` table (nullable amenity/parking columns,
+  provenance columns incl. `datasetVintage`), state index, DAO observe/insert, entity→model
+  mapping, SAMPLE_VERSION 2→3 reseed with 6 fictional labeled sample stops.
+  (3) `TruckStopsScreen` in feature/dashboard: offline search (name/highway/state), state +
+  amenity filter chips, unknown-vs-not-listed display per stop, sample/verification tags,
+  dataset-provenance panel, hidden-unknown StatePanel; home tile enabled ("Sample" badge);
+  route wired in LastWagonApp. (4) Tests: TruckStopSearchTest (8), TruckStopContentTest (5),
+  DAO round-trip w/ null amenities, MigrationTest extended v1→v5 with default+NULL checks.
+  (5) ci.yml build-reports artifact now also captures core/data/schemas so the CI-generated
+  5.json can be committed by a follow-up session (this host cannot run Gradle).
+- **Verification:** this host has no Android SDK and dl.google.com is proxy-blocked, so NO
+  local Gradle run. Local evidence: standalone kotlin-compiler-embeddable 2.2.10 + JUnit
+  4.13.2 from Maven Central — compiled Models.kt + all 6 core/model test files, ran
+  JUnitCore: **31 tests OK, exit 0** (2026-07-17T12:10Z; includes the 8 new search tests).
+  core/data (Robolectric Room), Compose compiles, and lint are pending on CI for the pushed
+  commit — treat CI as the real build verification. On-device UI review remains the standing
+  device gate. NOTE: exported schema 5.json is generated on CI, not committed here — commit
+  it from the CI artifact (or an SDK-capable session) to keep the schemas-in-VCS convention.
+- **Decisions:** no new Gradle module (constraints: module set is owner-approved) — screen
+  lives in feature/dashboard; real-dataset import stays gated on V1/V2; no availability or
+  open-now claims anywhere in the UI; SAMPLE_VERSION bump reseeds existing installs.
+- **Do-not-retry:** plain `kotlin-compiler` Maven jar crashes on value-class codegen when
+  invoked standalone (unsafe-coerce + missing org.jetbrains:annotations); use
+  kotlin-compiler-embeddable WITH kotlin-stdlib, kotlinx-coroutines-core-jvm, AND
+  org.jetbrains:annotations on the java classpath, plus -kotlin-home dir containing
+  lib/kotlin-stdlib.jar.
+- **Next action:** watch CI on claude/continue-track-c-bkd3q7; if green, owner device-review
+  of the directory screen + commit 5.json; then V1/V2 verification unlocks the real import.
+- **Lock:** 1db3979e-6329-406a-9d6c-b04065ef141d acquired and released.

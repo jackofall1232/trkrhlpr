@@ -8,6 +8,7 @@ class FakeContentRepository(
     categories: List<InspectionCategory> = emptyList(),
     items: List<InspectionItem> = emptyList(),
     tests: List<TestCategory> = emptyList(),
+    stops: List<TruckStop> = emptyList(),
     var practiceQuestion: PracticeQuestion? = null,
     var dailyQuestion: DailyQuestion? = null,
     var dailyQuestions: List<DailyQuestion> = listOfNotNull(dailyQuestion),
@@ -15,6 +16,7 @@ class FakeContentRepository(
     val inspectionCategories = MutableStateFlow(categories)
     val inspectionItems = MutableStateFlow(items)
     val testCategories = MutableStateFlow(tests)
+    val truckStops = MutableStateFlow(stops)
     override suspend fun ensureSampleContent() = Unit
     override fun observeInspectionCategories() = inspectionCategories
     override fun observeInspectionItems() = inspectionItems
@@ -24,6 +26,7 @@ class FakeContentRepository(
         practiceQuestion?.let { listOf(it) } ?: emptyList()
     override suspend fun getDailyQuestion() = dailyQuestion
     override suspend fun getDailyQuestions() = dailyQuestions
+    override fun observeTruckStops() = truckStops
 }
 
 class FakeProgressRepository(

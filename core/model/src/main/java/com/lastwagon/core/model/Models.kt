@@ -119,6 +119,86 @@ object DailySafety {
         return streak
     }
 }
+/** One truck-stop / rest-area directory record (Track C). Amenity fields are three-state:
+ *  true/false when the source actually recorded the fact, null when unknown. Unknown is never
+ *  displayed or filtered as absent — missing data is unknown, not proof of absence. */
+data class TruckStop(
+    val id: ContentId,
+    val name: String,
+    val state: String,
+    val highway: String,
+    val latitude: Double,
+    val longitude: Double,
+    val truckParkingSpaces: Int? = null,
+    val hasDiesel: Boolean? = null,
+    val hasShowers: Boolean? = null,
+    val hasFood: Boolean? = null,
+    val hasRepair: Boolean? = null,
+    val isSample: Boolean = true,
+    val sourceCitation: String = "",
+    val verificationStatus: VerificationStatus = VerificationStatus.UNVERIFIED,
+    /** Human-readable provenance of the imported dataset (e.g. compilation date), shown in
+     *  the directory so drivers can judge how stale a record may be. */
+    val datasetVintage: String = "",
+)
+
+enum class TruckStopAmenity { DIESEL, SHOWERS, FOOD, REPAIR }
+
+data class TruckStopFilter(
+    val query: String = "",
+    /** Two-letter state filter; null means all states. */
+    val state: String? = null,
+    /** Amenities the driver requires. Only stops with the amenity recorded true match. */
+    val requiredAmenities: Set<TruckStopAmenity> = emptySet(),
+)
+
+data class TruckStopSearchResult(
+    val matches: List<TruckStop>,
+    /** Stops that matched the query/state but were hidden ONLY because at least one required
+     *  amenity is unknown (null, never false). Surfaced in the UI so amenity filters never
+     *  silently bury records whose data is merely missing. */
+    val hiddenUnknownCount: Int,
+)
+
+/** Pure offline search/filter logic for the truck-stop directory. */
+object TruckStopSearch {
+    fun amenityValue(stop: TruckStop, amenity: TruckStopAmenity): Boolean? = when (amenity) {
+        TruckStopAmenity.DIESEL -> stop.hasDiesel
+        TruckStopAmenity.SHOWERS -> stop.hasShowers
+        TruckStopAmenity.FOOD -> stop.hasFood
+        TruckStopAmenity.REPAIR -> stop.hasRepair
+    }
+
+    /**
+     * A stop matches when it satisfies the text query (name, highway, or state,
+     * case-insensitive), the state filter, and has every required amenity recorded true.
+     * A stop whose required amenities are only *unknown* (none false) is excluded from
+     * matches but counted in [TruckStopSearchResult.hiddenUnknownCount]; a stop with a
+     * required amenity recorded false is an ordinary non-match. Results are ordered by
+     * state then name for stable, scannable display.
+     */
+    fun search(stops: List<TruckStop>, filter: TruckStopFilter): TruckStopSearchResult {
+        val query = filter.query.trim()
+        val base = stops.filter { stop ->
+            (filter.state == null || stop.state.equals(filter.state, ignoreCase = true)) &&
+                (query.isEmpty() || listOf(stop.name, stop.highway, stop.state)
+                    .any { it.contains(query, ignoreCase = true) })
+        }
+        val matches = mutableListOf<TruckStop>()
+        var hiddenUnknown = 0
+        for (stop in base) {
+            val required = filter.requiredAmenities.map { amenityValue(stop, it) }
+            when {
+                required.all { it == true } -> matches += stop
+                required.none { it == false } -> hiddenUnknown++
+            }
+        }
+        return TruckStopSearchResult(
+            matches.sortedWith(compareBy({ it.state }, { it.name })), hiddenUnknown,
+        )
+    }
+}
+
 enum class ThemePreference { DARK, LIGHT, SYSTEM }
 data class UserPreferences(
     val theme: ThemePreference = ThemePreference.DARK,
@@ -200,6 +280,8 @@ interface ContentRepository {
     suspend fun getDailyQuestion(): DailyQuestion?
     /** The full pool of daily questions, for deterministic one-per-day selection. */
     suspend fun getDailyQuestions(): List<DailyQuestion>
+    /** Truck-stop directory records, ordered by state then name. */
+    fun observeTruckStops(): Flow<List<TruckStop>>
 }
 interface ProgressRepository {
     fun observeInspectionProgress(): Flow<InspectionProgress>

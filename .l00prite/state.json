@@ -1,20 +1,20 @@
 {
   "schema_version": 2,
   "project_name": "trkrhlpr (product: Last Wagon)",
-  "current_goal": "Track C opened: truck-stop data-source research documented (docs/truck-stop-data-sources.md); awaiting owner approval of the sourcing plan (Track C gate) and full-text verification V1-V5; Track B still behind foundation approval + flagged-item verification",
-  "current_phase": "truck_stop_source_research_complete",
+  "current_goal": "Track C unit 11 phase 1 built (truck-stop directory vs labeled sample data, Room v5, offline search UI); verify via CI, then owner device review; real NTAD import stays behind V1/V2 license verification",
+  "current_phase": "truck_stop_directory_sample_phase_built",
   "active_agent": null,
   "last_agent": "claude",
-  "last_updated": "2026-07-17T11:26:00Z",
-  "status": "track_a_complete_track_c_research_ready_for_owner_review",
+  "last_updated": "2026-07-17T12:13:00Z",
+  "status": "track_c_phase1_pushed_awaiting_ci",
   "blocked": false,
   "blocker_reason": null,
   "active_event_id": null,
   "last_event_processed": "event-20260714-022005-github-pr2-foundation-review-a5f2",
   "pending_event_count": 0,
   "review_response_required": false,
-  "ci_status": "success (85fb789 on claude/byo-ors-key-override, runs 29553557584+29553559115: assembleDebug + check green). PR #19 green with review round addressed. PR #18 merged earlier (ae80a0e). This session: docs-only change, no CI needed.",
+  "ci_status": "pending on claude/continue-track-c-bkd3q7 (Track C phase 1 commit). Local evidence: 31 core/model tests green via standalone kotlinc (this host cannot run Gradle). Prior green: 85fb789 (PR #19 branch).",
   "execution_active": false,
   "execution_stop_reason": "human_review_gate",
-  "next_recommended_action": "2026-07-17: owner reviews docs/truck-stop-data-sources.md and approves or redirects the section-8 sourcing plan (federal NTAD seed -> optional OSM/Overture enrichment; TPIMS deferred). Full-text verification V1-V5 needs a network-open session (this environment 403s all research hosts). Standing gates unchanged: 0.1.0-beta release publication (owner), PR #19 merge decision, Track B foundation approval, ORS_API_KEY + api.heigit.org path check."
+  "next_recommended_action": "Watch CI on claude/continue-track-c-bkd3q7. If green: commit the CI-generated Room schema 5.json (build-reports artifact) and owner device-reviews the truck-stops screen. Track C real-data import waits on V1/V2 (NTAD license + field schema, Jason's Law refresh status). Standing gates unchanged: 0.1.0-beta release publication, PR #19 merge decision, Track B foundation approval."
 }

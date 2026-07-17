@@ -64,5 +64,6 @@ jobs:
           path: |
             **/build/reports/**
             **/build/test-results/**
+            core/data/schemas/**
           if-no-files-found: ignore
           retention-days: 7

@@ -71,6 +71,20 @@ data class ExamResultEntity(
     val correct: Int, val total: Int, val completedAtEpochMillis: Long,
 )
 
+/** Truck-stop directory record (schema v5, Track C). Amenity columns are three-state
+ *  nullable booleans: NULL means the source did not record the fact — unknown, never
+ *  treated as absent. */
+@Entity(tableName = "truck_stops", indices = [Index("state")])
+data class TruckStopEntity(
+    @PrimaryKey val id: String, val name: String, val state: String, val highway: String,
+    val latitude: Double, val longitude: Double,
+    val truckParkingSpaces: Int?, val hasDiesel: Boolean?, val hasShowers: Boolean?,
+    val hasFood: Boolean?, val hasRepair: Boolean?, val isSample: Boolean,
+    @ColumnInfo(defaultValue = "") val sourceCitation: String = "",
+    @ColumnInfo(defaultValue = "UNVERIFIED") val verificationStatus: String = "UNVERIFIED",
+    @ColumnInfo(defaultValue = "") val datasetVintage: String = "",
+)
+
 data class TestAttemptStats(val total: Int, val correct: Int)
 
 @Dao
@@ -105,6 +119,8 @@ interface LastWagonDao {
     fun observeCompletedDailyDays(): Flow<List<Long>>
     @Query("SELECT * FROM exam_results ORDER BY completedAtEpochMillis DESC, id DESC")
     fun observeExamResults(): Flow<List<ExamResultEntity>>
+    @Query("SELECT * FROM truck_stops ORDER BY state, name")
+    fun observeTruckStops(): Flow<List<TruckStopEntity>>
     @Query("SELECT COUNT(*) FROM content_versions WHERE version = :version")
     suspend fun contentVersionCount(version: Int): Int
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -115,6 +131,8 @@ interface LastWagonDao {
     suspend fun insertTestCategories(values: List<TestCategoryEntity>)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertQuestions(values: List<QuestionEntity>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertTruckStops(values: List<TruckStopEntity>)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertContentVersion(value: ContentVersionEntity)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -180,12 +198,34 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
     }
 }
 
+/** Schema v4 -> v5: adds the truck_stops directory table (Track C). Additive and
+ *  non-destructive. Amenity columns are intentionally nullable (NULL = unknown); the
+ *  NOT NULL DEFAULT columns mirror the entity's @ColumnInfo defaults so Room's
+ *  post-migration schema validation passes. */
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `truck_stops` (" +
+                "`id` TEXT NOT NULL, `name` TEXT NOT NULL, `state` TEXT NOT NULL, " +
+                "`highway` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, " +
+                "`truckParkingSpaces` INTEGER, `hasDiesel` INTEGER, `hasShowers` INTEGER, " +
+                "`hasFood` INTEGER, `hasRepair` INTEGER, `isSample` INTEGER NOT NULL, " +
+                "`sourceCitation` TEXT NOT NULL DEFAULT '', " +
+                "`verificationStatus` TEXT NOT NULL DEFAULT 'UNVERIFIED', " +
+                "`datasetVintage` TEXT NOT NULL DEFAULT '', " +
+                "PRIMARY KEY(`id`))",
+        )
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_truck_stops_state` ON `truck_stops` (`state`)")
+    }
+}
+
 @Database(
     entities = [ContentVersionEntity::class, InspectionCategoryEntity::class,
         InspectionItemEntity::class, InspectionCompletionEntity::class,
         TestCategoryEntity::class, QuestionEntity::class, TestAttemptEntity::class,
-        DailyCompletionEntity::class, DailyDayCompletionEntity::class, ExamResultEntity::class],
-    version = 4,
+        DailyCompletionEntity::class, DailyDayCompletionEntity::class, ExamResultEntity::class,
+        TruckStopEntity::class],
+    version = 5,
     exportSchema = true,
 )
 abstract class LastWagonDatabase : RoomDatabase() {
@@ -193,7 +233,7 @@ abstract class LastWagonDatabase : RoomDatabase() {
     companion object {
         fun create(context: Context) =
             Room.databaseBuilder(context, LastWagonDatabase::class.java, "lastwagon.db")
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                 .build()
     }
 }
