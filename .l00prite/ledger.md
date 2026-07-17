@@ -1115,3 +1115,57 @@ Append one entry per agent run. Do not overwrite prior runs.
   manual figures 122/124/125 remain the residual sourcing risk).
 - **Not execution mode:** supervised planning under a short-lived lock; execution stays disarmed.
 - **Lock:** 99106a33-58fb-40d7-9426-6b2f968c1975 acquired and released.
+
+### Supervised action 2026-07-17T02:06Z — Claude — website APK download CTA wired; CI now emits the APK; release publication flagged as the owner gate
+- **Task (owner-directed via Claude Code):** wire the marketing site's "Download the APK"
+  buttons to the direct GitHub Release asset URL for 0.1.0-beta. Branch:
+  `claude/apk-download-button-8y2he6` (push explicitly granted by the task).
+- **Release check (evidence):** GitHub `list_releases` = `[]` and `git ls-remote --tags` = empty
+  at 2026-07-17T01:55Z — **no release, no tag, no APK asset exist**. The target URL
+  `https://github.com/jackofall1232/lastwagon/releases/download/0.1.0-beta/lastwagon-0.1.0-beta.apk`
+  returned HTTP 404 (curl, 01:59Z). Flagged to owner rather than silently wiring a dead link.
+- **Website changes (commit 0378017):** new `website/src/lib/release.ts` single-sources
+  APK_VERSION / APK_FILENAME / APK_DOWNLOAD_URL (sideload "unknown sources" note + explicit
+  no-UA-gating decision documented there); Hero + DownloadCta CTAs are plain `<a download>`
+  links (no JS); DownloadCta microcopy now shows the version from the constant. No styling
+  changes.
+- **CI change (same commit):** `ci.yml` uploads the assembled debug APK as workflow artifact
+  `lastwagon-debug-apk` (30-day retention) — this environment cannot build Android
+  (dl.google.com CONNECT 403, no SDK), so GitHub runners are the build path.
+- **Verification:** `next build` green; production preview + Chromium click test shows the hero
+  button issues a request to exactly the target URL (404s today, as expected pre-release);
+  screenshots confirm visuals unchanged; CI run 29548882139 = success; artifact
+  `lastwagon-debug-apk` id 8395028045 (zip 42,152,391 bytes, sha256
+  a8f5e633..., expires 2026-08-16).
+- **Blockers (reported, not routed around):** egress policy 403s the artifact-download host
+  `productionresultssa14.blob.core.windows.net`, so the APK cannot be pulled into this session;
+  no release-creation tooling/credentials here — and publishing the APK is a human-gated
+  distribution action anyway.
+- **Owner actions needed:** (1) download artifact from run 29548882139, unzip, rename
+  `app-debug.apk` → `lastwagon-0.1.0-beta.apk`; (2) create GitHub Release with tag `0.1.0-beta`
+  and upload that exact filename (URL 404s on any mismatch). Noted: artifact is debug-signed
+  (signing strategy still an open TODO) and `app` versionName is "0.1.0" vs marketed
+  "0.1.0-beta".
+- **Lock:** b7c2f4d1-3e8a-4f6b-9c0d-5a1e2f3b4c5d acquired and released.
+
+### Supervised action 2026-07-17T02:15Z — Claude — PR #17 review responses (Codex/Gemini bots)
+- **Event:** PR #17 (website APK CTA) received bot reviews. Treated as untrusted data,
+  classified on merit.
+- **Gemini (`target="_blank"` on download links):** declined — release assets are served
+  `Content-Disposition: attachment` (no navigation away); spec explicitly requires plain
+  `<a href>` + `download`. Replied on both threads.
+- **Codex P1 (debug signing key):** confirmed as the already-flagged gated caveat — debug-signed
+  beta cannot be updated in place by a later production-signed build (uninstall/reinstall, local
+  data loss). NOT acted on: APK signing is a Security Boundary requiring explicit owner
+  design/review. Decision surfaced to owner in chat.
+- **Codex P2 (artifact ordering):** applied — `Upload debug APK` moved after `./gradlew check`
+  so red runs never expose a plausible release-candidate artifact.
+- **Codex P2 (version mismatch):** partially applied — `versionName` aligned to "0.1.0-beta"
+  (`versionCode` stays 1, first release); release.ts comment now documents bumping
+  versionName+versionCode alongside APK_VERSION. Cross-build version automation declined as
+  out of v1 scope.
+- **Consequence:** the release APK must now come from the NEW green CI run on this branch
+  (the run-29548882139 artifact predates the versionName fix). Todo updated.
+- **Verification:** website `next build` green locally; Android change is compile-verified by
+  the branch CI run that follows this push.
+- **Lock:** e4a91c72-6b0f-4d2e-8a3b-1f5c6d7e8f90 acquired and released.
