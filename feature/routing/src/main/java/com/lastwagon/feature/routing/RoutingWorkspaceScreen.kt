@@ -496,7 +496,9 @@ private fun RoutePlanner(
                 originFromGps = true
                 originSearch.clear()
                 // Reverse geocoding is confirmation display only — routing keeps the exact
-                // device coordinates even when a nearby address label is shown.
+                // device coordinates even when a nearby address label is shown. Offline,
+                // the coordinate label stands on its own; no doomed lookup is attempted.
+                if (!online) return@launch
                 when (val reversed = geocodingProvider.reverse(located)) {
                     is GeocodeLookupResult.Success -> reversed.suggestions.firstOrNull()?.let { nearest ->
                         val label = "Near ${nearest.label}"
@@ -554,7 +556,9 @@ private fun RoutePlanner(
                 },
                 searchState = originSearchState,
                 onTextChange = { value ->
+                    // Manual input supersedes any pending GPS lookup and its status text.
                     locationJob?.cancel()
+                    locationMessage = null
                     originText = value
                     if (origin?.label != value) {
                         origin = null
@@ -566,6 +570,7 @@ private fun RoutePlanner(
                 },
                 onSuggestionSelected = { suggestion ->
                     locationJob?.cancel()
+                    locationMessage = null
                     origin = AddressSelection(suggestion.label, suggestion.point)
                     originFromGps = false
                     originText = suggestion.label
@@ -640,7 +645,10 @@ private fun RoutePlanner(
             val originPoint = origin?.point
             val destinationPoint = destination?.point
             Button(
-                enabled = !calculating && online && originPoint != null && destinationPoint != null,
+                // Also disabled while a GPS fix is pending so a route can never be
+                // calculated from a stale origin the driver has asked to replace.
+                enabled = !calculating && !locating && online &&
+                    originPoint != null && destinationPoint != null,
                 onClick = {
                     if (originPoint != null && destinationPoint != null) {
                         calculating = true

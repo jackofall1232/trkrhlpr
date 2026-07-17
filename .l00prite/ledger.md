@@ -1265,3 +1265,13 @@ Append one entry per agent run. Do not overwrite prior runs.
   caveats already on record.
 - **Verification:** CI on the pushed commit (branch run + PR run). Both prior runs on
   8ac5c84 were green.
+
+### Supervised action 2026-07-17T03:35Z — Claude — PR #18 Codex round 2 (3 P2s) applied; CI green on round 1
+- **CI:** run 29552048126 (76c2463, round-1 review fixes) SUCCESS.
+- **Applied (all judged valid):** (1) Calculate disabled while a GPS fix is pending —
+  prevents routing from a stale origin the driver asked to replace; (2) GPS reverse
+  geocoding skipped when offline — coordinate label stands alone, no doomed request;
+  (3) manual origin input/selection clears stale GPS status text along with the pending job.
+- **Owner discussion opened (in chat):** key-distribution architecture (BYO key in-app vs
+  baked env key vs self-hosted/proxy endpoint) following Codex P1 — no repo change until
+  the owner decides; current CI secret wiring stands in the meantime.
