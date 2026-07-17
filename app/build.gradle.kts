@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
@@ -9,7 +11,7 @@ plugins {
 val orsKeyFromLocalProperties = rootProject.file("local.properties")
     .takeIf { it.exists() }
     ?.inputStream()
-    ?.use { stream -> java.util.Properties().apply { load(stream) } }
+    ?.use { stream -> Properties().apply { load(stream) } }
     ?.getProperty("ORS_API_KEY")
     .orEmpty()
 val orsApiKey = providers.gradleProperty("ORS_API_KEY")
