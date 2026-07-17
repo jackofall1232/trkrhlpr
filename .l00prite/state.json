@@ -5,16 +5,16 @@
   "current_phase": "content_source_research_complete",
   "active_agent": null,
   "last_agent": "claude",
-  "last_updated": "2026-07-17T00:33:47Z",
-  "status": "track_a_complete_ci_green_track_b_plan_set_up",
+  "last_updated": "2026-07-17T02:06:30Z",
+  "status": "track_a_complete_website_apk_cta_wired_release_publication_pending",
   "blocked": false,
   "blocker_reason": null,
   "active_event_id": null,
   "last_event_processed": "event-20260714-022005-github-pr2-foundation-review-a5f2",
   "pending_event_count": 0,
   "review_response_required": false,
-  "ci_status": "success (c79d82d, run 29543346913: assembleDebug + check both green)",
+  "ci_status": "success (0378017 on claude/apk-download-button-8y2he6, run 29548882139: assembleDebug + check green; APK artifact lastwagon-debug-apk uploaded)",
   "execution_active": false,
   "execution_stop_reason": "human_review_gate",
-  "next_recommended_action": "Track A complete + CI green. Track B content-authoring plan set up (docs/track-b-content-plan.md). Immediate gate = FOUNDATION APPROVAL (B0) to start Track B. Owner decisions requested: (1) approve B0; (2) confirm JSON-asset content pipeline; (3) checklist-only first vs checklist+CDL; (4) drop-unconfirmable-air-figures policy. eCFR/GovInfo reachable here so the B1 verification pass can run in this env; fmcsa.dot.gov 403 (AAMVA manual figures 122/124/125 residual risk)."
+  "next_recommended_action": "Website APK CTA wired on claude/apk-download-button-8y2he6 (2026-07-17 ledger entry). OWNER GATE: publish GitHub Release tag 0.1.0-beta with asset named exactly lastwagon-0.1.0-beta.apk (CI artifact from run 29548882139; debug-signed, versionName mismatch 0.1.0 vs 0.1.0-beta noted) — link 404s until then. Standing Track B gate unchanged: FOUNDATION APPROVAL (B0) + owner decisions (JSON pipeline, checklist-only vs +CDL, air-figures policy); eCFR/GovInfo reachable here, fmcsa.dot.gov 403."
 }

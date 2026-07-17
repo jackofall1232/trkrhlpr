@@ -1115,3 +1115,35 @@ Append one entry per agent run. Do not overwrite prior runs.
   manual figures 122/124/125 remain the residual sourcing risk).
 - **Not execution mode:** supervised planning under a short-lived lock; execution stays disarmed.
 - **Lock:** 99106a33-58fb-40d7-9426-6b2f968c1975 acquired and released.
+
+### Supervised action 2026-07-17T02:06Z — Claude — website APK download CTA wired; CI now emits the APK; release publication flagged as the owner gate
+- **Task (owner-directed via Claude Code):** wire the marketing site's "Download the APK"
+  buttons to the direct GitHub Release asset URL for 0.1.0-beta. Branch:
+  `claude/apk-download-button-8y2he6` (push explicitly granted by the task).
+- **Release check (evidence):** GitHub `list_releases` = `[]` and `git ls-remote --tags` = empty
+  at 2026-07-17T01:55Z — **no release, no tag, no APK asset exist**. The target URL
+  `https://github.com/jackofall1232/lastwagon/releases/download/0.1.0-beta/lastwagon-0.1.0-beta.apk`
+  returned HTTP 404 (curl, 01:59Z). Flagged to owner rather than silently wiring a dead link.
+- **Website changes (commit 0378017):** new `website/src/lib/release.ts` single-sources
+  APK_VERSION / APK_FILENAME / APK_DOWNLOAD_URL (sideload "unknown sources" note + explicit
+  no-UA-gating decision documented there); Hero + DownloadCta CTAs are plain `<a download>`
+  links (no JS); DownloadCta microcopy now shows the version from the constant. No styling
+  changes.
+- **CI change (same commit):** `ci.yml` uploads the assembled debug APK as workflow artifact
+  `lastwagon-debug-apk` (30-day retention) — this environment cannot build Android
+  (dl.google.com CONNECT 403, no SDK), so GitHub runners are the build path.
+- **Verification:** `next build` green; production preview + Chromium click test shows the hero
+  button issues a request to exactly the target URL (404s today, as expected pre-release);
+  screenshots confirm visuals unchanged; CI run 29548882139 = success; artifact
+  `lastwagon-debug-apk` id 8395028045 (zip 42,152,391 bytes, sha256
+  a8f5e633..., expires 2026-08-16).
+- **Blockers (reported, not routed around):** egress policy 403s the artifact-download host
+  `productionresultssa14.blob.core.windows.net`, so the APK cannot be pulled into this session;
+  no release-creation tooling/credentials here — and publishing the APK is a human-gated
+  distribution action anyway.
+- **Owner actions needed:** (1) download artifact from run 29548882139, unzip, rename
+  `app-debug.apk` → `lastwagon-0.1.0-beta.apk`; (2) create GitHub Release with tag `0.1.0-beta`
+  and upload that exact filename (URL 404s on any mismatch). Noted: artifact is debug-signed
+  (signing strategy still an open TODO) and `app` versionName is "0.1.0" vs marketed
+  "0.1.0-beta".
+- **Lock:** b7c2f4d1-3e8a-4f6b-9c0d-5a1e2f3b4c5d acquired and released.
